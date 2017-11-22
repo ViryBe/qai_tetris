@@ -1,7 +1,9 @@
 TARGET = tetris_player
 SRC_DIR = src
 BUILD_DIR = _build
+DOC_DIR = doc
 OCAMLC = ocamlopt -g -I $(BUILD_DIR)
+DOCGEN = ocamldoc -html -d $(DOC_DIR)
 MODULES = qlearn tetris
 SOURCES = $(SRC_DIR)/$(MODULES:=.ml)
 OBJS = $(BUILD_DIR)/$(MODULES:=.cmo)
