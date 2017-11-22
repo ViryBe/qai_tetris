@@ -1,10 +1,10 @@
 TARGET = tetris_player
 SRC_DIR = src
 BUILD_DIR = _build
+OCAMLC = ocamlopt -g -I $(BUILD_DIR)
 MODULES = qlearn tetris
 SOURCES = $(SRC_DIR)/$(MODULES:=.ml)
-OBJS = $(SOURCES:.ml=.cmo)
-OCAMLC = ocamlopt -g -I $(BUILD_DIR)
+OBJS = $(BUILD_DIR)/$(MODULES:=.cmo)
 DEP = ocamldep
 
 all: .depend byte
