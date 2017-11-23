@@ -10,6 +10,8 @@
 
 # ocamlbuild working directory
 _build/
+# name of the executable file
+tetris_player
 
 # ocamlbuild targets
 *.byte
