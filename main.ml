@@ -18,6 +18,7 @@ let float_check var_ref cl_param =
     raise (Arg.Bad ("float not in [0, 1]"))
   else var_ref := cl_param 
 
+(** Checks existence of file *)
 let check_qpath given_qpath =
   if Sys.file_exists "qpath" then
     qpath := given_qpath
