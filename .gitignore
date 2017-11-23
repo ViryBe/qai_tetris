@@ -27,3 +27,6 @@ setup.log
 *.aux
 *.log
 *.synctex.gz
+
+# doc
+doc/
