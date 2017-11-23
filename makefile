@@ -1,12 +1,10 @@
 TARGET = tetris_player
-SRC_DIR = src
-BUILD_DIR = _build
 DOC_DIR = doc
-OCAMLC = ocamlopt -g -I $(BUILD_DIR)
+OCAMLC = ocamlopt -g
 DOCGEN = ocamldoc -html -d $(DOC_DIR)
-MODULES = qlearn tetris
-SOURCES = $(SRC_DIR)/$(MODULES:=.ml)
-OBJS = $(BUILD_DIR)/$(MODULES:=.cmo)
+MODULES = agent game aio main
+SOURCES = $(MODULES:=.ml)
+OBJS = $(MODULES:=.cmo)
 DEP = ocamldep
 
 all: .depend byte
@@ -14,7 +12,7 @@ all: .depend byte
 byte: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(OCAMLC) -o $(BUILD_DIR)/$@ $^
+	$(OCAMLC) $^ -o $@
 
 %.cmi: %.mli
 	$(OCAMLC) $<
@@ -25,7 +23,7 @@ $(TARGET): $(OBJS)
 .PHONY: clean
 
 clean:
-	rm -f SRC_DIR/*.cm[io] *~
+	rm -f *.cm[io] *~
 
 .depend: $(SOURCES)
 	$(DEP) *.mli *.ml > .depend
