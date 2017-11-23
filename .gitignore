@@ -30,3 +30,6 @@ setup.log
 
 # doc
 doc/
+
+# vim specific files
+*.swp
