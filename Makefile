@@ -1,7 +1,7 @@
 TARGET = tetris_player
 DOC_DIR = doc
 OCAMLC = ocamlopt -g
-DOCGEN = ocamldoc -html -d $(DOC_DIR)
+DOCGEN = ocamldoc -html -latex -man -texi -d $(DOC_DIR)
 MODULES = agent game aio
 SOURCES = $(MODULES:=.ml)
 INTERFACES = $(MODULES:=.mli)
@@ -22,8 +22,8 @@ $(TARGET): $(CINT) $(OBJS) main.ml
 %.cmx: %.ml
 	$(OCAMLC) -c $<
 
-doc: $(SOURCES) $(INTERFACES)
-	$(DOCGEN) $<
+doc: $(SOURCES) $(INTERFACES) $(CINT)
+	$(DOCGEN) $(SOURCES) $(INTERFACES)
 
 .PHONY: clean
 
