@@ -1,11 +1,8 @@
 (** Manages all inputs and outputs needed for the program, the learning
- * part and the tetris part *)
+    part and the tetris part *)
 
-(** Saves any float matrix to disk*)
-val save_mat : string -> 'a array array -> bool
-(** @param 1 matrix to save
- *  @return boolean indicating whether matrix has been saved successfully *)
+(** Saves any matrix to disk*)
+val save_mat : float array array -> string -> unit
 
-(** Loads a marshalled matrix *)
-val load_mat : string -> 'a array array
-(** @param string path to file containing data *)
+(** Loads a marshalled matrix from file fpath*)
+val load_mat : string -> float array array
