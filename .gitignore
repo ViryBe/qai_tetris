@@ -15,6 +15,9 @@ _build/
 *.byte
 *.native
 
+# ocamldep files
+.depend
+
 # oasis generated files
 setup.data
 setup.log
