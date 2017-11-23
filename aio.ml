@@ -8,7 +8,8 @@ let save_mat mat dest =
   Marshal.to_channel outfile mat []
 
 (** The danger here is that from_channel reads anything from the file, that is
-    why we need the : float array array stuff, to force output type.
+    why we need the : float array array stuff, to force output type. {e Trying
+    to read something else apparently ends in a segfault}.
     @param src path of file from which the matrix will be loaded
     @return matrix which were serialised in file *)
 let load_mat src =
