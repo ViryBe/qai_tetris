@@ -4,7 +4,7 @@ OCAMLC = ocamlopt -g
 DOCGEN = ocamldoc -html -d $(DOC_DIR)
 MODULES = agent game aio main
 SOURCES = $(MODULES:=.ml)
-OBJS = $(MODULES:=.cmo)
+OBJS = $(MODULES:=.cmx)
 DEP = ocamldep
 
 all: .depend byte
@@ -23,7 +23,7 @@ $(TARGET): $(OBJS)
 .PHONY: clean
 
 clean:
-	rm -f *.cm[io] *~
+	rm -f *.cm[xio] *.o *~
 
 .depend: $(SOURCES)
 	$(DEP) *.mli *.ml > .depend
