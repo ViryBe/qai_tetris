@@ -20,6 +20,9 @@ $(TARGET): $(OBJS)
 %.cmo: %.ml
 	$(OCAMLC) -c $<
 
+doc: $(SOURCES)
+	$(DOCGEN) $<
+
 .PHONY: clean
 
 clean:
