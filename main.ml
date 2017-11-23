@@ -18,10 +18,15 @@ let float_check var_ref cl_param =
     raise (Arg.Bad ("float not in [0, 1]"))
   else var_ref := cl_param 
 
+let check_qpath given_qpath =
+  if Sys.file_exists "qpath" then
+    qpath := given_qpath
+  else raise (Arg.Bad ("File " ^ given_qpath ^ " does not exist"))
+
 (** Speclist for argument parsing *)
 let speclist = [
   ("-d", Arg.Set demo, ": set demo mode");
-  ("-q", Arg.Set_string qpath, ": set path of Q matrix file");
+  ("-q", Arg.String check_qpath, ": set path of Q matrix file");
   ("-n", Arg.Set_int ngames, ": set number of games played");
   ("-e", Arg.Float (float_check epsilon),
    ": set frequency of random action, in [0, 1]");
