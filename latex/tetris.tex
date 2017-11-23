@@ -1,0 +1,138 @@
+\documentclass{article}
+\usepackage{listings}       % code
+\usepackage{fourier}        % danger
+\usepackage{graphicx}
+
+\title{Super projet de la mort qui tue}
+\author{...}
+
+\begin{document}
+\maketitle
+\lstset{language=Caml}
+
+\section{Tetris}
+
+\subsection{Types}
+\begin{lstlisting}[frame=L]
+(* Type plateau (simple alias)  *)
+type plateau = int array array
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Type piece (simple alias)  *)
+type piece = int array array
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Type mouvement (rotation + translation )*)
+type mouvement =
+  | Nord
+  | Sud
+  | Est
+  | Ouset
+  | Placement of int (* sur quelle ligne on place la piece *)
+\end{lstlisting}
+
+\subsection{Fonctions}
+
+
+\begin{lstlisting}[frame=L]
+(* Fonction qui place une nouvelle piece sur le plateau
+ * et renvoie le plateau resultant *)
+val next_step : plateau -> piece -> mouvement -> plateau
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Donne une piece random *)
+val random_piece : () -> piece
+\end{lstlisting}
+
+\subsubsection{Suggestions d'implementation}
+
+Details d'impelementations.
+
+\section{Joueur, AI}
+
+Grand debat sur la matrice Q, les états...
+
+\subsection{Types}
+
+\subsection{Fonctions}
+
+\danger{} le type de \( Q \) est flottant a cause de \( \epsilon \), \( \alpha \) et \( \gamma \).
+
+\noindent
+\danger{} les parametres des fonctions sont a changer en fonction de notre
+choix de representation des etats.
+
+\begin{lstlisting}[frame=L]
+(* fonction qui calcul le learning rate a l'etape k
+ * Parametres k : int
+ *)
+val alpha : int -> float
+\end{lstlisting}
+
+
+\begin{lstlisting}[frame=L]
+(* fonction qui determine le prochain coup a jouer
+ * Parametres :
+ * 1 : matrice Q
+ * 2 : epsilon (combien de coup aléatoire)
+ * 3 : plateau en cours
+ * 4 : piece a placer
+ * 5 : liste des actions possibles
+ * Retour :
+ * le prochain coup a jouer
+ *)
+
+val play : float array array -> float -> plateau -> piece ->
+	mouvement array -> mouvement
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* fonction d'entrainement du modele
+ * Paramètres :
+ * 1 : matrice Q
+ * 2 : epsilon (combien de coup aléatoire)
+ * 3 : gamma ('memoire' du modele)
+ * 4 : alpha (learining rate)
+ * 5 : n nombres de jeux d'entrainement
+ * Retour :
+ * matrice Q apres entrainement
+ *)
+
+val training : float array array -> float -> float ->
+	(fun int -> float) -> int -> float array array
+\end{lstlisting}
+
+\subsection{Suggestions d'implementation}
+
+\begin{lstlisting}[frame=L]
+(* fonction qui renvoie le reward a partir d'un plateau *)
+val evaluator : plateau -> float
+\end{lstlisting}
+
+\begin{lstlisting}
+(* calcul du prochain etat a y reflechir *)
+\end{lstlisting}
+
+\section{Main}
+
+Principalement initialisation du jeu (plateau) et des constantes (pieces et
+mouvement qui sont predefini).
+
+
+\subsection{Options:}
+\begin{itemize}
+	\item n : nombre de coup a jouer
+	\item epsilon : proba des coups aleatoires
+	\item gamma : vison de l'agent
+	\item matrice Q (sous forme de nom de fichier)
+\end{itemize}
+% \begin{center}
+%     \includegraphics[height=4cm]{images.duckduckgo.com.jpeg}
+% \end{center}
+
+
+
+\end{document}
