@@ -1,6 +1,18 @@
 (** Simple fuction giving the max of an array *)
 let flarray_max arr = Array.fold_left max 0. arr
 
+(** Argmax with random choice if two same max *)
+let argmax_r arr =
+  let len = Array.length arr in
+  let rec build_maxis k maxv =
+    if k >= len then [] else
+    if arr.(k) >= maxv then k :: build_maxis (k+1) arr.(k)
+    else build_maxis (k+1) maxv
+  in
+  let maxis = build_maxis 0 min_float in
+  Random.self_init () ;
+  List.nth maxis (Random.int (List.length maxis))
+
 (** Evaluation function defining reward *)
 let get_reward board = Game.board_height board
 
