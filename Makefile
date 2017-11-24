@@ -30,7 +30,7 @@ doc: $(SOURCES) $(INTERFACES) $(CINT)
 clean:
 	rm -f *.cm[xio] *.o *~
 
-.depend: $(SOURCES)
-	$(DEP) *.mli *.ml > .depend
+.depend: $(SOURCES) $(INTERFACES)
+	$(DEP) $^ > .depend
 
 include .depend
