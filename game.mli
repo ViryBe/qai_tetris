@@ -1,22 +1,30 @@
 (** Implements a tetris game *)
 
-(** The tetris board *)
-type board
+(** Module using the overall board *)
+module Board :
+  sig
+    (** The tetris board *)
+    type t
 
-(** Creates a empty board *)
-val create_board : unit -> board
+    (** Creates an empty board *)
+    val create : unit -> t
 
-(** Gives height of a board, i.e. number of stages stacked *)
-val board_height : board -> int
+    (** Gives the height of the given board, i.e. number of stages stacked *)
+    val height : t -> int
+  end
 
-(** Tetromino, i.e. a piece of tetris, on which the player acts *)
-type tetromino
+(** Manipulates tetrominos in the board *)
+module Tetromino :
+  sig
+    (** Tetromino type *)
+    type t
 
-(** Generates a random tetromino *)
-val random_piece : unit -> tetromino
+    (** Generates a random tetromino *)
+    val create_ran : unit -> t
+  end
 
 (** An action executed by the player *)
 type action
 
 (** Plays a turn and gives updated board *)
-val play : board -> tetromino -> action -> board
+val play : Board.t -> Tetromino.t -> action -> Board.t
