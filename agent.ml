@@ -15,13 +15,13 @@ let argmax_r arr =
   List.nth maxis (Random.int (List.length maxis))
 
 (** Evaluation function defining reward *)
-let get_reward board = Game.board_height board
+let get_reward board = Game.Board.height board
 
 (** Function updating Q matrix *)
 let train qmat eps gam alpha ngames action_set =
   (* Initialise state *)
-  let board = ref (Game.create_board ())
-  and tetromino = ref (Game.random_piece ())
+  let board = ref (Game.Board.create ())
+  and tetromino = ref (Game.Tetromino.create_ran ())
   in
   let state = ref (get_state !board !tetromino)
   in
@@ -34,7 +34,7 @@ let train qmat eps gam alpha ngames action_set =
     (* Compute the reward associated to the board *)
     let reward = get_reward !board in
     (* Create next state *)
-    tetromino := Game.random_piece () ;
+    tetromino := Game.Tetromino.create_ran () ;
     let nstate = get_state board tetromino
     in
     (* Update Q matrix *)
