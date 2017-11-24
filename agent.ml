@@ -1,15 +1,16 @@
 (** Simple fuction giving the max of an array *)
-let flarray_max arr = Array.fold_left max 0. arr
+let flarray_max arr = Array.fold_left max min_float arr
 
 (** Argmax with random choice if two same max *)
 let argmax_r arr =
   let len = Array.length arr in
-  let rec build_maxis k maxv =
+  let maxv = flarray_max arr in
+  let rec build_maxis k =
     if k >= len then [] else
-    if arr.(k) >= maxv then k :: build_maxis (k+1) arr.(k)
-    else build_maxis (k+1) maxv
+    if arr.(k) == maxv then k :: build_maxis (k+1)
+    else build_maxis (k+1)
   in
-  let maxis = build_maxis 0 min_float in
+  let maxis = build_maxis 0 in
   Random.self_init () ;
   List.nth maxis (Random.int (List.length maxis))
 
