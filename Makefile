@@ -3,8 +3,8 @@ DOC_DIR = doc
 CC = ocamlfind ocamlopt -g
 PACKAGES = bolt
 OCAMLC = $(CC) -package $(PACKAGES) -linkpkg
-DOCGEN = ocamlfind ocamldoc -d $(DOC_DIR) -html
-DEPGEN = ocamlfind ocamldep -package $(PACKAGES) -linkpkg
+DOCGEN = ocamlfind ocamldoc -package $(PACKAGES) -d $(DOC_DIR) -html
+DEPGEN = ocamlfind ocamldep -package $(PACKAGES)
 MODULES = agent game aio
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
