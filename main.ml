@@ -1,10 +1,11 @@
 (** Main module of the tetris player, starts everything *)
 
-let epsilon = ref 0.
-let gamma = ref 0.
-let ngames = ref 0
-let demo = ref false
-let qpath = ref ""
+(* Mutable global references used to store parameters *)
+let epsilon = ref 0. (** Random action frequency *)
+let gamma = ref 0. (** Sight length of the agent *)
+let ngames = ref 0 (** Number of games to be played *)
+let demo = ref false (** Training or playing *)
+let qpath = ref "" (** Path of the q matrix to load *)
 
 (** Usage string *)
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [-d -q matpath] [-e epsilon] " ^
@@ -26,12 +27,12 @@ let check_qpath given_qpath =
 
 (** Speclist for argument parsing *)
 let speclist = [
-  ("-d", Arg.Set demo, ": set demo mode");
+  ("-demo", Arg.Set demo, ": set demo mode");
   ("-q", Arg.String check_qpath, ": set path of Q matrix file");
   ("-n", Arg.Set_int ngames, ": set number of games played");
-  ("-e", Arg.Float (float_check epsilon),
+  ("-epsilon", Arg.Float (float_check epsilon),
    ": set frequency of random action, in [0, 1]");
-  ("-g", Arg.Float (float_check gamma),
+  ("-gamma", Arg.Float (float_check gamma),
    ": set sight length of the policy, in [0, 1]");
 ]
 
