@@ -1,39 +1,46 @@
-(** Simple fuction giving the max of an array *)
-let flarray_max arr = Array.fold_left max min_float arr
+(** Manages agent training and embodies the agent *)
 
-(** Argmax with random choice if two same max *)
-let argmax_r arr =
-  let len = Array.length arr in
-  let maxv = flarray_max arr in
-  let rec build_maxis k =
-    if k >= len then [] else
-    if arr.(k) == maxv then k :: build_maxis (k+1)
-    else build_maxis (k+1)
-  in
-  let maxis = build_maxis 0 in
-  Random.self_init () ;
-  List.nth maxis (Random.int (List.length maxis))
+(** Auxiliary functions *)
+module Auxfct = struct
+
+  (** Simple fuction giving the max of an array *)
+  let flarray_max arr = Array.fold_left max min_float arr
+
+  (** Argmax with random choice if two same max *)
+  let argmax_r arr =
+    let len = Array.length arr in
+    let maxv = flarray_max arr in
+    let rec build_maxis k =
+      if k >= len then [] else
+      if arr.(k) == maxv then k :: build_maxis (k+1)
+      else build_maxis (k+1)
+    in
+    let maxis = build_maxis 0 in
+    Random.self_init () ;
+    List.nth maxis (Random.int (List.length maxis))
+
+  (** One to one mapping from bool array to digit *)
+  let arr2dig arr =
+    Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 arr
+
+  (** Outputs the two last lines of the board *)
+  let get_board_top board =
+    let height = Game.Board.height board in
+    if height >= 2 then
+      Game.Board.to_arr (height - 2) height board else
+      Game.Board.to_arr 0 height board
+end
+
 
 (** Evaluation function defining reward *)
 let get_reward board = Game.Board.height board
 
-(** One to one mapping from bool array to digit *)
-let arr2dig arr =
-  Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 arr
-
-(** Outputs the two last lines of the board *)
-let get_board_top board =
-  let height = Game.Board.height board in
-  if height >= 2 then
-    Game.Board.to_arr (height - 2) height board else
-    Game.Board.to_arr 0 height board
-
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
-  let board_repr = get_board_top board
+  let board_repr = Auxfct.get_board_top board
   and tetromino_repr = Game.Tetromino.to_arr tetromino in
   let board_one = Array.fold_left Array.append [| |] board_repr in
-  arr2dig (Array.append board_one tetromino_repr)
+  Auxfct.arr2dig (Array.append board_one tetromino_repr)
 
 (** Function updating Q matrix *)
 let update_qmat qmat eps gam alpha action_set nturns =
@@ -57,8 +64,9 @@ let update_qmat qmat eps gam alpha action_set nturns =
     in
     (* Update Q matrix *)
     qmat.(!state).(action) <- (1. -. alpha i) *. qmat.(nstate).(action) +.
-                             (alpha i) *. (float_of_int reward +.
-                                           gam *. (flarray_max qmat.(nstate))) ;
+                              (alpha i) *.
+                              (float_of_int reward +.
+                               gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate
   done ;
   !board
