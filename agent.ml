@@ -17,12 +17,9 @@ let argmax_r arr =
 (** Evaluation function defining reward *)
 let get_reward board = Game.Board.height board
 
-(** Converts bool to int *)
-let int_of_bool b = if b then 1 else 0
-
 (** One to one mapping from bool array to digit *)
 let arr2dig arr =
-  Array.fold_left (fun acc elt -> acc lsl 1 + (int_of_bool elt)) arr
+  Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 arr
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board_repr tetromino = 5
