@@ -6,3 +6,6 @@ val save_mat : float array array -> string -> unit
 
 (** Loads a marshalled matrix from file fpath*)
 val load_mat : string -> float array array
+
+(** Logs the result of a game *)
+val log_game : string -> unit

@@ -16,3 +16,7 @@ let load_mat src =
   let infile = open_in src
   in
   (Marshal.from_channel infile : float array array)
+
+(** Saves a message as a game result
+    @param msg string containing the message *)
+let log_game msg = Bolt.Logger.log "gamesave" Bolt.Level.INFO msg
