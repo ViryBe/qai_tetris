@@ -44,3 +44,17 @@ let train qmat eps gam alpha ngames action_set =
     state := nstate
   done ;
   !board
+
+
+let map_action = fun index_action actions_set ->
+  actions_set.(index_action)
+
+let choose_action = fun q epsilon state actions_set ->
+  let tirage = Random.float 1. in
+  if tirage < epsilon
+  then map_action( argmax_r q.(state)) actions_set
+  else map_action (Random.int (Array.length actions_set)) actions_set
+
+
+let alpha = fun k ->
+  1. /. (1. +. 18. *. k)
