@@ -29,6 +29,12 @@ module Auxfct = struct
     if height >= 2 then
       Game.Board.to_arr (height - 2) height board else
       Game.Board.to_arr 0 height board
+
+  let int_from_action = fun action ->
+    let rotation = Game.Action.rotation action in
+    let translation = Game.Action.translation action in
+    5
+
 end
 
 
@@ -42,28 +48,36 @@ let get_state board tetromino =
   let board_one = Array.fold_left Array.append [| |] board_repr in
   Auxfct.arr2dig (Array.append board_one tetromino_repr)
 
+(** gives the action coresponding to index_action *)
+let map_action = fun index_action actions_set -> actions_set.(index_action)
+
+(** chose an action for the current state *)
+let choose_action = fun q epsilon state actions_set ->
+  let tirage = Random.float 1. in
+  if tirage < epsilon
+  then map_action( Auxfct.argmax_r q.(state)) actions_set
+  else map_action (Random.int (Array.length actions_set)) actions_set
+
 (** Function updating Q matrix *)
 let update_qmat qmat eps gam alpha action_set nturns =
   (* Initialise state *)
   let board = ref (Game.Board.create ())
-  and tetromino = ref (Game.Tetromino.create_ran ())
-  in
-  let state = ref (get_state !board !tetromino)
-  in
+  and tetromino = ref (Game.Tetromino.create_ran ()) in
+  let state = ref (get_state !board !tetromino) in
 
   for i = 0 to nturns- 1 do
     (* Compute action *)
-    let action = choose_action qmat !state action_set eps in
+    let action = choose_action qmat eps !state action_set eps in
     (* Update board accordingly to action *)
     board := Game.play !board !tetromino action ;
     (* Compute the reward associated to the board *)
     let reward = get_reward !board in
     (* Create next state *)
     tetromino := Game.Tetromino.create_ran () ;
-    let nstate = get_state !board !tetromino
-    in
+    let nstate = get_state !board !tetromino in
+    let n_action = Auxfct.int_from_action action in
     (* Update Q matrix *)
-    qmat.(!state).(action) <- (1. -. alpha i) *. qmat.(nstate).(action) +.
+    qmat.(!state).(n_action) <- (1. -. alpha i) *. qmat.(nstate).(n_action) +.
                               (alpha i) *.
                               (float_of_int reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
@@ -80,15 +94,6 @@ let train qmat eps gam alpha ngames action_set nturns =
   done
 
 
-(** gives the action coresponding to index_action *)
-let map_action = fun index_action actions_set -> actions_set.(index_action)
-
-(** chose an action for the current state *)
-let choose_action = fun q epsilon state actions_set ->
-  let tirage = Random.float 1. in
-  if tirage < epsilon
-  then map_action( argmax_r q.(state)) actions_set
-  else map_action (Random.int (Array.length actions_set)) actions_set
 
 
 let alpha = fun k ->
