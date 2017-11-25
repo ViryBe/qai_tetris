@@ -36,7 +36,7 @@ let get_state board tetromino =
   arr2dig (Array.append board_one tetromino_repr)
 
 (** Function updating Q matrix *)
-let update_qmat qmat eps gam alpha ngames action_set nturns =
+let update_qmat qmat eps gam alpha action_set nturns =
   (* Initialise state *)
   let board = ref (Game.Board.create ())
   and tetromino = ref (Game.Tetromino.create_ran ())
@@ -63,10 +63,19 @@ let update_qmat qmat eps gam alpha ngames action_set nturns =
   done ;
   !board
 
+(** Train the Q matrix with ngames of nturns each *)
+let train qmat eps gam alpha ngames action_set nturns =
+  for i = 0 to ngames do
+    let new_height = Game.Board.height
+        qmat eps gam alpha action_set nturns) in
+    Printf.printf "%d\n" new_height
+  done
 
-let map_action = fun index_action actions_set ->
-  actions_set.(index_action)
 
+(** gives the action coresponding to index_action *)
+let map_action = fun index_action actions_set -> actions_set.(index_action)
+
+(** chose an action for the current state *)
 let choose_action = fun q epsilon state actions_set ->
   let tirage = Random.float 1. in
   if tirage < epsilon
