@@ -13,8 +13,8 @@ module Board :
     val height : t -> int
 
     (** Creates a representation of the board *)
-    val to_arr : t -> int -> int -> bool array array
-    (** {e to_arr board low up} outputs a matrix representing the board
+    val to_arr : int -> int -> t -> int array array
+    (** {e to_arr low up board} outputs a matrix representing the board
         {e board} from line {e low} to line {e up}
         @return boolean matrix with true if block occupied by a tetromino, else
                 false *)
@@ -28,6 +28,9 @@ module Tetromino :
 
     (** Generates a random tetromino *)
     val create_ran : unit -> t
+
+    (** Outputs an array representation of a tetromino *)
+    val to_arr : t -> int array
   end
 
 (** An action executed by the player *)

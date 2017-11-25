@@ -21,8 +21,19 @@ let get_reward board = Game.Board.height board
 let arr2dig arr =
   Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 arr
 
+(** Outputs the two last lines of the board *)
+let get_board_top board =
+  let height = Game.Board.height board in
+  if height >= 2 then
+    Game.Board.to_arr (height - 2) height board else
+    Game.Board.to_arr 0 height board
+
 (** Outputs state from board repr and a tetromino *)
-let get_state board_repr tetromino = 5
+let get_state board tetromino =
+  let board_repr = get_board_top board
+  and tetromino_repr = Game.Tetromino.to_arr tetromino in
+  let board_one = Array.fold_left Array.append [| |] board_repr in
+  arr2dig (Array.append board_one tetromino_repr)
 
 (** Function updating Q matrix *)
 let update_qmat qmat eps gam alpha ngames action_set nturns =
@@ -42,7 +53,7 @@ let update_qmat qmat eps gam alpha ngames action_set nturns =
     let reward = get_reward !board in
     (* Create next state *)
     tetromino := Game.Tetromino.create_ran () ;
-    let nstate = get_state board tetromino
+    let nstate = get_state !board !tetromino
     in
     (* Update Q matrix *)
     qmat.(!state).(action) <- (1. -. alpha i) *. qmat.(nstate).(action) +.
