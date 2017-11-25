@@ -34,7 +34,12 @@ module Tetromino :
   end
 
 (** An action executed by the player *)
-type action
+module Action : sig
+  type t
+
+  val rotation : t -> int
+  val translation : t -> int
+end
 
 (** Plays a turn and gives updated board *)
-val play : Board.t -> Tetromino.t -> action -> Board.t
+val play : Board.t -> Tetromino.t -> Action.t -> Board.t
