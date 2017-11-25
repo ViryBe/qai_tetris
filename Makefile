@@ -1,20 +1,22 @@
 TARGET = tetris_player
 DOC_DIR = doc
-OCAMLC = ocamlopt -g
-DOCGEN = ocamldoc -d $(DOC_DIR) -html
+CC = ocamlfind ocamlopt -g
+PACKAGES = bolt
+OCAMLC = $(CC) -package $(PACKAGES) -linkpkg
+DOCGEN = ocamlfind ocamldoc -d $(DOC_DIR) -html
+DEPGEN = ocamlfind ocamldep -package $(PACKAGES) -linkpkg
 MODULES = agent game aio
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
-DEP = ocamldep
 
 all: .depend byte
 
 byte: $(TARGET)
 
 $(TARGET): $(CINT) $(OBJS) main.ml
-	$(OCAMLC) $(OBJS) main.ml -o $@
+	$(MAINCC) $(OBJS) main.ml -o $@
 
 %.cmi: %.mli
 	$(OCAMLC) $<
@@ -31,6 +33,6 @@ clean:
 	rm -f *.cm[xio] *.o *~
 
 .depend: $(SOURCES) $(INTERFACES)
-	$(DEP) $^ > .depend
+	$(DEPGEN) $^ > .depend
 
 include .depend

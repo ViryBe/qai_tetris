@@ -35,3 +35,7 @@ doc/
 
 # vim specific files
 *.swp
+
+# logging facilities
+.bolt.conf
+log/

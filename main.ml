@@ -36,6 +36,7 @@ let speclist = [
 ]
 
 let () =
+  Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
   Arg.parse
     speclist
     (fun x -> raise (Arg.Bad ("Bad argument: " ^ x)))
