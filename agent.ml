@@ -63,8 +63,8 @@ let choose_action = fun q epsilon state action_set ->
 (** Function updating Q matrix *)
 let update_qmat qmat eps gam alpha action_set nturns =
   (* Initialise state *)
-  let board = ref (Game.Board.create ())
-  and tetromino = ref (Game.Tetromino.create_ran ()) in
+  let board = ref (Game.Board.make ())
+  and tetromino = ref (Game.Tetromino.make_rand ()) in
   let state = ref (get_state !board !tetromino) in
 
   for i = 0 to nturns- 1 do
@@ -75,7 +75,7 @@ let update_qmat qmat eps gam alpha action_set nturns =
     (* Compute the reward associated to the board *)
     let reward = get_reward !board in
     (* Create next state *)
-    tetromino := Game.Tetromino.create_ran () ;
+    tetromino := Game.Tetromino.make_rand () ;
     let nstate = get_state !board !tetromino in
     let n_action = Auxfct.int_from_action action in
     (* Update Q matrix *)
@@ -89,9 +89,12 @@ let update_qmat qmat eps gam alpha action_set nturns =
 
 (** Train the Q matrix with ngames of nturns each *)
 let train qmat eps gam alpha ngames action_set ntetr =
+  boltlog Bolt.Level.INFO
+    (Printf.sprintf "Session:ngames=%d:eps=%f:gam=%f" ngames eps gam) ;
   for i = 0 to ngames do
     let new_height = Game.Board.height
         (update_qmat qmat eps gam alpha action_set ntetr) in
+    Aio.log_game (Printf.sprintf "%d" new_height) ;
     Printf.printf "%d\n" new_height
   done
 
