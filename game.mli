@@ -6,7 +6,7 @@ module Board : sig
   type t
 
   (** Creates an empty board *)
-  val create : unit -> t
+  val make : unit -> t
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
   val height : t -> int
@@ -24,7 +24,7 @@ module Tetromino : sig
   type t
 
   (** Generates a random tetromino *)
-  val create_ran : unit -> t
+  val make_rand : unit -> t
 
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
