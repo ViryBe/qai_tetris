@@ -84,7 +84,7 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
-  let action_set =
+  let set =
     [|{rot=North; trans = Column(0)};
       {rot=North; trans = Column(1)};
       {rot=North; trans = Column(2)};

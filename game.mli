@@ -42,7 +42,7 @@ module Action : sig
   val int_from_translation : t -> int
 
   (** list of all the actions *)
-  val action_set : t array
+  val set : t array
 
 end
 
