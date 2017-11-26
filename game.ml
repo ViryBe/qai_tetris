@@ -10,7 +10,7 @@ module Board = struct
 
 
   (** Creates an empty board *)
-  let create () =
+  let make () =
     {board = Array.make_matrix total_length total_height 0;
      stacked_height = 0
     }
@@ -32,21 +32,21 @@ module Tetromino = struct
   (* List of pieces of the game *)
   let tetromino_list =
     [|
-      Piece([|1;1;1;1|]); (* square *)
-      Piece([|1;0;1;0|]); (* line *)
-      Piece([|1;0;0;0|]); (* point *)
-      Piece([|1;0;1;1|]); (* L shape *)
-      Piece([|1;0;0;1|])  (* diag *)
+      Piece [|1;1;1;1|]; (* square *)
+      Piece [|1;0;1;0|]; (* line *)
+      Piece [|1;0;0;0|]; (* point *)
+      Piece [|1;0;1;1|]; (* L shape *)
+      Piece [|1;0;0;1|]  (* diag *)
     |]
 
   (** Generates a random tetromino *)
-  let create_ran () =
+  let make_rand () =
     let n = Random.int 6 in
     tetromino_list.(n)
 
   (** Outputs an array representation of a tetromino *)
   let to_arr p = match p with
-    |Piece(x) -> x
+    | Piece x -> x
 
 end
 
@@ -58,19 +58,16 @@ module Action = struct
   (** The type of an action *)
   type t = {rot : rotation; trans : translation}
 
-  (** Number of available actions *)
-  let card = 20 (* 5 translations and 4 rotations *)
-
   (** Extracts the rotation component of an action *)
-  let int_rotation action = match action.rot with
+  let int_from_rotation action = match action.rot with
     | North -> 0
     | East -> 1
     | South -> 2
     | West -> 3
 
   (** Extracts the translation component of an action *)
-  let int_translation action = match action.trans with
-    |Column(x) -> x
+  let int_from_translation action = match action.trans with
+    | Column x -> x
 
   (** 2D to 1D Array - index match *)
   let get_index i j = 2*i + j
