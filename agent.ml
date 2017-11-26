@@ -67,7 +67,7 @@ let update_qmat qmat eps gam alpha action_set nturns =
 
   for i = 0 to nturns- 1 do
     (* Compute action *)
-    let action = choose_action qmat eps !state action_set eps in
+    let action = choose_action qmat eps !state action_set in
     (* Update board accordingly to action *)
     board := Game.play !board !tetromino action ;
     (* Compute the reward associated to the board *)
