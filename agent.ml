@@ -29,12 +29,6 @@ module Auxfct = struct
     if height >= 2 then
       Game.Board.to_arr (height - 2) height board else
       Game.Board.to_arr 0 height board
-
-  (** One to one onto mapping from action to int *)
-  let int_from_action = fun action ->
-    let rotation = Game.Action.rotation action in
-    let translation = Game.Action.translation action in
-    translation lsl 2 + rotation
 end
 
 (** Logging shortcut, to log with adequate logger *)
@@ -57,11 +51,15 @@ let map_action = fun index_action action_set -> action_set.(index_action)
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
   if tirage < epsilon
-  then map_action (Auxfct.argmax_r q.(state)) action_set
-  else map_action (Random.int (Array.length action_set)) action_set
+  then
+    let action_no = Auxfct.argmax_r q.(state) in
+    (action_set.(action_no), action_no)
+  else
+    let action_no = Random.int (Array.length action_set) in
+    (action_set.(action_no), action_no)
 
 (** Function updating Q matrix *)
-let update_qmat qmat eps gam alpha action_set nturns =
+let update_qmat qmat eps gam alpha nturns =
   (* Initialise state *)
   let board = ref (Game.Board.make ())
   and tetromino = ref (Game.Tetromino.make_rand ()) in
@@ -69,7 +67,7 @@ let update_qmat qmat eps gam alpha action_set nturns =
 
   for i = 0 to nturns- 1 do
     (* Compute action *)
-    let action = choose_action qmat eps !state action_set in
+    let action, act_ind = choose_action qmat eps !state Game.Action.set in
     (* Update board accordingly to action *)
     board := Game.play !board !tetromino action ;
     (* Compute the reward associated to the board *)
@@ -77,9 +75,8 @@ let update_qmat qmat eps gam alpha action_set nturns =
     (* Create next state *)
     tetromino := Game.Tetromino.make_rand () ;
     let nstate = get_state !board !tetromino in
-    let n_action = Auxfct.int_from_action action in
     (* Update Q matrix *)
-    qmat.(!state).(n_action) <- (1. -. alpha i) *. qmat.(nstate).(n_action) +.
+    qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(nstate).(act_ind) +.
                               (alpha i) *.
                               (float_of_int reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
@@ -88,12 +85,12 @@ let update_qmat qmat eps gam alpha action_set nturns =
   !board
 
 (** Train the Q matrix with ngames of nturns each *)
-let train qmat eps gam alpha ngames action_set ntetr =
+let train qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:eps=%f:gam=%f" ngames eps gam) ;
   for i = 0 to ngames do
     let new_height = Game.Board.height
-        (update_qmat qmat eps gam alpha action_set ntetr) in
+        (update_qmat qmat eps gam alpha ntetr) in
     Aio.log_game (Printf.sprintf "%d" new_height) ;
     Printf.printf "%d\n" new_height
   done
@@ -104,7 +101,7 @@ let play qmat ntetr =
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let  state = ref (get_state !board !tetromino) in
   for i = 0 to ntetr - 1 do
-    let action = choose_action qmat 0. !state Game.Action.set in
+    let action, _ = choose_action qmat 0. !state Game.Action.set in
     board := Game.play !board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
     state := get_state !board !tetromino ;
