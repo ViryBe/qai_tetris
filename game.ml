@@ -84,34 +84,6 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
-  let action_card = 20
-
-  let actions_set =
-    [|{rot=North; trans = Column(0)};
-      {rot=North; trans = Column(1)};
-      {rot=North; trans = Column(2)};
-      {rot=North; trans = Column(3)};
-      {rot=North; trans = Column(4)};
-      {rot=East; trans = Column(0)};
-      {rot=East; trans = Column(1)};
-      {rot=East; trans = Column(2)};
-      {rot=East; trans = Column(3)};
-      {rot=East; trans = Column(4)};
-      {rot=South; trans = Column(0)};
-      {rot=South; trans = Column(1)};
-      {rot=South; trans = Column(2)};
-      {rot=South; trans = Column(3)};
-      {rot=South; trans = Column(4)};
-      {rot=West; trans = Column(0)};
-      {rot=West; trans = Column(1)};
-      {rot=West; trans = Column(2)};
-      {rot=West; trans = Column(3)};
-      {rot=West; trans = Column(4)}
-    |]
-
-  (** Decode the actions *)
-  let int_to_action i = actions_set.(i)
-
 end
 
 let tetromino_per_game = 10000
@@ -144,8 +116,7 @@ let is_full board x =
   done;
   !n = 6
 
-let play board tetromino i =
-  let action = Action.int_to_action i in
+let play board tetromino action =
   let x = ref(Board.height board + 1) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
   while not (collide board !x y tetromino (Action.get_rotation action)) &&  !x > 0 do

@@ -33,14 +33,22 @@ end
 (** An action executed by the player *)
 module Action : sig
 
-  (** Cardinal of the number of actions *)
-  val card : int
+  type rotation = North | South | East | West
+  type translation = Column of int (* Int between 0 and 4 *)
+
+  (** The type of an action *)
+  type t = {rot : rotation; trans : translation}
+  (** Extracts the rotation component of an action *)
+  val int_from_rotation : t -> int
+
+  (** Extracts the translation component of an action *)
+  val int_from_translation : t -> int
 end
 
 (** Number of tetromino played in a game *)
 val tetromino_per_game : int
 
 (** Plays a turn and gives updated board *)
-val play : Board.t -> Tetromino.t -> int -> Board.t
+val play : Board.t -> Tetromino.t -> Action.t -> Board.t
 (** [play b t a] plays the action [a] on tetromino [t] in board [b] and returns
     a new board with the consequences of the turn *)

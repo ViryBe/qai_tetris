@@ -37,6 +37,29 @@ module Auxfct = struct
     translation lsl 2 + rotation
 end
 
+let action_set =
+  [|{rot=North; trans = Column(0)};
+    {rot=North; trans = Column(1)};
+    {rot=North; trans = Column(2)};
+    {rot=North; trans = Column(3)};
+    {rot=North; trans = Column(4)};
+    {rot=East; trans = Column(0)};
+    {rot=East; trans = Column(1)};
+    {rot=East; trans = Column(2)};
+    {rot=East; trans = Column(3)};
+    {rot=East; trans = Column(4)};
+    {rot=South; trans = Column(0)};
+    {rot=South; trans = Column(1)};
+    {rot=South; trans = Column(2)};
+    {rot=South; trans = Column(3)};
+    {rot=South; trans = Column(4)};
+    {rot=West; trans = Column(0)};
+    {rot=West; trans = Column(1)};
+    {rot=West; trans = Column(2)};
+    {rot=West; trans = Column(3)};
+    {rot=West; trans = Column(4)}
+  |]
+
 (** Logging shortcut, to log with adequate logger *)
 let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 
