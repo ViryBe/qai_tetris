@@ -35,11 +35,6 @@ module Action : sig
 
   (** The type of an action *)
   type t
-  (** Extracts the rotation component of an action *)
-  val int_from_rotation : t -> int
-
-  (** Extracts the translation component of an action *)
-  val int_from_translation : t -> int
 
   (** list of all the actions *)
   val set : t array

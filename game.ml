@@ -24,8 +24,8 @@ module Board = struct
   (** Creates a representation of the board *)
   let to_arr low high board =
     let rec loop k =
-      if k > high then [| |] else
-        Array.append board.(k) (loop (k+1))
+      if k > high then [| [| |] |] else
+        Array.append [| board.board.(k) |] (loop (k+1))
     in
     loop low
 
@@ -115,7 +115,8 @@ let collide table x y tetromino rotation =
   let n = ref(0) in
   for i=0 to 1 do
     for j=0 to 1 do
-      n := (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) + (Board.get_board table).(x+i).(y+j)
+      n := (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) +
+           (Board.get_board table).(x+i).(y+j)
     done;
   done;
   !n > 4
@@ -127,7 +128,9 @@ let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in
   for i=0 to 1 do
     for j=0 to 1 do
-      board.(x+i).(j+y) <- board.(x+i).(y+j) + (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j)
+      board.(x+i).(j+y) <-
+        board.(x+i).(y+j) +
+        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j)
     done;
   done;
   Board.update_board board (max (update_height board x y) (Board.height table))
