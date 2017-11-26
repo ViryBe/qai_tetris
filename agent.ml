@@ -37,6 +37,8 @@ module Auxfct = struct
 
 end
 
+(** Logging shortcut, to log with adequate logger *)
+let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 
 (** Evaluation function defining reward *)
 let get_reward board = Game.Board.height board
