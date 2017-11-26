@@ -1,15 +1,18 @@
 (** Main module of the tetris player, starts everything *)
 
-(* Mutable global references used to store parameters *)
-let epsilon = ref 0. (** Random action frequency *)
-let gamma = ref 0. (** Sight length of the agent *)
-let ngames = ref 0 (** Number of games to be played *)
-let demo = ref false (** Training or playing *)
-let qpath = ref "" (** Path of the q matrix to load *)
+(** Big mutable global record containing parameters *)
+type glob_params = {
+  epsilon : float ref;
+  gamma : float ref;
+  ngames : int ref;
+  demo : bool ref;
+  qpath : string ref;
+}
 
-(** Usage string *)
-let usage = "Usage: " ^ Sys.argv.(0) ^ " [-d -q matpath] [-e epsilon] " ^
-            "[-g gamma] [-n ngames]"
+(** Init command line params *)
+let cl_params = {epsilon = ref 0. ; gamma = ref 0. ; ngames = ref 0 ;
+                 demo = ref false ; qpath = ref ""}
+
 
 (** Checks adequation of input float parameter
     @param var_ref reference used to store the parameter
@@ -22,24 +25,29 @@ let float_check var_ref cl_param =
 (** Checks existence of file *)
 let check_qpath given_qpath =
   if Sys.file_exists "qpath" then
-    qpath := given_qpath
+    cl_params.qpath := given_qpath
   else raise (Arg.Bad ("File " ^ given_qpath ^ " does not exist"))
 
 (** Speclist for argument parsing *)
 let speclist = [
-  ("-demo", Arg.Set demo, ": set demo mode");
+  ("-demo", Arg.Set cl_params.demo, ": set demo mode");
   ("-q", Arg.String check_qpath, ": set path of Q matrix file");
-  ("-n", Arg.Set_int ngames, ": set number of games played");
-  ("-epsilon", Arg.Float (float_check epsilon),
+  ("-n", Arg.Set_int cl_params.ngames, ": set number of games played");
+  ("-epsilon", Arg.Float (float_check cl_params.epsilon),
    ": set frequency of random action, in [0, 1]");
-  ("-gamma", Arg.Float (float_check gamma),
+  ("-gamma", Arg.Float (float_check cl_params.gamma),
    ": set sight length of the policy, in [0, 1]");
 ]
 
 let () =
-  Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
+  (** Usage string *)
+  let usage = "Usage: " ^ Sys.argv.(0) ^ " [-demo -q matpath] [-epsilon float] " ^
+              "[-g float] [-n int]" in
   Arg.parse
     speclist
     (fun x -> raise (Arg.Bad ("Bad argument: " ^ x)))
     usage;
-  Printf.printf "%f %f %d %b\n" !epsilon !gamma !ngames !demo
+  (* Init logconf *)
+  Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
+  Printf.printf "%f %f %d %b\n" !(cl_params.epsilon) !(cl_params.gamma)
+    !(cl_params.ngames) !(cl_params.demo)
