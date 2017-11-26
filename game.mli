@@ -37,10 +37,10 @@ module Action : sig
   type t
 
   (** Extracts the rotation component of an action *)
-  val int_rotation : t -> int
+  val int_from_rotation : t -> int
 
   (** Extracts the translation component of an action *)
-  val int_translation : t -> int
+  val int_from_translation : t -> int
 end
 
 (** Number of tetromino played in a game *)

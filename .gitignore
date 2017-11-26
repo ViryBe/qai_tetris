@@ -41,3 +41,6 @@ doc/
 # logging facilities
 .bolt.conf
 log/
+
+# tag files
+tags
