@@ -30,11 +30,11 @@ module Auxfct = struct
       Game.Board.to_arr (height - 2) height board else
       Game.Board.to_arr 0 height board
 
+  (** One to one onto mapping from action to int *)
   let int_from_action = fun action ->
     let rotation = Game.Action.rotation action in
     let translation = Game.Action.translation action in
-    5
-
+    translation lsl 2 + rotation
 end
 
 (** Logging shortcut, to log with adequate logger *)
