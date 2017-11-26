@@ -88,10 +88,10 @@ let update_qmat qmat eps gam alpha action_set nturns =
   !board
 
 (** Train the Q matrix with ngames of nturns each *)
-let train qmat eps gam alpha ngames action_set nturns =
+let train qmat eps gam alpha ngames action_set ntetr =
   for i = 0 to ngames do
     let new_height = Game.Board.height
-        (update_qmat qmat eps gam alpha action_set nturns) in
+        (update_qmat qmat eps gam alpha action_set ntetr) in
     Printf.printf "%d\n" new_height
   done
 
