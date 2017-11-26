@@ -19,10 +19,12 @@ module Board = struct
   let height b = b.stacked_height
 
   (** Creates a representation of the board *)
-  let to_arr l h b = b.board
-  (** [to_arr l u b] outputs a matrix representing the board
-      [b] from line [l] to line [u] (included) where each element is
-      one if the square is occupied by a tetromino else zero *)
+  let to_arr low high board =
+    let rec loop k =
+      if k > high then [| |] else
+        Array.append board.(k) (loop (k+1))
+    in
+    loop low
 end
 
 module Tetromino = struct
