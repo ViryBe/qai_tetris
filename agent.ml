@@ -98,5 +98,19 @@ let train qmat eps gam alpha ngames action_set ntetr =
     Printf.printf "%d\n" new_height
   done
 
+(** Plays a game of ntetr with qmat *)
+let play qmat ntetr =
+  let board = ref (Game.Board.make ())
+  and tetromino = ref (Game.Tetromino.make_rand ()) in
+  let  state = ref (get_state !board !tetromino) in
+  for i = 0 to ntetr - 1 do
+    let action = choose_action qmat 0. !state Game.Action.set in
+    board := Game.play !board !tetromino action ;
+    tetromino := Game.Tetromino.make_rand () ;
+    state := get_state !board !tetromino ;
+  done ;
+
+  !board
+
 let alpha = fun k ->
   1. /. (1. +. 18. *. k)
