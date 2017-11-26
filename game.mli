@@ -33,16 +33,17 @@ end
 (** An action executed by the player *)
 module Action : sig
 
-  type rotation = North | South | East | West
-  type translation = Column of int (* Int between 0 and 4 *)
-
   (** The type of an action *)
-  type t = {rot : rotation; trans : translation}
+  type t
   (** Extracts the rotation component of an action *)
   val int_from_rotation : t -> int
 
   (** Extracts the translation component of an action *)
   val int_from_translation : t -> int
+
+  (** list of all the actions *)
+  val action_set : t array
+
 end
 
 (** Number of tetromino played in a game *)

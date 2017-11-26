@@ -84,6 +84,29 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
+  let action_set =
+    [|{rot=North; trans = Column(0)};
+      {rot=North; trans = Column(1)};
+      {rot=North; trans = Column(2)};
+      {rot=North; trans = Column(3)};
+      {rot=North; trans = Column(4)};
+      {rot=East; trans = Column(0)};
+      {rot=East; trans = Column(1)};
+      {rot=East; trans = Column(2)};
+      {rot=East; trans = Column(3)};
+      {rot=East; trans = Column(4)};
+      {rot=South; trans = Column(0)};
+      {rot=South; trans = Column(1)};
+      {rot=South; trans = Column(2)};
+      {rot=South; trans = Column(3)};
+      {rot=South; trans = Column(4)};
+      {rot=West; trans = Column(0)};
+      {rot=West; trans = Column(1)};
+      {rot=West; trans = Column(2)};
+      {rot=West; trans = Column(3)};
+      {rot=West; trans = Column(4)}
+    |]
+
 end
 
 let tetromino_per_game = 10000
