@@ -36,9 +36,6 @@ module Action : sig
   (** The type of an action *)
   type t
 
-  (** Number of available actions *)
-  val card : int
-
   (** Extracts the rotation component of an action *)
   val rotation : t -> int
 
