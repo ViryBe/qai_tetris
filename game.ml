@@ -33,10 +33,6 @@ end
 
 module Tetromino = struct
   (** Tetromino type *)
-end
-
-module Tetromino = struct
-  (** Tetromino type *)
   type t = Piece of int array
 
   (* List of pieces of the game *)
@@ -127,7 +123,7 @@ let is_full board x =
 
 let play board tetromino action =
   let x = ref(Board.height board + 1) in (* +1 to add the new tetromino *)
-  let y = Action.int_translation action in
+  let y = Action.int_from_translation action in
   while not (collide board !x y tetromino (Action.get_rotation action)) &&  !x > 0 do
     x := !x - 1
   done;
