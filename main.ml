@@ -6,10 +6,11 @@ let gamma = ref 0. (** Sight length of the agent *)
 let ngames = ref 0 (** Number of games to be played *)
 let demo = ref false (** Training or playing *)
 let qpath = ref "" (** Path of the q matrix to load *)
+let logconf = ref "" (** Path to bolt log conf file *)
 
 (** Usage string *)
-let usage = "Usage: " ^ Sys.argv.(0) ^ " [-d -q matpath] [-e epsilon] " ^
-            "[-g gamma] [-n ngames]"
+let usage = "Usage: " ^ Sys.argv.(0) ^ " [-demo -q matpath] [-epsilon float] " ^
+            "[-g float] [-n int]"
 
 (** Checks adequation of input float parameter
     @param var_ref reference used to store the parameter
@@ -34,9 +35,12 @@ let speclist = [
    ": set frequency of random action, in [0, 1]");
   ("-gamma", Arg.Float (float_check gamma),
    ": set sight length of the policy, in [0, 1]");
+  ("-logconf", Arg.Set_string logconf, ": load bolt log config file");
 ]
 
 let () =
+  (* Init logconf *)
+  if !logconf <> "" then Unix.putenv "BOLT_CONFIG" !logconf ;
   Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
   Arg.parse
     speclist
