@@ -49,14 +49,14 @@ let get_state board tetromino =
   Auxfct.arr2dig (Array.append board_one tetromino_repr)
 
 (** gives the action coresponding to index_action *)
-let map_action = fun index_action actions_set -> actions_set.(index_action)
+let map_action = fun index_action action_set -> action_set.(index_action)
 
 (** chose an action for the current state *)
-let choose_action = fun q epsilon state actions_set ->
+let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
   if tirage < epsilon
-  then map_action( Auxfct.argmax_r q.(state)) actions_set
-  else map_action (Random.int (Array.length actions_set)) actions_set
+  then map_action (Auxfct.argmax_r q.(state)) action_set
+  else map_action (Random.int (Array.length action_set)) action_set
 
 (** Function updating Q matrix *)
 let update_qmat qmat eps gam alpha action_set nturns =
@@ -92,9 +92,6 @@ let train qmat eps gam alpha ngames action_set nturns =
         (update_qmat qmat eps gam alpha action_set nturns) in
     Printf.printf "%d\n" new_height
   done
-
-
-
 
 let alpha = fun k ->
   1. /. (1. +. 18. *. k)
