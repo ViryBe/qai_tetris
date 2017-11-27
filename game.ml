@@ -35,6 +35,18 @@ module Board = struct
 
   (** Get the board *)
   let get_board b = b.board
+
+  (** Checks whether line is full *)
+  let is_full board x =
+    let n = ref 0 in
+    for i = 0 to 5 do
+      if board.(x).(i) = 1 then n := !n + 1;
+    done;
+    !n = 6
+
+  (** Document me! *)
+  let update_height board x y =
+    if board.(x).(y) = 0 && board.(x).(y+1) = 0 then x else x-1
 end
 
 module Tetromino = struct
@@ -53,7 +65,7 @@ module Tetromino = struct
 
   (** Generates a random tetromino *)
   let make_rand () =
-    let n = Random.int 6 in
+    let n = Random.int (Array.length tetromino_list) in
     tetromino_list.(n)
 
   (** Outputs an array representation of a tetromino *)
@@ -88,27 +100,28 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
+  (** The set of all possible actions *)
   let set =
-    [|{rot=North; trans = Column(0)};
-      {rot=North; trans = Column(1)};
-      {rot=North; trans = Column(2)};
-      {rot=North; trans = Column(3)};
-      {rot=North; trans = Column(4)};
-      {rot=East; trans = Column(0)};
-      {rot=East; trans = Column(1)};
-      {rot=East; trans = Column(2)};
-      {rot=East; trans = Column(3)};
-      {rot=East; trans = Column(4)};
-      {rot=South; trans = Column(0)};
-      {rot=South; trans = Column(1)};
-      {rot=South; trans = Column(2)};
-      {rot=South; trans = Column(3)};
-      {rot=South; trans = Column(4)};
-      {rot=West; trans = Column(0)};
-      {rot=West; trans = Column(1)};
-      {rot=West; trans = Column(2)};
-      {rot=West; trans = Column(3)};
-      {rot=West; trans = Column(4)}
+    [|{rot=North; trans = Column 0};
+      {rot=North; trans = Column 1};
+      {rot=North; trans = Column 2};
+      {rot=North; trans = Column 3};
+      {rot=North; trans = Column 4};
+      {rot=East; trans = Column 0};
+      {rot=East; trans = Column 1};
+      {rot=East; trans = Column 2};
+      {rot=East; trans = Column 3};
+      {rot=East; trans = Column 4};
+      {rot=South; trans = Column 0};
+      {rot=South; trans = Column 1};
+      {rot=South; trans = Column 2};
+      {rot=South; trans = Column 3};
+      {rot=South; trans = Column 4};
+      {rot=West; trans = Column 0};
+      {rot=West; trans = Column 1};
+      {rot=West; trans = Column 2};
+      {rot=West; trans = Column 3};
+      {rot=West; trans = Column 4}
     |]
 
 end
