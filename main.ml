@@ -18,13 +18,13 @@ let () =
     cl_params.epsilon cl_params.gamma cl_params.alphap cl_params.ngames ;
   (* Launching program *)
   if cl_params.demo (* Demo mode *)
-  then let qmat = Aio.load_mat cl_params.qpath in
+  then let qmat = Aio.Qio.load cl_params.qpath in
       ignore (Agent.play qmat Game.tetromino_per_game)
   else
     (* Set Q matrix (load or create *)
     let qinit = if cl_params.qpath = "" then
         Array.make_matrix state_card (Array.length Game.Action.set) 0. else
-        Aio.load_mat cl_params.qpath
+        Aio.Qio.load cl_params.qpath
     in
     (* Start training *)
     Agent.train qinit cl_params.epsilon cl_params.gamma
