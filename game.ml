@@ -31,6 +31,18 @@ module Board = struct
 
   (** Get the board *)
   let get_board b = b.board
+                      
+  (** Checks whether line is full *)
+  let is_full board x =
+    let n = ref 0 in
+    for i = 0 to 5 do
+      if board.(x).(i) = 1 then n := !n + 1;
+    done;
+    !n = 6
+
+  (** Document me! *)
+  let update_height board x y =
+    if board.(x).(y) = 0 && board.(x).(y+1) = 0 then x else x-1
 end
 
 module Tetromino = struct
@@ -84,27 +96,28 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
+  (** The set of all possible actions *)
   let set =
-    [|{rot=North; trans = Column(0)};
-      {rot=North; trans = Column(1)};
-      {rot=North; trans = Column(2)};
-      {rot=North; trans = Column(3)};
-      {rot=North; trans = Column(4)};
-      {rot=East; trans = Column(0)};
-      {rot=East; trans = Column(1)};
-      {rot=East; trans = Column(2)};
-      {rot=East; trans = Column(3)};
-      {rot=East; trans = Column(4)};
-      {rot=South; trans = Column(0)};
-      {rot=South; trans = Column(1)};
-      {rot=South; trans = Column(2)};
-      {rot=South; trans = Column(3)};
-      {rot=South; trans = Column(4)};
-      {rot=West; trans = Column(0)};
-      {rot=West; trans = Column(1)};
-      {rot=West; trans = Column(2)};
-      {rot=West; trans = Column(3)};
-      {rot=West; trans = Column(4)}
+    [|{rot=North; trans = Column 0};
+      {rot=North; trans = Column 1};
+      {rot=North; trans = Column 2};
+      {rot=North; trans = Column 3};
+      {rot=North; trans = Column 4};
+      {rot=East; trans = Column 0};
+      {rot=East; trans = Column 1};
+      {rot=East; trans = Column 2};
+      {rot=East; trans = Column 3};
+      {rot=East; trans = Column 4};
+      {rot=South; trans = Column 0};
+      {rot=South; trans = Column 1};
+      {rot=South; trans = Column 2};
+      {rot=South; trans = Column 3};
+      {rot=South; trans = Column 4};
+      {rot=West; trans = Column 0};
+      {rot=West; trans = Column 1};
+      {rot=West; trans = Column 2};
+      {rot=West; trans = Column 3};
+      {rot=West; trans = Column 4}
     |]
 
 end
@@ -112,7 +125,7 @@ end
 let tetromino_per_game = 10000
 
 let collide table x y tetromino rotation =
-  let n = ref(0) in
+  let n = ref 0 in
   for i=0 to 1 do
     for j=0 to 1 do
       n := (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) +
@@ -120,9 +133,6 @@ let collide table x y tetromino rotation =
     done;
   done;
   !n > 4
-
-let update_height board x y =
-  if board.(x).(y) = 0 && board.(x).(y+1) = 0 then x else x-1
 
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in
@@ -133,14 +143,8 @@ let place_tetromino table tetromino rotation x y =
         (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j)
     done;
   done;
-  Board.update_board board (max (update_height board x y) (Board.height table))
-
-let is_full board x =
-  let n = ref(0) in
-  for i=0 to 5 do
-    if board.(x).(i) = 1 then n := !n + 1;
-  done;
-  !n = 6
+  Board.update_board board
+    (max (Board.update_height board x y) (Board.height table))
 
 let play board tetromino action =
   let x = ref(Board.height board + 1) in (* +1 to add the new tetromino *)
@@ -152,7 +156,7 @@ let play board tetromino action =
   for i=0 to 1 do
     let table = Board.get_board t in
     let line = !x - i in
-    if is_full table line then
+    if Board.is_full table line then
       Array.blit table (line+1) table line ((Board.height t)-line-1)
   done;
   t
