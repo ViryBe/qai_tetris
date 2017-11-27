@@ -1,6 +1,9 @@
 module Board = struct
   (** The tetris board *)
-  type t = {board : int array array; stacked_height : int ref }
+  type t = {
+      board : int array array;
+      mutable stacked_height : int
+  }
 
   (** Total height of the board *)
   let total_height = 20000
@@ -12,18 +15,18 @@ module Board = struct
   (** Creates an empty board *)
   let make () =
     {board = Array.make_matrix total_length total_height 0;
-     stacked_height = ref 0
+     stacked_height = 0
     }
 
   let update_board board height =
-    {board = board; stacked_height = ref height}
+    {board = board; stacked_height = height}
 
   let update_height_board board height =
-    board.stacked_height := height
+    board.stacked_height <- height
 
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
-  let height b = !(b.stacked_height)
+  let height b = b.stacked_height
 
   (** Creates a representation of the board *)
   let to_arr low high board =
