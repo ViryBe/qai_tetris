@@ -61,7 +61,7 @@ module Tetromino = struct
 
   (** Generates a random tetromino *)
   let make_rand () =
-    let n = Random.int 6 in
+    let n = Random.int (Array.length tetromino_list) in
     tetromino_list.(n)
 
   (** Outputs an array representation of a tetromino *)
@@ -149,9 +149,11 @@ let place_tetromino table tetromino rotation x y =
 let play board tetromino action =
   let x = ref(Board.height board + 1) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
-  while not (collide board !x y tetromino (Action.get_rotation action)) &&  !x > 0 do
+  while !x > 0 &&
+        not (collide board !x y tetromino (Action.get_rotation action)) do
     x := !x - 1
-  done;
+  done ;
+  x := !x + 1 ;
   let t = place_tetromino board tetromino (Action.get_rotation action) !x y in
   for i=0 to 1 do
     let table = Board.get_board t in
