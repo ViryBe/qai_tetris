@@ -27,10 +27,13 @@ $(TARGET): $(CINT) $(OBJS) main.ml
 doc: $(SOURCES) $(INTERFACES) $(CINT)
 	$(DOCGEN) $(SOURCES) $(INTERFACES)
 
-.PHONY: clean
+.PHONY: clean tags
 
 clean:
 	rm -f *.cm[xio] *.o *~
+
+tags:
+	otags -vi *.ml *.mli
 
 .depend: $(SOURCES) $(INTERFACES)
 	$(DEPGEN) $^ > .depend
