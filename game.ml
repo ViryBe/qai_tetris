@@ -31,7 +31,7 @@ module Board = struct
 
   (** Get the board *)
   let get_board b = b.board
-                      
+
   (** Checks whether line is full *)
   let is_full board x =
     let n = ref 0 in
