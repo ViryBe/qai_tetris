@@ -32,10 +32,17 @@ let check_qpath given_qpath =
     cl_params.qpath := given_qpath
   else raise (Arg.Bad ("File " ^ given_qpath ^ " does not exist"))
 
-(** Speclist for argument parsing *)
+let check_demo d =
+  if d then
+    if !(cl_params.qpath) = "" then
+      raise (Arg.Bad "path to Q matrix required in demo mode")
+    else cl_params.demo := true
+  else cl_params.demo := false (* Leave it to false *)
+
+(** Speclist for argument parsing, mind the order *)
 let speclist = [
-  ("-demo", Arg.Set cl_params.demo, "demo mode");
   ("-q", Arg.String check_qpath, "path of Q matrix file");
+  ("-demo", Arg.Bool check_demo, "demo mode");
   ("-n", Arg.Set_int cl_params.ngames, "number of games played");
   ("-epsilon", Arg.Float (float_check cl_params.epsilon),
    "frequency of random action, in [0, 1]");
@@ -46,8 +53,9 @@ let speclist = [
 
 let () =
   (** Usage string *)
-  let usage = "Usage: " ^ Sys.argv.(0) ^ " [-demo -q matpath] [-epsilon float] " ^
-              "[-g float] [-n int]" in
+  let usage = "Usage: " ^ Sys.argv.(0) ^
+              " [-q matpath -demo bool] [-epsilon float] " ^
+              "[-gamma float] [-alpha float] [-n int]" in
   Arg.parse
     speclist
     (fun x -> raise (Arg.Bad ("Bad argument: " ^ x)))
@@ -57,15 +65,16 @@ let () =
   Printf.printf "Parameters: eps=%f:gam=%f:ngames=%d\n" !(cl_params.epsilon)
     !(cl_params.gamma) !(cl_params.ngames) ;
   (* Launching program *)
-  if !(cl_params.demo)
-  then if !(cl_params.qpath) = ""
-    then raise (Arg.Bad "Demo mode requires qpath")
-    else let qmat = Aio.load_mat !(cl_params.qpath) in
+  if !(cl_params.demo) (* Demo mode *)
+  then let qmat = Aio.load_mat !(cl_params.qpath) in
       ignore (Agent.play qmat Game.tetromino_per_game)
-  else if !(cl_params.qpath) = ""
-  then let qinit = Array.make_matrix state_card
-           (Array.length Game.Action.set) 0. in
+  else
+    (* Set Q matrix (load or create *)
+    let qinit = if !(cl_params.qpath) = "" then
+        Array.make_matrix state_card (Array.length Game.Action.set) 0. else
+        Aio.load_mat !(cl_params.qpath)
+    in
+    (* Start training *)
     Agent.train qinit !(cl_params.epsilon) !(cl_params.gamma)
       (fun k -> 1. /. (1. +. !(cl_params.alphap) *. float k))
-      !(cl_params.ngames)
-      Game.tetromino_per_game
+      !(cl_params.ngames) Game.tetromino_per_game
