@@ -59,22 +59,22 @@ let choose_action = fun q epsilon state action_set ->
     (action_set.(action_no), action_no)
 
 (** Function updating Q matrix *)
-let update_qmat qmat eps gam alpha nturns =
+let update_qmat qmat eps gam alpha ntetr =
   (* Initialise state *)
   let board = ref (Game.Board.make ())
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let state = ref (get_state !board !tetromino) in
 
-  for i = 0 to nturns- 1 do
+  for i = 0 to ntetr - 1 do
     (* Compute action *)
     let action, act_ind = choose_action qmat eps !state Game.Action.set in
     (* Update board accordingly to action *)
     board := Game.play !board !tetromino action ;
-    (* Compute the reward associated to the board *)
-    let reward = get_reward !board in
     (* Create next state *)
     tetromino := Game.Tetromino.make_rand () ;
     let nstate = get_state !board !tetromino in
+    (* Compute the reward associated to the board *)
+    let reward = get_reward !board in
     (* Update Q matrix *)
     qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(nstate).(act_ind) +.
                               (alpha i) *.
@@ -95,7 +95,7 @@ let train qmat eps gam alpha ngames ntetr =
     Printf.printf "%d\n" new_height
   done
 
-(** Plays a game of ntetr with qmat *)
+(** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
 let play qmat ntetr =
   let board = ref (Game.Board.make ())
   and tetromino = ref (Game.Tetromino.make_rand ()) in
