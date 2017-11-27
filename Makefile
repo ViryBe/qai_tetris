@@ -5,7 +5,7 @@ PACKAGES = bolt
 OCAMLC = $(CC) -package $(PACKAGES) -linkpkg
 DOCGEN = ocamlfind ocamldoc -package $(PACKAGES) -d $(DOC_DIR) -html
 DEPGEN = ocamlfind ocamldep -package $(PACKAGES)
-MODULES = agent game aio
+MODULES = game aio agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmx)
@@ -16,7 +16,7 @@ all: .depend byte
 byte: $(TARGET)
 
 $(TARGET): $(CINT) $(OBJS) main.ml
-	$(MAINCC) $(OBJS) main.ml -o $@
+	$(OCAMLC) $(OBJS) main.ml -o $@
 
 %.cmi: %.mli
 	$(OCAMLC) $<
