@@ -21,10 +21,6 @@ module Board = struct
   let update_board board height =
     {board = board; stacked_height = height}
 
-  let update_height_board board height =
-    board.stacked_height <- height
-
-
   (** Gives the height of the given board, i.e. number of stages stacked *)
   let height b = b.stacked_height
 
@@ -47,9 +43,9 @@ module Board = struct
     done;
     !n = 6
 
-  (** Document me! *)
-  let update_height board x y =
-    if board.(x).(y) = 0 && board.(x).(y+1) = 0 then x else x-1
+  (** Returns height of board after placing a tetromino at (x, y) *)
+  let assess_height board x y =
+    if board.(x).(y) = 0 && board.(x).(y+1) = 0 then (x-1) else x
 end
 
 module Tetromino = struct
@@ -144,20 +140,6 @@ let collide table x y tetromino rotation =
   done;
   !n
 
-let update_height board x y =
-  if board.(x).(y) > 0 || board.(x).(y+1) > 0 then
-    begin
-      print_int x;
-      print_string ": Au moins un 1 en haut \n";
-      x
-    end
-  else
-    begin
-      print_int (x-1);
-      print_string ": pas de 1 en haut \n";
-      x-1
-    end
-
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in
   for i=0 to 1 do
@@ -168,14 +150,7 @@ let place_tetromino table tetromino rotation x y =
     done;
   done;
   print_string "Place tetromino \n";
-  Board.update_board board (max (update_height board (x+1) y) (Board.height table))
-
-let is_full board x =
-  let n = ref(0) in
-  for i=0 to 5 do
-    if board.(x).(i) = 1 then n := !n + 1;
-  done;
-  !n = 6
+  Board.update_board board (max (Board.assess_height board (x+1) y) (Board.height table))
 
 let print_debug_array board stacked =
   for i=stacked downto 0 do
@@ -192,16 +167,16 @@ let play board tetromino action =
   while !x >= 0 && not (collide board !x y tetromino (Action.get_rotation action)) do
     x := !x - 1;
   done;
-  let t = place_tetromino board tetromino (Action.get_rotation action) (!x+1) y in
+  let nboard = place_tetromino board tetromino (Action.get_rotation action) (!x+1) y in
   for i=0 to 1 do
-    let table = Board.get_board t in
+    let table = Board.get_board nboard in
     let line = !x - i in
-    if line > 0 && is_full table line then
+    if line > 0 && Board.is_full table line then
       begin
-      Array.blit table (line+1) table line ((Board.height t)-line-1);
-      Board.update_height_board t ((Board.height t) -1 );
+      Array.blit table (line+1) table line ((Board.height nboard)-line-1);
+      nboard.stacked_height <- ((Board.height nboard) -1 );
       print_string "is full"
       end
   done;
-  print_debug_array (Board.get_board t) (Board.height t);
-  t
+  print_debug_array (Board.get_board nboard) (Board.height nboard);
+  nboard
