@@ -29,6 +29,12 @@ module Auxfct = struct
     if height >= 2 then
       Game.Board.to_arr (height - 2) height board else
       Game.Board.to_arr 0 height board
+
+  let arr_find arr elt =
+    let rec loop k =
+      if arr.(k) = elt then k else loop (k+1)
+    in
+    loop 0
 end
 
 (** Logging shortcut, to log with adequate logger *)
@@ -40,9 +46,11 @@ let get_reward board = Game.Board.height board
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
   let board_repr = Auxfct.get_board_top board
-  and tetromino_repr = Game.Tetromino.to_arr tetromino in
+  and tetromino_repr = Auxfct.arr_find Game.Tetromino.tetromino_list
+      tetromino in
   let board_one = Array.fold_left Array.append [| |] board_repr in
-  Auxfct.arr2dig (Array.append board_one tetromino_repr)
+  let dig_board = Auxfct.arr2dig board_one in
+  tetromino_repr lsl (Game.Board.width * 2) + dig_board
 
 (** gives the action coresponding to index_action *)
 let map_action = fun index_action action_set -> action_set.(index_action)

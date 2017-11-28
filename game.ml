@@ -20,6 +20,8 @@ module Board = struct
   (** Total length of the board *)
   let total_length = 6
 
+  (** Width of the board *)
+  let width = 6
 
   (** Creates an empty board *)
   let make () =

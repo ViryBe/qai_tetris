@@ -11,6 +11,9 @@ module Board : sig
   (** Gives the height of the given board, i.e. number of stages stacked *)
   val height : t -> int
 
+  (** Width of the considered board *)
+  val width : int
+
   (** Creates a representation of the board *)
   val to_arr : int -> int -> t -> int array array
   (** [to_arr l u b] outputs a matrix representing the board
@@ -22,6 +25,9 @@ end
 module Tetromino : sig
   (** Tetromino type *)
   type t
+
+  (** Array of tetrominos *)
+  val tetromino_list : t array
 
   (** Generates a random tetromino *)
   val make_rand : unit -> t
