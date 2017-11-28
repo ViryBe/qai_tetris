@@ -10,8 +10,8 @@ let print_debug_array board stacked =
 module Board = struct
   (** The tetris board *)
   type t = {
-      mutable board : int array array;
-      mutable stacked_height : int
+      board : int array array;
+      stacked_height : int
   }
 
   (** Total height of the board *)
@@ -27,8 +27,8 @@ module Board = struct
      stacked_height = 0
     }
 
-  let update_board board height =
-    {board = board; stacked_height = height}
+  (** Creates a board filled with board of height height *)
+  let make_filled board height = {board = board; stacked_height = height}
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
   let height b = b.stacked_height
@@ -140,7 +140,6 @@ let collide table x y tetromino rotation =
   let n = ref(false) in
   for i=0 to 1 do
     for j=0 to 1 do
-      print_debug_array (Board.get_board table) (Board.height table) ;
       if (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
          (Board.get_board table).(x-i).(y+j) = 1  then
         begin
@@ -150,6 +149,7 @@ let collide table x y tetromino rotation =
   done;
   !n
 
+(** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in
   for i=0 to 1 do
@@ -159,27 +159,27 @@ let place_tetromino table tetromino rotation x y =
         (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j)
     done;
   done;
-  Board.update_board board (max (Board.assess_height board x y) (Board.height table))
+  Board.make_filled board (max (Board.assess_height board x y)
+                             (Board.height table))
 
 let play board tetromino action =
   let x = ref((Board.height board) + 2) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
-  while !x > 0 && not (collide board !x y tetromino (Action.get_rotation action)) do
+  while !x > 0 && not (collide board !x y tetromino
+                         (Action.get_rotation action)) do
     x := !x - 1;
   done;
   x := !x + 1 ;
-  let nboard = place_tetromino board tetromino (Action.get_rotation action) !x y in
+  let nboard = ref (place_tetromino board tetromino (Action.get_rotation action)
+                      !x y) in
   for i=0 to 1 do
-    let table = Board.get_board nboard in
+    let table = Board.get_board !nboard in
     let line = !x - i in
     if line >= 0 && Board.is_full table line then
       begin
-      Array.blit table (line+1) table line ((Board.height nboard) - line);
-      print_debug_array table (Board.height nboard + 2) ;
-      nboard.stacked_height <- ((Board.height nboard) - 1 );
-      nboard.board <- table ;
-      end
+        Array.blit table (line+1)
+          table line (Board.height !nboard - line + 1);
+        nboard := Board.make_filled table (Board.height !nboard - 1)
+      end ;
   done;
-  Printf.printf "final\n" ;
-  print_debug_array (Board.get_board nboard) (Board.height nboard);
-  nboard
+  !nboard
