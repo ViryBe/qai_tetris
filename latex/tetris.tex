@@ -20,11 +20,40 @@
 
 \section{Tetris}
 
-\subsection{Types}
+\subsection{Board}
+
 \begin{lstlisting}[frame=L]
-(* Type plateau (simple alias)  *)
-type plateau = int array array
+(* Plateau de tetris *)
+type t = {board :  int array array ; stacked_height : int}
 \end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction make : créé un plateau vide *)
+val make : () -> t
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction make_filled : créé un plateau rempli *)
+val make_filled : int array array -> int -> t
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction height : Donne la hauteur d'un plateau*)
+val height : t -> int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction to_arr : renvoie le tableau de la ligne low à la ligne high à partir du plateau*)
+val to_arr : int -> int -> t -> int array array
+\end{lstlisting}
+
+\subsection{Action}
+
+\subsection{Qio}
+
+
+\subsection{Types}
+
 
 \begin{lstlisting}[frame=L]
 (* Type piece (simple alias)  *)
