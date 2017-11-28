@@ -7,6 +7,7 @@ OCAMLCOPT = $(CCOPT) -package $(PACKAGES) -linkpkg
 OCAMLC = $(CC) -package $(PACKAGES) -linkpkg
 DOCGEN = ocamlfind ocamldoc -package $(PACKAGES) -d $(DOC_DIR) -html
 DEPGEN = ocamlfind ocamldep -package $(PACKAGES)
+TOPGEN = ocamlfind ocamlmktop -package $(PACKAGES) -linkpkg
 MODULES = game aio agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
@@ -37,6 +38,9 @@ $(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
 
 doc: $(SOURCES) $(INTERFACES) $(CINT)
 	$(DOCGEN) $(SOURCES) $(INTERFACES)
+
+top: $(OBJS)
+	$(TOPGEN) $^
 
 .PHONY: clean tags
 
