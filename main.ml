@@ -1,7 +1,7 @@
 (** Main module of the tetris player, starts everything *)
 
 (** Number of states *)
-let state_card = 20480
+let state_card = 65535
 
 let () =
   (* Load command line parameters *)

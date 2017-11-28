@@ -27,7 +27,7 @@ module Auxfct = struct
   let get_board_top board =
     let height = Game.Board.height board in
     if height >= 2 then
-      Game.Board.to_arr (height - 2) height board else
+      Game.Board.to_arr (height - 1) height board else
       Game.Board.to_arr 0 height board
 end
 
