@@ -70,21 +70,30 @@ module Board = struct
     Printf.printf "------------" ;
     print_newline ()
 
+  let pop arr i =
+    let ret = ref [||] in
+    for j = 0 to (Array.length arr) -1 do
+      if j <> i then
+        ret := Array.append !ret  [|arr.(j)|]
+    done;
+    !ret
+
 
   let update_board board x =
-    let nboard = ref board in
+    let nminus_mligne = ref 0 in
+    let table = ref (get_board board) in
     for i = 0 to 1 do
-      let table = get_board board in
-      let line = x - i in
-      if is_full table line then
+    let line = x - i in
+      if is_full !table line then
         begin
-          Array.blit table (line+1)
-            table line (height board - line + 1);
+          (* Array.blit table (line+1)
+             table line (height board - line + 1); *)
+          table := pop !table line;
 
-          nboard := make_filled table (height board - 1) ;
+          nminus_mligne := !nminus_mligne + 1
         end;
     done;
-    !nboard
+    {board  = !table; stacked_height = (height board - !nminus_mligne)}
 
 end
 
@@ -205,3 +214,4 @@ let play board tetromino action =
   let nboard = place_tetromino board tetromino (Action.get_rotation action)
                       !x y in
   Board.update_board nboard !x
+  (* nboard *)

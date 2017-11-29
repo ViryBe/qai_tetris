@@ -11,7 +11,7 @@ module Auxfct = struct
 
   (** Argmax with random choice if two same max *)
   let argmax_r arr =
-    let epscmp = 1.e-307 in (* Equality on floats isn't reliable *)
+    let epscmp = 1.e-5 in (* Equality on floats isn't reliable *)
     let len = Array.length arr in
     let maxv = flarray_max arr in
     let rec build_maxis k =
@@ -42,7 +42,7 @@ module Auxfct = struct
 end
 
 (** Evaluation function defining reward *)
-let get_reward board = Game.Board.height board
+let get_reward board = 1. /. log (float (Game.Board.height board))
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
@@ -87,7 +87,7 @@ let update_qmat qmat eps gam alpha ntetr =
     (* Update Q matrix *)
     qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(nstate).(act_ind) +.
                               (alpha i) *.
-                              (float_of_int reward +.
+                              (reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate
   done ;
