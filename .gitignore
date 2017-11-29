@@ -14,8 +14,8 @@ _build/
 # name of the executable file
 tetris_player.opt
 tetris_player
+tetris_player.top
 a.out
-tetristop
 
 # ocamlbuild targets
 *.byte
