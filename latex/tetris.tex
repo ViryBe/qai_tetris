@@ -47,6 +47,31 @@ val height : t -> int
 val to_arr : int -> int -> t -> int array array
 \end{lstlisting}
 
+\begin{lstlisting}[frame=L]
+(* Fonction is_full : Vérifie si une ligne est pleine *)
+val is_full : int array array -> int -> bool
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction assess_height : Donne la hauteur après placement du tetromino en (x,y) *)
+val assess_height : int array array -> int -> int -> int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction print : Affiche le plateau *)
+val print : t -> unit
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction pop *)
+val pop : 'a array -> int -> 'a array
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction update_board : met à jour le plateau à partir de l'ancien et de sa hauteur avec la nouvelle pièce (c'est ça ?)*)
+val update_board : t -> int -> t
+\end{lstlisting}
+
 \subsection{Action}
 
 \subsection{Qio}
