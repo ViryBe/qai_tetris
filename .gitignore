@@ -15,6 +15,7 @@ _build/
 tetris_player.opt
 tetris_player
 a.out
+tetristop
 
 # ocamlbuild targets
 *.byte
