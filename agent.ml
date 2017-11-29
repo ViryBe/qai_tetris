@@ -1,5 +1,8 @@
 (** Manages agent training and embodies the agent *)
 
+(** Logging shortcut, to log with adequate logger *)
+let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
+
 (** Auxiliary functions *)
 module Auxfct = struct
 
@@ -8,15 +11,16 @@ module Auxfct = struct
 
   (** Argmax with random choice if two same max *)
   let argmax_r arr =
+    let epscmp = 1.e-307 in (* Equality on floats isn't reliable *)
     let len = Array.length arr in
     let maxv = flarray_max arr in
     let rec build_maxis k =
-      if k >= len then [] else
-      if arr.(k) == maxv then k :: build_maxis (k+1)
+      if k >= len then []
+      else if arr.(k) >= maxv -. epscmp && arr.(k) <= maxv +. epscmp
+      then k :: build_maxis (k+1)
       else build_maxis (k+1)
     in
     let maxis = build_maxis 0 in
-    Random.self_init () ;
     List.nth maxis (Random.int (List.length maxis))
 
   (** One to one mapping from bool array to digit *)
@@ -27,7 +31,7 @@ module Auxfct = struct
   let get_board_top board =
     let height = Game.Board.height board in
     if height >= 2 then
-      Game.Board.to_arr (height - 2) height board else
+      Game.Board.to_arr (height - 1) height board else
       Game.Board.to_arr 0 height board
 
   let arr_find arr elt =
@@ -36,9 +40,6 @@ module Auxfct = struct
     in
     loop 0
 end
-
-(** Logging shortcut, to log with adequate logger *)
-let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 
 (** Evaluation function defining reward *)
 let get_reward board = Game.Board.height board
