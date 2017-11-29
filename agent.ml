@@ -59,7 +59,7 @@ let map_action = fun index_action action_set -> action_set.(index_action)
 (** chose an action for the current state *)
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
-  if tirage < epsilon
+  if tirage > epsilon
   then
     let action_no = Auxfct.argmax_r q.(state) in
     (action_set.(action_no), action_no)
