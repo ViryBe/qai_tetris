@@ -17,15 +17,18 @@ let () =
   Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
   (* Launching program *)
   if cl_params.demo (* Demo mode *)
-  then let qmat = Aio.Qio.load cl_params.qpath in
-      ignore (Agent.play qmat cl_params.ntetr)
+      then match cl_params.qload with
+      | Some qpath -> let qmat = Aio.Qio.load qpath in
+          ignore (Agent.play qmat cl_params.ntetr)
+      | None -> raise (Arg.Bad "demo mode requires -qload")
   else
     (* Set Q matrix (load or create *)
-    let qinit = if cl_params.qpath = "" then
-        Array.make_matrix state_card (Array.length Game.Action.set) 0. else
-        Aio.Qio.load cl_params.qpath
+    let qinit =
+      match cl_params.qload with
+      | None -> Array.make_matrix state_card (Array.length Game.Action.set) 0.
+      | Some str -> Aio.Qio.load str
     in
     (* Start training *)
-    Agent.train qinit cl_params.epsilon cl_params.gamma
+    Agent.train ?qpath:cl_params.qsave qinit cl_params.epsilon cl_params.gamma
       (fun k -> 1. /. (1. +. cl_params.alphap *. float k))
       cl_params.ngames cl_params.ntetr

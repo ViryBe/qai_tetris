@@ -3,6 +3,14 @@
 (** Logging shortcut, to log with adequate logger *)
 let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 
+(** Used for optional arguments:
+    @param x the optional argument
+    @param f the function calling x *)
+let may ~f x =
+  match x with
+  | None -> ()
+  | Some x -> ignore (f x)
+
 (** Auxiliary functions *)
 module Auxfct = struct
 
@@ -94,15 +102,16 @@ let update_qmat qmat eps gam alpha ntetr =
   !board
 
 (** Train the Q matrix with ngames of nturns each *)
-let train qmat eps gam alpha ngames ntetr =
+let train ?qpath qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:ntetr=%d:eps=%f:gam=%f"
        ngames ntetr eps gam) ;
   for i = 0 to ngames do
     let fboard = (update_qmat qmat eps gam alpha ntetr) in
     Aio.log_game (Printf.sprintf "%f" (get_reward fboard)) ;
-    Printf.printf "Reward of game %d: %f\n" i (get_reward fboard) ;
-  done
+    Printf.printf "Reward of game %d: %f\n" i (get_reward fboard)
+  done ;
+  may (Aio.Qio.save qmat) qpath
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
 let play qmat ntetr =

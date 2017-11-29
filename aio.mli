@@ -7,10 +7,10 @@ module Qio : sig
   type t = float array array
 
   (** Saves any matrix to disk*)
-  val save : float array array -> string -> unit
+  val save : t -> string -> unit
 
   (** Loads a marshalled matrix from file fpath*)
-  val load : string -> float array array
+  val load : string -> t
 end
 
 (** Logs the result of a game *)
@@ -26,7 +26,8 @@ module Clargs : sig
     ngames : int ;
     ntetr : int ;
     demo : bool ;
-    qpath : string ;
+    qload : string option ;
+    qsave : string option ;
   }
 
   (** Parse the command line *)

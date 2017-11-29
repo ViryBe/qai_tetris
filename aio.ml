@@ -36,7 +36,8 @@ module Clargs = struct
     ngames : int ;
     ntetr : int ;
     demo : bool ;
-    qpath : string ;
+    qload : string option ;
+    qsave : string option ;
   }
 
   (** Create refs as arg parser works on ref. A bit overkill *)
@@ -46,12 +47,14 @@ module Clargs = struct
   let ngames = ref 4
   let ntetr = ref 100
   let demo = ref false
-  let qpath = ref ""
+  let qload = ref None
+  let qsave = ref None
 
   (** Usage string *)
   let usage = "Usage: " ^ Sys.argv.(0) ^
-              " [-q matpath -demo bool] [-epsilon float] " ^
-              "[-gamma float] [-alphap float] [-ngames int] [-ntetr int]"
+              " [-demo -qload string] [-epsilon float] " ^
+              "[-gamma float] [-alphap float] [-ngames int] [-ntetr int] " ^
+              "[-qsave string] [-qload string]"
 
   (** Checks adequation of input float parameter
       @param var_ref reference used to store the parameter
@@ -62,22 +65,17 @@ module Clargs = struct
     else param_ref := cl_param
 
   (** Checks existence of file *)
-  let check_qpath given_qpath =
-    if Sys.file_exists !qpath then
-      qpath := given_qpath
+  let check_qload given_qpath =
+    if Sys.file_exists given_qpath then
+      qload := Some given_qpath
     else raise (Arg.Bad ("File " ^ given_qpath ^ " does not exist"))
 
-  let check_demo d =
-    if d then
-      if !qpath = "" then
-        raise (Arg.Bad "path to Q matrix required in demo mode")
-      else demo := true
-    else demo := false (* Leave it to false *)
+  (** Set the option *)
+  let set_option opt_ref arg = opt_ref := Some arg
 
   (** Speclist for argument parsing, mind the order *)
   let speclist = [
-    ("-q", Arg.String check_qpath, "path of Q matrix file");
-    ("-demo", Arg.Bool check_demo, "demo mode");
+    ("-demo", Arg.Set demo, "demo mode, requires qload");
     ("-ngames", Arg.Set_int ngames, "number of games played");
     ("-ntetr", Arg.Set_int ntetr, "number of tetrominos played in a game");
     ("-epsilon", Arg.Float (float_check epsilon),
@@ -85,11 +83,14 @@ module Clargs = struct
     ("-gamma", Arg.Float (float_check gamma),
      "sight length of the policy, in [0, 1]");
     ("-alphap", Arg.Set_float alphap, "parameter of the learning rate");
+    ("-qload", Arg.String check_qload, "path of Q matrix to load");
+    ("-qsave", Arg.String (set_option qsave),
+     "output file for generated Q matrix");
   ]
 
   let parse argv =
     Arg.parse_argv argv speclist
       (fun x -> raise (Arg.Bad ("Bad argument: " ^ x))) usage ;
     {epsilon = !epsilon ; gamma = !gamma ; alphap = !alphap ; ngames = !ngames ;
-     ntetr = !ntetr ; demo = !demo ; qpath = !qpath }
+     ntetr = !ntetr ; demo = !demo ; qload = !qload ; qsave = !qsave }
 end
