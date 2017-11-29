@@ -15,17 +15,22 @@ OBJS = $(MODULES:=.cmo)
 OBJSOPT = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
 
-all: .depend byte opt
+all: .depend byte opt top
 
 byte: $(TARGET)
 
 opt: $(TARGET).opt
+
+top: $(TARGET).top
 
 $(TARGET): $(CINT) $(OBJS) main.ml
 	$(OCAMLC) $(OBJS) main.ml -o $@
 
 $(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
 	$(OCAMLCOPT) $(OBJSOPT) main.ml -o $@
+
+$(TARGET).top: $(OBJS)
+	$(TOPGEN) $^ -o $@
 
 %.cmi: %.mli
 	$(OCAMLC) $<
@@ -38,9 +43,6 @@ $(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
 
 doc: $(SOURCES) $(INTERFACES) $(CINT)
 	$(DOCGEN) $(SOURCES) $(INTERFACES)
-
-top: $(OBJS)
-	$(TOPGEN) $^
 
 .PHONY: clean tags
 
