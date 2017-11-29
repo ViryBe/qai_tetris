@@ -15,7 +15,7 @@ module Board = struct
   }
 
   (** Total height of the board *)
-  let total_height = 200
+  let total_height = 2000
 
   (** Total length of the board *)
   let total_length = 6
@@ -69,6 +69,23 @@ module Board = struct
     done ;
     Printf.printf "------------" ;
     print_newline ()
+
+
+  let update_board board x =
+    let nboard = ref board in
+    for i = 0 to 1 do
+      let table = get_board board in
+      let line = x - i in
+      if is_full table line then
+        begin
+          Array.blit table (line+1)
+            table line (height board - line + 1);
+
+          nboard := make_filled table (height board - 1) ;
+        end;
+    done;
+    !nboard
+
 end
 
 module Tetromino = struct
@@ -168,9 +185,10 @@ let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in
   for i=0 to 1 do
     for j=0 to 1 do
-      board.(x-i).(j+y) <-
-        board.(x-i).(y+j) +
-        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j)
+      board.(x - i).(y + j) <-
+        board.(x - i).(y + j) +
+        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j);
+          Printf.printf "%d\n" board.(x - i).(y + j);
     done;
   done;
   Board.make_filled board (max (Board.assess_height board x y)
@@ -184,21 +202,6 @@ let play board tetromino action =
     x := !x - 1;
   done;
   x := !x + 1 ;
-  let nboard = ref (place_tetromino board tetromino (Action.get_rotation action)
-                      !x y) in
-  for i=0 to 1 do
-    let table = Board.get_board !nboard in
-    let line = !x - i in
-    if line >= 0 && Board.is_full table line then
-      begin
-        Printf.printf "### BLITTING ###\n";
-        Board.print !nboard ;
-        Array.blit table (line+1)
-          table line (Board.height !nboard - line + 1);
-        nboard := Board.make_filled table (Board.height !nboard - 1) ;
-        Printf.printf "Have blitted, result:\n" ;
-        Board.print !nboard
-      end ;
-  done;
-  Board.print !nboard ;
-  !nboard
+  let nboard = place_tetromino board tetromino (Action.get_rotation action)
+                      !x y in
+  Board.update_board nboard !x
