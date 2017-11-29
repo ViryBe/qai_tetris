@@ -15,7 +15,7 @@ module Board = struct
   }
 
   (** Total height of the board *)
-  let total_height = 20000
+  let total_height = 200
 
   (** Total length of the board *)
   let total_length = 6
@@ -57,6 +57,18 @@ module Board = struct
   (** Returns height of board after placing a tetromino at (x, y) *)
   let assess_height board x y =
     if board.(x).(y) = 0 && board.(x).(y+1) = 0 then (x-1) else x
+
+  (** Prints board to stdout *)
+  let print board =
+    Printf.printf "------------\n" ;
+    for i = 0 to board.stacked_height do
+      for j = 0 to total_length - 1 do
+        Printf.printf "%d " board.board.(i).(j)
+      done ;
+      print_newline ()
+    done ;
+    Printf.printf "------------" ;
+    print_newline ()
 end
 
 module Tetromino = struct
@@ -136,7 +148,7 @@ module Action = struct
 
 end
 
-let tetromino_per_game = 10000
+let tetromino_per_game = 100
 
 let collide table x y tetromino rotation =
   let n = ref(false) in
@@ -179,9 +191,14 @@ let play board tetromino action =
     let line = !x - i in
     if line >= 0 && Board.is_full table line then
       begin
+        Printf.printf "### BLITTING ###\n";
+        Board.print !nboard ;
         Array.blit table (line+1)
           table line (Board.height !nboard - line + 1);
-        nboard := Board.make_filled table (Board.height !nboard - 1)
+        nboard := Board.make_filled table (Board.height !nboard - 1) ;
+        Printf.printf "Have blitted, result:\n" ;
+        Board.print !nboard
       end ;
   done;
+  Board.print !nboard ;
   !nboard

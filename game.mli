@@ -19,6 +19,9 @@ module Board : sig
   (** [to_arr l u b] outputs a matrix representing the board
       [b] from line [l] to line [u] (included) where each element is
       one if the square is occupied by a tetromino else zero *)
+
+  (** Prints board to stdout *)
+  val print : t -> unit
 end
 
 (** Manipulates tetrominos in the board *)
