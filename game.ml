@@ -1,12 +1,3 @@
-let print_debug_array board stacked =
-  for i=stacked downto 0 do
-    for j=0 to 5 do
-      print_int board.(i).(j);
-      print_string " ";
-    done;
-    print_string "\n";
-  done
-
 module Board = struct
   (** The tetris board *)
   type t = {
@@ -25,7 +16,7 @@ module Board = struct
 
   (** Creates an empty board *)
   let make () =
-    {board = Array.make_matrix total_height total_length 0;
+    {board = Array.make_matrix total_height width 0;
      stacked_height = 0
     }
 
@@ -62,7 +53,7 @@ module Board = struct
   let print board =
     Printf.printf "------------\n" ;
     for i = 0 to board.stacked_height do
-      for j = 0 to total_length - 1 do
+      for j = 0 to width - 1 do
         Printf.printf "%d " board.board.(i).(j)
       done ;
       print_newline ()
@@ -77,7 +68,6 @@ module Board = struct
         ret := Array.append !ret  [|arr.(j)|]
     done;
     !ret
-
 
   let update_board board x =
     let nminus_mligne = ref 0 in
@@ -197,7 +187,6 @@ let place_tetromino table tetromino rotation x y =
       board.(x - i).(y + j) <-
         board.(x - i).(y + j) +
         (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j);
-          Printf.printf "%d\n" board.(x - i).(y + j);
     done;
   done;
   Board.make_filled board (max (Board.assess_height board x y)
@@ -214,4 +203,3 @@ let play board tetromino action =
   let nboard = place_tetromino board tetromino (Action.get_rotation action)
                       !x y in
   Board.update_board nboard !x
-  (* nboard *)

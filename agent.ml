@@ -98,10 +98,9 @@ let train qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:eps=%f:gam=%f" ngames eps gam) ;
   for i = 0 to ngames do
-    let new_height = Game.Board.height
-        (update_qmat qmat eps gam alpha ntetr) in
-    Aio.log_game (Printf.sprintf "%d" new_height) ;
-    Printf.printf "%d\n" new_height
+    let fboard = (update_qmat qmat eps gam alpha ntetr) in
+    Aio.log_game (Printf.sprintf "%f" (get_reward fboard)) ;
+    Printf.printf "Reward of game %d: %f\n" i (get_reward fboard) ;
   done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
