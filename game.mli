@@ -50,9 +50,6 @@ module Action : sig
 
 end
 
-(** Number of tetromino played in a game *)
-val tetromino_per_game : int
-
 (** Plays a turn and gives updated board *)
 val play : Board.t -> Tetromino.t -> Action.t -> Board.t
 (** [play b t a] plays the action [a] on tetromino [t] in board [b] and returns

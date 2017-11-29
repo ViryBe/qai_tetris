@@ -15,12 +15,10 @@ let () =
   in
   (* Init logconf *)
   Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
-  Printf.printf "Parameters: eps=%f:gam=%f:alphap=%f:ngames=%d\n"
-    cl_params.epsilon cl_params.gamma cl_params.alphap cl_params.ngames ;
   (* Launching program *)
   if cl_params.demo (* Demo mode *)
   then let qmat = Aio.Qio.load cl_params.qpath in
-      ignore (Agent.play qmat Game.tetromino_per_game)
+      ignore (Agent.play qmat cl_params.ntetr)
   else
     (* Set Q matrix (load or create *)
     let qinit = if cl_params.qpath = "" then
@@ -30,4 +28,4 @@ let () =
     (* Start training *)
     Agent.train qinit cl_params.epsilon cl_params.gamma
       (fun k -> 1. /. (1. +. cl_params.alphap *. float k))
-      cl_params.ngames Game.tetromino_per_game
+      cl_params.ngames cl_params.ntetr

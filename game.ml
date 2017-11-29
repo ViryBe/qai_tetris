@@ -5,11 +5,8 @@ module Board = struct
       stacked_height : int
   }
 
-  (** Total height of the board *)
+  (** Total height of the board TODO eh eh, remove *)
   let total_height = 2000
-
-  (** Total length of the board *)
-  let total_length = 6
 
   (** Width of the board *)
   let width = 6
@@ -163,8 +160,6 @@ module Action = struct
     |]
 
 end
-
-let tetromino_per_game = 100
 
 let collide table x y tetromino rotation =
   let n = ref(false) in

@@ -34,6 +34,7 @@ module Clargs = struct
     gamma : float ;
     alphap : float ;
     ngames : int ;
+    ntetr : int ;
     demo : bool ;
     qpath : string ;
   }
@@ -43,13 +44,14 @@ module Clargs = struct
   let gamma = ref 0.2
   let alphap = ref 1.
   let ngames = ref 4
+  let ntetr = ref 100
   let demo = ref false
   let qpath = ref ""
 
   (** Usage string *)
   let usage = "Usage: " ^ Sys.argv.(0) ^
               " [-q matpath -demo bool] [-epsilon float] " ^
-              "[-gamma float] [-alphap float] [-n int]"
+              "[-gamma float] [-alphap float] [-ngames int] [-ntetr int]"
 
   (** Checks adequation of input float parameter
       @param var_ref reference used to store the parameter
@@ -76,17 +78,18 @@ module Clargs = struct
   let speclist = [
     ("-q", Arg.String check_qpath, "path of Q matrix file");
     ("-demo", Arg.Bool check_demo, "demo mode");
-    ("-n", Arg.Set_int ngames, "number of games played");
+    ("-ngames", Arg.Set_int ngames, "number of games played");
+    ("-ntetr", Arg.Set_int ntetr, "number of tetrominos played in a game");
     ("-epsilon", Arg.Float (float_check epsilon),
      "frequency of random action, in [0, 1]");
     ("-gamma", Arg.Float (float_check gamma),
      "sight length of the policy, in [0, 1]");
-    ("-alpha", Arg.Set_float alphap, "parameter of the learning rate");
+    ("-alphap", Arg.Set_float alphap, "parameter of the learning rate");
   ]
 
   let parse argv =
     Arg.parse_argv argv speclist
       (fun x -> raise (Arg.Bad ("Bad argument: " ^ x))) usage ;
     {epsilon = !epsilon ; gamma = !gamma ; alphap = !alphap ; ngames = !ngames ;
-     demo = !demo ; qpath = !qpath }
+     ntetr = !ntetr ; demo = !demo ; qpath = !qpath }
 end

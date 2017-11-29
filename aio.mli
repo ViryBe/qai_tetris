@@ -24,6 +24,7 @@ module Clargs : sig
     gamma : float ;
     alphap : float ;
     ngames : int ;
+    ntetr : int ;
     demo : bool ;
     qpath : string ;
   }
