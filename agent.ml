@@ -105,7 +105,9 @@ let train qmat eps gam alpha ngames ntetr =
   let get_reward_norm = get_reward ntetr in
   for i = 0 to ngames do
     let fboard = (update_qmat qmat eps gam alpha ntetr get_reward_norm) in
-    Aio.log_game (Printf.sprintf "game %d: %f" i (get_reward_norm fboard)) ;
+    let reward = get_reward_norm fboard in
+    Aio.log_game (Printf.sprintf "game %d: %f" i reward) ;
+    Aio.log_reward reward ;
     Printf.printf "Reward of game %d: %f\n" i (get_reward_norm fboard)
   done
 

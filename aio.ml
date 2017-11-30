@@ -27,6 +27,10 @@ end
     @param msg string containing the message *)
 let log_game msg = Bolt.Logger.log "gamesave" Bolt.Level.INFO msg
 
+(** Logs reward in a gnuplot friendly format *)
+let log_reward rew = Bolt.Logger.log "gnuplot_reward" Bolt.Level.INFO
+    (Printf.sprintf "%f" rew)
+
 module Clargs = struct
   (** Holds all the parameters *)
   type t = {

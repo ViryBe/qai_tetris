@@ -16,6 +16,9 @@ end
 (** Logs the result of a game *)
 val log_game : string -> unit
 
+(** Logs reward in a gnuplot friendly format *)
+val log_reward : float -> unit
+
 (** Manages command line *)
 module Clargs : sig
   (** Type of the parameters *)
