@@ -51,6 +51,6 @@ module Action : sig
 end
 
 (** Plays a turn and gives updated board *)
-val play : Board.t -> Tetromino.t -> Action.t -> Board.t
-(** [play b t a] plays the action [a] on tetromino [t] in board [b] and returns
-    a new board with the consequences of the turn *)
+val play : Board.t -> Tetromino.t -> Action.t -> unit
+(** [play b t a] plays the action [a] on tetromino [t] in board [b], updating
+    it in place consequently *)
