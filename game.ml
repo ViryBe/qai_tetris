@@ -36,13 +36,6 @@ module Board = struct
 
   (** Checks whether line is full *)
   let is_full board x = Array.fold_left ( && ) true board.(x)
-      (*
-    let n = ref 0 in
-    for i = 0 to 5 do
-      if board.(x).(i) then n := !n + 1;
-    done;
-    !n = 6
-         *)
 
   (** Returns height of board after placing a tetromino at (x, y) *)
   let assess_height board x y =
@@ -60,14 +53,6 @@ module Board = struct
     Printf.printf "------------" ;
     print_newline ()
 
-  let pop arr i =
-    let ret = ref [||] in
-    for j = 0 to (Array.length arr) -1 do
-      if j <> i then
-        ret := Array.append !ret  [|arr.(j)|]
-    done;
-    !ret
-
   (** Removes full lines *)
   let update_board board x =
     let nminus_mligne = ref 0 in
@@ -77,12 +62,10 @@ module Board = struct
       if is_full !table line then
         begin
           Array.blit !table (line+1) !table line (height board - line + 1);
-          (* table := pop !table line; *)
           nminus_mligne := !nminus_mligne + 1
         end
     done ;
     board.stacked_height <- board.stacked_height - !nminus_mligne
-    (* {board  = !table; stacked_height = (height board - !nminus_mligne)} *)
 
   (** Update height (in place) *)
   let update_height board new_height = board.stacked_height <- new_height
