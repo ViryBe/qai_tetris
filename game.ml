@@ -200,5 +200,4 @@ let play board tetromino action =
   done;
   x := !x + 1 ;
   place_tetromino board tetromino (Action.get_rotation action) !x y ;
-  Board.update_board board !x ;
-  board
+  Board.update_board board !x
