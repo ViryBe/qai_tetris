@@ -45,7 +45,7 @@ module Clargs = struct
   }
 
   (** Create refs as arg parser works on ref. A bit overkill *)
-  let epsilon = ref 0.2
+  let epsilon = ref 0.05
   let gamma = ref 0.2
   let alphap = ref 1.
   let ngames = ref 4

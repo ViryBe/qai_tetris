@@ -107,8 +107,7 @@ let train qmat eps gam alpha ngames ntetr =
     let fboard = (update_qmat qmat eps gam alpha ntetr get_reward_norm) in
     let reward = get_reward_norm fboard in
     Aio.log_game (Printf.sprintf "game %d: %f" i reward) ;
-    Aio.log_reward reward ;
-    Printf.printf "Reward of game %d: %f\n" i (get_reward_norm fboard)
+    Aio.log_reward reward
   done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
