@@ -65,9 +65,6 @@ let get_state board tetromino =
   let dig_board = Auxfct.arr2dig board_one in
   tetromino_repr lsl (Game.Board.width * 2) + dig_board
 
-(** gives the action coresponding to index_action *)
-let map_action = fun index_action action_set -> action_set.(index_action)
-
 (** chose an action for the current state *)
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
@@ -79,23 +76,23 @@ let choose_action = fun q epsilon state action_set ->
     let action_no = Random.int (Array.length action_set) in
     (action_set.(action_no), action_no)
 
-(** Function updating Q matrix *)
+(** Function updating Q matrix, plays one game *)
 let update_qmat qmat eps gam alpha ntetr ~get_reward =
   (* Initialise state *)
-  let board = ref (Game.Board.make ())
+  let board = Game.Board.make ()
   and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let state = ref (get_state !board !tetromino) in
+  let state = ref (get_state board !tetromino) in
 
   for i = 0 to ntetr - 1 do
     (* Compute action *)
     let action, act_ind = choose_action qmat eps !state Game.Action.set in
     (* Update board accordingly to action *)
-    board := Game.play !board !tetromino action ;
+    Game.play board !tetromino action ;
     (* Create next state *)
     tetromino := Game.Tetromino.make_rand () ;
-    let nstate = get_state !board !tetromino in
+    let nstate = get_state board !tetromino in
     (* Compute the reward associated to the board *)
-    let reward = get_reward !board in
+    let reward = get_reward board in
     (* Update Q matrix *)
     qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(nstate).(act_ind) +.
                               (alpha i) *.
@@ -103,7 +100,7 @@ let update_qmat qmat eps gam alpha ntetr ~get_reward =
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate
   done ;
-  !board
+  board
 
 (** Train the Q matrix with ngames of nturns each *)
 let train ?qpath qmat eps gam alpha ngames ntetr =
@@ -120,17 +117,15 @@ let train ?qpath qmat eps gam alpha ngames ntetr =
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
 let play qmat ntetr =
-  let board = ref (Game.Board.make ())
+  let board = Game.Board.make ()
   and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let  state = ref (get_state !board !tetromino) in
+  let  state = ref (get_state board !tetromino) in
   for i = 0 to ntetr - 1 do
     let action, _ = choose_action qmat 0. !state Game.Action.set in
-    board := Game.play !board !tetromino action ;
+    Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
-    state := get_state !board !tetromino ;
+    state := get_state board !tetromino ;
   done ;
+  board
 
-  !board
-
-let alpha = fun k ->
-  1. /. (1. +. 18. *. k)
+let alpha = fun k -> 1. /. (1. +. 18. *. k)
