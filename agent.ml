@@ -103,7 +103,7 @@ let update_qmat qmat eps gam alpha ntetr ~get_reward =
   board
 
 (** Train the Q matrix with ngames of nturns each *)
-let train ?qpath qmat eps gam alpha ngames ntetr =
+let train qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:ntetr=%d:eps=%f:gam=%f"
        ngames ntetr eps gam) ;
@@ -112,8 +112,7 @@ let train ?qpath qmat eps gam alpha ngames ntetr =
     let fboard = (update_qmat qmat eps gam alpha ntetr get_reward_norm) in
     Aio.log_game (Printf.sprintf "game %d: %f" i (get_reward_norm fboard)) ;
     Printf.printf "Reward of game %d: %f\n" i (get_reward_norm fboard)
-  done ;
-  may (Aio.Qio.save qmat) qpath
+  done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
 let play qmat ntetr =

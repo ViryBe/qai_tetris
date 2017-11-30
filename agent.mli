@@ -1,8 +1,8 @@
 (** Agent module, builds the Q matrix used by policy *)
 
 (** Builds a Q matrix used by agent to determine actions *)
-val train : ?qpath:string -> float array array -> float -> float -> (int -> float) ->
-  int -> int -> unit
+val train : float array array -> float -> float -> (int -> float) -> int ->
+  int -> unit
 (** [train q e g ak ng nt] trains the matrix [q] with [e] the frequency of
     random choice,
     [g] the sight length of the agent, i.e. weight given to future turns to
