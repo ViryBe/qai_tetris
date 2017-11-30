@@ -116,8 +116,8 @@ let play qmat ntetr =
     let action, _ = choose_action qmat 0. !state Game.Action.set in
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
-    state := get_state board !tetromino ;
+    state := get_state board !tetromino
   done ;
+  Printf.printf "%d Tetrominos: final height of %d\n" ntetr
+    (Game.Board.height board) ;
   board
-
-let alpha = fun k -> 1. /. (1. +. 18. *. k)
