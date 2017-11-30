@@ -46,3 +46,6 @@ log/
 
 # tag files
 tags
+
+# folder containing saved matrices
+data/
