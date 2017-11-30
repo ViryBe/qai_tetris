@@ -41,7 +41,6 @@ doc/
 *.swp
 
 # logging facilities
-.bolt.conf
 log/
 
 # tag files
