@@ -3,14 +3,6 @@
 (** Logging shortcut, to log with adequate logger *)
 let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 
-(** Used for optional arguments:
-    @param x the optional argument
-    @param f the function calling x *)
-let may ~f x =
-  match x with
-  | None -> ()
-  | Some x -> ignore (f x)
-
 (** Auxiliary functions *)
 module Auxfct = struct
 
