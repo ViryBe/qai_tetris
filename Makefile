@@ -33,7 +33,7 @@ $(TARGET).top: $(OBJS)
 	$(TOPGEN) $^ -o $@
 
 %.cmi: %.mli
-	$(OCAMLC) $<
+	$(OCAMLC) -c $<
 
 %.cmo: %.ml
 	$(OCAMLC) -c $<
