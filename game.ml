@@ -5,7 +5,7 @@ module Board = struct
   (** The tetris board *)
   type t = {
       board : bool array array;
-      stacked_height : int
+      mutable stacked_height : int
   }
 
   (** Total height of the board TODO eh eh, remove *)
@@ -20,9 +20,6 @@ module Board = struct
      stacked_height = 0
     }
 
-  (** Creates a board filled with board of height height *)
-  let make_filled board height = {board = board; stacked_height = height}
-
   (** Gives the height of the given board, i.e. number of stages stacked *)
   let height b = b.stacked_height
 
@@ -34,16 +31,18 @@ module Board = struct
     in
     Array.map (fun arr -> Array.map int_of_bool arr) (loop low)
 
-  (** Get the board *)
+  (** Get the board, should be consistent with mutable policy *)
   let get_board b = b.board
 
   (** Checks whether line is full *)
-  let is_full board x =
+  let is_full board x = Array.fold_left ( && ) true board.(x)
+      (*
     let n = ref 0 in
     for i = 0 to 5 do
       if board.(x).(i) then n := !n + 1;
     done;
     !n = 6
+         *)
 
   (** Returns height of board after placing a tetromino at (x, y) *)
   let assess_height board x y =
@@ -69,22 +68,25 @@ module Board = struct
     done;
     !ret
 
+  (** Removes full lines *)
   let update_board board x =
     let nminus_mligne = ref 0 in
     let table = ref (get_board board) in
     for i = 0 to 1 do
-    let line = x - i in
+      let line = x - i in
       if is_full !table line then
         begin
           (* Array.blit table (line+1)
              table line (height board - line + 1); *)
           table := pop !table line;
-
           nminus_mligne := !nminus_mligne + 1
-        end;
-    done;
-    {board  = !table; stacked_height = (height board - !nminus_mligne)}
+        end
+    done ;
+    board.stacked_height <- board.stacked_height - !nminus_mligne
+    (* {board  = !table; stacked_height = (height board - !nminus_mligne)} *)
 
+  (** Update height (in place) *)
+  let update_height board new_height = board.stacked_height <- new_height
 end
 
 module Tetromino = struct
@@ -179,16 +181,16 @@ let collide table x y tetromino rotation =
 
 (** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
-  let board = Board.get_board table in
+  let board = Board.get_board table in (* Still modifies table.board *)
   for i=0 to 1 do
     for j=0 to 1 do
       board.(x - i).(y + j) <-
         board.(x - i).(y + j) ||
-        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1;
+        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1
     done;
   done;
-  Board.make_filled board (max (Board.assess_height board x y)
-                             (Board.height table))
+  Board.update_height table (max (Board.assess_height board x y)
+                               (Board.height table))
 
 let play board tetromino action =
   let x = ref((Board.height board) + 2) in (* +1 to add the new tetromino *)
@@ -198,6 +200,6 @@ let play board tetromino action =
     x := !x - 1;
   done;
   x := !x + 1 ;
-  let nboard = place_tetromino board tetromino (Action.get_rotation action)
-                      !x y in
-  Board.update_board nboard !x
+  place_tetromino board tetromino (Action.get_rotation action) !x y ;
+  Board.update_board board !x ;
+  board
