@@ -1,7 +1,10 @@
+(** Converts bool to int *)
+let int_of_bool b = if b then 1 else 0
+
 module Board = struct
   (** The tetris board *)
   type t = {
-      board : int array array;
+      board : bool array array;
       stacked_height : int
   }
 
@@ -13,7 +16,7 @@ module Board = struct
 
   (** Creates an empty board *)
   let make () =
-    {board = Array.make_matrix total_height width 0;
+    {board = Array.make_matrix total_height width false;
      stacked_height = 0
     }
 
@@ -29,7 +32,7 @@ module Board = struct
       if k > high then [| [| |] |] else
         Array.append [| board.board.(k) |] (loop (k+1))
     in
-    loop low
+    Array.map (fun arr -> Array.map int_of_bool arr) (loop low)
 
   (** Get the board *)
   let get_board b = b.board
@@ -38,20 +41,20 @@ module Board = struct
   let is_full board x =
     let n = ref 0 in
     for i = 0 to 5 do
-      if board.(x).(i) = 1 then n := !n + 1;
+      if board.(x).(i) then n := !n + 1;
     done;
     !n = 6
 
   (** Returns height of board after placing a tetromino at (x, y) *)
   let assess_height board x y =
-    if board.(x).(y) = 0 && board.(x).(y+1) = 0 then (x-1) else x
+    if not board.(x).(y) && not board.(x).(y+1) then (x-1) else x
 
   (** Prints board to stdout *)
   let print board =
     Printf.printf "------------\n" ;
     for i = 0 to board.stacked_height do
       for j = 0 to width - 1 do
-        Printf.printf "%d " board.board.(i).(j)
+        Printf.printf "%b " board.board.(i).(j)
       done ;
       print_newline ()
     done ;
@@ -86,16 +89,16 @@ end
 
 module Tetromino = struct
   (** Tetromino type *)
-  type t = Piece of int array
+  type t = Piece of bool array
 
   (* List of pieces of the game *)
   let tetromino_list =
     [|
-      Piece [|1;1;1;1|]; (* square *)
-      Piece [|1;0;1;0|]; (* line *)
-      Piece [|1;0;0;0|]; (* point *)
-      Piece [|1;0;1;1|]; (* L shape *)
-      Piece [|1;0;0;1|]  (* diag *)
+      Piece [|true;true;true;true|]; (* square *)
+      Piece [|true;false;true;false|]; (* line *)
+      Piece [|true;false;false;false|]; (* point *)
+      Piece [|true;false;true;true|]; (* L shape *)
+      Piece [|true;false;false;true|]  (* diag *)
     |]
 
   (** Generates a random tetromino *)
@@ -105,7 +108,7 @@ module Tetromino = struct
 
   (** Outputs an array representation of a tetromino *)
   let to_arr p = match p with
-    | Piece x -> x
+    | Piece x -> Array.map int_of_bool x
 
 end
 
@@ -166,7 +169,7 @@ let collide table x y tetromino rotation =
   for i=0 to 1 do
     for j=0 to 1 do
       if (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
-         (Board.get_board table).(x-i).(y+j) = 1  then
+         (Board.get_board table).(x-i).(y+j) then
         begin
           n:= true;
         end
@@ -180,8 +183,8 @@ let place_tetromino table tetromino rotation x y =
   for i=0 to 1 do
     for j=0 to 1 do
       board.(x - i).(y + j) <-
-        board.(x - i).(y + j) +
-        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j);
+        board.(x - i).(y + j) ||
+        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1;
     done;
   done;
   Board.make_filled board (max (Board.assess_height board x y)
