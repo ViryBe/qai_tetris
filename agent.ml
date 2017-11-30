@@ -89,7 +89,7 @@ let update_qmat qmat eps gam alpha ntetr ~get_reward =
     (* Compute the reward associated to the board *)
     let reward = get_reward !board in
     (* Update Q matrix *)
-    qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(nstate).(act_ind) +.
+    qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(!state).(act_ind) +.
                               (alpha i) *.
                               (reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
