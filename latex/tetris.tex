@@ -23,7 +23,7 @@
 \subsection{Board}
 
 \begin{lstlisting}[frame=L]
-(* Plateau de tetris *)
+(* Type t : plateau de tetris *)
 type t = {board :  int array array ; stacked_height : int}
 \end{lstlisting}
 
@@ -63,7 +63,7 @@ val print : t -> unit
 \end{lstlisting}
 
 \begin{lstlisting}[frame=L]
-(* Fonction pop *)
+(* Fonction pop : enlève la ligne i d'un tableau *)
 val pop : 'a array -> int -> 'a array
 \end{lstlisting}
 
@@ -72,7 +72,43 @@ val pop : 'a array -> int -> 'a array
 val update_board : t -> int -> t
 \end{lstlisting}
 
+\subsection{Tetromino}
+
+\begin{lstlisting}[frame=L]
+(* Type t *)
+type t = Piece : int array
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction make_rand : génère un tétromino aléatoire *)
+val make_rand : unit -> t
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction to_arr : représentation sous forme de tableau d'un tétromino *)
+val to_arr : int -> int -> t -> int array array
+\end{lstlisting}
+
 \subsection{Action}
+
+\begin{lstlisting}[frame=L]
+(* Type rotation *)
+type rotation =
+  | North
+  | South
+  | East
+  | West
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Type translation : entier entre 0 et 4 (pourquoi pas 5 ?)*)
+type translation = Column : int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Type t *)
+type t = {rot : rotation ; trans : translation}
+\end{lstlisting}
 
 \subsection{Qio}
 
@@ -83,16 +119,6 @@ val update_board : t -> int -> t
 \begin{lstlisting}[frame=L]
 (* Type piece (simple alias)  *)
 type piece = int array array
-\end{lstlisting}
-
-\begin{lstlisting}[frame=L]
-(* Type mouvement (rotation + translation )*)
-type mouvement =
-  | Nord
-  | Sud
-  | Est
-  | Ouset
-  | Placement of int (* sur quelle ligne on place la piece *)
 \end{lstlisting}
 
 \subsection{Fonctions}
