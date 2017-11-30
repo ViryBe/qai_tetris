@@ -9,7 +9,7 @@ module Board = struct
   }
 
   (** Total height of the board TODO eh eh, remove *)
-  let total_height = 2000
+  let total_height = 20001
 
   (** Width of the board *)
   let width = 6
@@ -76,9 +76,8 @@ module Board = struct
       let line = x - i in
       if is_full !table line then
         begin
-          (* Array.blit table (line+1)
-             table line (height board - line + 1); *)
-          table := pop !table line;
+          Array.blit !table (line+1) !table line (height board - line + 1);
+          (* table := pop !table line; *)
           nminus_mligne := !nminus_mligne + 1
         end
     done ;
