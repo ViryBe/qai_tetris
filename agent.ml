@@ -49,8 +49,12 @@ module Auxfct = struct
     loop 0
 end
 
-(** Evaluation function defining reward *)
-let get_reward board = 1. /. log (float (Game.Board.height board))
+(** Evaluation function defining reward
+    @param ntetr a parameter to normalise reward fct, typically the number of
+                 tetrominos
+*)
+let get_reward param board =
+  1. /. ( 1. +. log (1. +. (float param /. (float (Game.Board.height board)))))
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
@@ -76,7 +80,7 @@ let choose_action = fun q epsilon state action_set ->
     (action_set.(action_no), action_no)
 
 (** Function updating Q matrix *)
-let update_qmat qmat eps gam alpha ntetr =
+let update_qmat qmat eps gam alpha ntetr ~get_reward =
   (* Initialise state *)
   let board = ref (Game.Board.make ())
   and tetromino = ref (Game.Tetromino.make_rand ()) in
@@ -106,10 +110,11 @@ let train ?qpath qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:ntetr=%d:eps=%f:gam=%f"
        ngames ntetr eps gam) ;
+  let get_reward_norm = get_reward ntetr in
   for i = 0 to ngames do
-    let fboard = (update_qmat qmat eps gam alpha ntetr) in
-    Aio.log_game (Printf.sprintf "%f" (get_reward fboard)) ;
-    Printf.printf "Reward of game %d: %f\n" i (get_reward fboard)
+    let fboard = (update_qmat qmat eps gam alpha ntetr get_reward_norm) in
+    Aio.log_game (Printf.sprintf "game %d: %f" i (get_reward_norm fboard)) ;
+    Printf.printf "Reward of game %d: %f\n" i (get_reward_norm fboard)
   done ;
   may (Aio.Qio.save qmat) qpath
 
