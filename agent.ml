@@ -41,12 +41,8 @@ module Auxfct = struct
     loop 0
 end
 
-(** Evaluation function defining reward
-    @param ntetr a parameter to normalise reward fct, typically the number of
-                 tetrominos
-*)
-let get_reward param board =
-  1. /. ( 1. +. log (1. +. (float param /. (float (Game.Board.height board)))))
+(** Reward function *)
+let r x = if x >= 0 then 1. /. (1. +. float x) else (-1.) *. (float x)
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
@@ -69,28 +65,29 @@ let choose_action = fun q epsilon state action_set ->
     (action_set.(action_no), action_no)
 
 (** Function updating Q matrix, plays one game *)
-let update_qmat qmat eps gam alpha ntetr ~get_reward =
+let update_qmat qmat eps gam alpha ntetr =
   (* Initialise state *)
   let board = Game.Board.make ()
   and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let state = ref (get_state board !tetromino) in
+  let state = ref (get_state board !tetromino)
+  and height = ref (Game.Board.height board) in
 
   for i = 0 to ntetr - 1 do
     (* Compute action *)
     let action, act_ind = choose_action qmat eps !state Game.Action.set in
     (* Update board accordingly to action *)
     Game.play board !tetromino action ;
-    (* Create next state *)
     tetromino := Game.Tetromino.make_rand () ;
-    let nstate = get_state board !tetromino in
-    (* Compute the reward associated to the board *)
-    let reward = get_reward board in
+    let nheight = Game.Board.height board in
+    let reward = r (nheight - !height)
+    and nstate = get_state board !tetromino in
     (* Update Q matrix *)
     qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(!state).(act_ind) +.
                               (alpha i) *.
                               (reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
-    state := nstate
+    state := nstate ;
+    height := nheight
   done ;
   board
 
@@ -99,12 +96,10 @@ let train qmat eps gam alpha ngames ntetr =
   boltlog Bolt.Level.INFO
     (Printf.sprintf "Session:ngames=%d:ntetr=%d:eps=%f:gam=%f"
        ngames ntetr eps gam) ;
-  let get_reward_norm = get_reward ntetr in
   for i = 0 to ngames do
-    let fboard = (update_qmat qmat eps gam alpha ntetr get_reward_norm) in
-    let reward = get_reward_norm fboard in
-    Aio.log_game (Printf.sprintf "game %d: %f" i reward) ;
-    Aio.log_reward reward
+    let fboard = (update_qmat qmat eps gam alpha ntetr) in
+    let fheight = Game.Board.height fboard in
+    Aio.log_data (float fheight)
   done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
