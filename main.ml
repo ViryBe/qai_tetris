@@ -21,24 +21,28 @@ let () =
     | Arg.Help str -> Printf.printf "%s" str ; raise (Arg.Help "")
     | Arg.Bad str -> Printf.printf "%s" str ; raise (Arg.Bad "")
   in
+  let alphap, gam, eps, ngames = Aio.Clargs.train_params clargs
+  and qload, qsave = Aio.Clargs.qio_params clargs
+  and demo = Aio.Clargs.demo_mode clargs
+  and ntetr = Aio.Clargs.rules clargs
+  in
   (* Init logconf *)
   Bolt.Logger.log "main" Bolt.Level.INFO "Qai tetris started" ;
   (* Launching program *)
-  if clargs.demo (* Demo mode *)
-      then match clargs.qload with
+  if demo (* Demo mode *)
+      then match qload with
       | Some qpath -> let qmat = Aio.Qio.load qpath in
-          ignore (Agent.play qmat clargs.ntetr)
+          ignore (Agent.play qmat ntetr)
       | None -> raise (Arg.Bad "demo mode requires -qload")
   else
     (* Set Q matrix (load or create *)
-    let qinit =
-      match clargs.qload with
+    let qmat =
+      match qload with
       | None -> Array.make_matrix state_card (Array.length Game.Action.set) 0.
       | Some str -> Aio.Qio.load str
     in
     (* Start training *)
-    Agent.train qinit clargs.epsilon clargs.gamma
-      (fun k -> 1. /. (1. +. clargs.alphap *. float k))
-      clargs.ngames clargs.ntetr ;
+    Agent.train qmat eps gam (fun k -> 1. /. (1. +. alphap *. float k))
+      ngames ntetr ;
     (* Save matrix if qsave path is specified *)
-    may (Aio.Qio.save qinit) clargs.qsave
+    may (Aio.Qio.save qmat) qsave

@@ -92,6 +92,19 @@ module Clargs = struct
      "output file for generated Q matrix");
   ]
 
+  (** Gives parameters used to train *)
+  let train_params clargs = (clargs.alphap, clargs.gamma, clargs.epsilon,
+                             clargs.ngames)
+
+  (** Gives input output parameters *)
+  let qio_params clargs = (clargs.qload, clargs.qsave)
+
+  (** Gives the mode used *)
+  let demo_mode clargs = clargs.demo
+
+  (** Gives the rules, for the moment only the number of tetrominos *)
+  let rules clargs = clargs.ntetr
+
   let parse argv =
     Arg.parse_argv argv speclist
       (fun x -> raise (Arg.Bad ("Bad argument: " ^ x))) usage ;

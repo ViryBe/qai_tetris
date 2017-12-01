@@ -22,16 +22,21 @@ val log_data : float -> unit
 (** Manages command line *)
 module Clargs : sig
   (** Type of the parameters *)
-  type t = {
-    epsilon : float ;
-    gamma : float ;
-    alphap : float ;
-    ngames : int ;
-    ntetr : int ;
-    demo : bool ;
-    qload : string option ;
-    qsave : string option ;
-  }
+  type t
+
+  (** Gives the training parameters,
+      @return [(alphap, gamma, epsilon, ngames)] *)
+  val train_params : t -> float * float * float * int
+
+  (** Gives input output paramters regarding Q matrices *)
+  val qio_params : t -> string option * string option
+
+  (** Get use mode, demo or training *)
+  val demo_mode : t -> bool
+
+  (** Gives rules
+      @return [ntetr] number of tetrominos *)
+  val rules : t -> int
 
   (** Parse the command line *)
   val parse : string array -> t
