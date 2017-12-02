@@ -7,7 +7,7 @@ let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
 module Auxfct = struct
 
   (** Simple fuction giving the max of an array *)
-  let flarray_max arr = Array.fold_left max min_float arr
+  let flarray_max arr = Array.fold_left max arr.(0) arr
 
   (** Argmax with random choice if two same max *)
   let argmax_r arr =
@@ -42,10 +42,10 @@ module Auxfct = struct
 end
 
 (** Reward function *)
-let r x = if x >= 2 then 0.
-  else if x = 1 then 50.
-  else if x = 0 then 100.
-  else 100. *. (float (abs x) +. 1.)
+let r x = if x >= 2 then -200.
+  else if x = 1 then -100.
+  else if x = 0 then 1.
+  else 100. *. (float (abs x))
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
