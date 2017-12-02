@@ -54,18 +54,17 @@ module Board = struct
     print_newline ()
 
   (** Removes full lines *)
-  let update_board board x =
+  let update_board b x =
     let nminus_mligne = ref 0 in
-    let table = ref (get_board board) in
     for i = 0 to 1 do
       let line = x - i in
-      if is_full !table line then
+      if is_full b.board line then
         begin
-          Array.blit !table (line+1) !table line (height board - line + 1);
+          Array.blit b.board (line+1) b.board line (height b - line + 1);
           nminus_mligne := !nminus_mligne + 1
         end
     done ;
-    board.stacked_height <- board.stacked_height - !nminus_mligne
+    b.stacked_height <- b.stacked_height - !nminus_mligne
 
   (** Update height (in place) *)
   let update_height board new_height = board.stacked_height <- new_height
