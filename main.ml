@@ -40,9 +40,9 @@ let () =
       match qload with
       | None -> Array.make_matrix state_card (Array.length Game.Action.set) 0.
       | Some str -> Aio.Qio.load str
+    and alpha k = 1. /. (1. +. alphap *. float k)
     in
     (* Start training *)
-    Agent.train qmat eps gam (fun k -> 1. /. (1. +. alphap *. float k))
-      ngames ntetr ;
+    Agent.train qmat eps gam alpha ngames ntetr ;
     (* Save matrix if qsave path is specified *)
     may (Aio.Qio.save qmat) qsave
