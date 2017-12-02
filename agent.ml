@@ -42,7 +42,10 @@ module Auxfct = struct
 end
 
 (** Reward function *)
-let r x = if x >= 0 then 1. /. (1. +. float x) else (-1.) *. (float x)
+let r x = if x >= 2 then 0.
+  else if x = 1 then 50.
+  else if x = 0 then 100.
+  else 100. *. (float (abs x) +. 1.)
 
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =

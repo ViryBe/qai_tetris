@@ -1,5 +1,6 @@
 (** A Input Output module *)
 
+(** Handles Q matrix input output *)
 module Qio = struct
 
   (** Basic type of Q matrix *)
@@ -47,7 +48,7 @@ module Clargs = struct
   (** Create refs as arg parser works on ref. A bit overkill *)
   let epsilon = ref 0.05
   let gamma = ref 0.2
-  let alphap = ref 1.
+  let alphap = ref 0.05
   let ngames = ref 4
   let ntetr = ref 100
   let demo = ref false
