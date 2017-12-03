@@ -1,6 +1,8 @@
 (** Converts bool to int *)
 let int_of_bool b = if b then 1 else 0
 
+let boltlog lvl msg = Bolt.Logger.log "game" lvl msg
+
 module Board = struct
   (** The tetris board *)
   type t = {
@@ -42,9 +44,19 @@ module Board = struct
     if not board.(x).(y) && not board.(x).(y+1) then (x-1) else x
 
   (** Prints board to stdout *)
-  let print board =
+  let print ?low ?up board =
     Printf.printf "------------\n" ;
-    for i = 0 to board.stacked_height do
+    let lb =
+      match low with
+      | None -> 0
+      | Some k -> k
+    and ub =
+      match up with
+      | None -> board.stacked_height
+      | Some k -> k
+    in
+    for i = max 0 lb to ub do
+      Printf.printf "%d: " i ;
       for j = 0 to width - 1 do
         Printf.printf "%b " board.board.(i).(j)
       done ;
@@ -55,16 +67,14 @@ module Board = struct
 
   (** Removes full lines *)
   let update_board b x =
-    let nminus_mligne = ref 0 in
     for i = 0 to 1 do
-      let line = x - i in
+      let line = max 0 (x - i) in
       if is_full b.board line then
         begin
           Array.blit b.board (line+1) b.board line (height b - line + 1);
-          nminus_mligne := !nminus_mligne + 1
+          b.stacked_height <- b.stacked_height - 1
         end
-    done ;
-    b.stacked_height <- b.stacked_height - !nminus_mligne
+    done
 
   (** Update height (in place) *)
   let update_height board new_height = board.stacked_height <- new_height
@@ -173,8 +183,8 @@ let collide table x y tetromino rotation =
 (** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
-  for i=0 to 1 do
-    for j=0 to 1 do
+  for i = 0 to 1 do
+    for j = 0 to 1 do
       board.(x - i).(y + j) <-
         board.(x - i).(y + j) ||
         (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1
@@ -184,7 +194,7 @@ let place_tetromino table tetromino rotation x y =
                                (Board.height table))
 
 let play board tetromino action =
-  let x = ref((Board.height board) + 2) in (* +1 to add the new tetromino *)
+  let x = ref (Board.height board + 2) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
   while !x > 0 && not (collide board !x y tetromino
                          (Action.get_rotation action)) do

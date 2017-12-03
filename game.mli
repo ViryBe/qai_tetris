@@ -20,8 +20,8 @@ module Board : sig
       [b] from line [l] to line [u] (included) where each element is
       one if the square is occupied by a tetromino else zero *)
 
-  (** Prints board to stdout *)
-  val print : t -> unit
+  (** Prints board to stdout from [low] to [up] if precised *)
+  val print : ?low:int -> ?up:int -> t -> unit
 
   (** Saves representation of board to a file *)
   val to_file : string -> t -> unit

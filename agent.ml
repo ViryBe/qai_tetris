@@ -59,13 +59,10 @@ let get_state board tetromino =
 (** chose an action for the current state *)
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
-  if tirage > epsilon
-  then
-    let action_no = Auxfct.argmax_r q.(state) in
-    (action_set.(action_no), action_no)
-  else
-    let action_no = Random.int (Array.length action_set) in
-    (action_set.(action_no), action_no)
+  let action_no = if tirage > epsilon then Auxfct.argmax_r q.(state)
+    else Random.int (Array.length action_set)
+  in
+  (action_set.(action_no), action_no)
 
 (** Function updating Q matrix, plays one game *)
 let update_qmat qmat eps gam alpha ntetr =
