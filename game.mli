@@ -41,6 +41,9 @@ module Tetromino : sig
 
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
+
+  (** Prints tetromino to stdout with North orientation *)
+  val print : t -> unit
 end
 
 (** An action executed by the player *)

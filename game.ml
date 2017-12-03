@@ -45,7 +45,7 @@ module Board = struct
 
   (** Prints board to stdout *)
   let print ?low ?up board =
-    Printf.printf "------------\n" ;
+    Printf.printf "  ------\n" ;
     let lb =
       match low with
       | None -> 0
@@ -55,14 +55,14 @@ module Board = struct
       | None -> board.stacked_height
       | Some k -> k
     in
-    for i = max 0 lb to ub do
-      Printf.printf "%d: " i ;
+    for i = ub downto max 0 lb do
+      Printf.printf "%d:" i ;
       for j = 0 to width - 1 do
-        Printf.printf "%b " board.board.(i).(j)
+        Printf.printf "%s" (if board.board.(i).(j) then "*" else " ")
       done ;
       print_newline ()
     done ;
-    Printf.printf "------------" ;
+    Printf.printf "  ------" ;
     print_newline ()
 
   (** Removes full lines *)
@@ -71,7 +71,7 @@ module Board = struct
       let line = max 0 (x - i) in
       if is_full b.board line then
         begin
-          Array.blit b.board (line+1) b.board line (height b - line + 1);
+          Array.blit b.board (line+1) b.board line (total_height - line - 1);
           b.stacked_height <- b.stacked_height - 1
         end
     done
@@ -114,6 +114,15 @@ module Tetromino = struct
   let to_arr p = match p with
     | Piece x -> Array.map int_of_bool x
 
+  (** Prints tetromino to stdout in default orientation *)
+  let print tetr =
+    match tetr with Piece arr ->
+      for i = 0 to 1 do
+        for j = 0 to 1 do
+          Printf.printf "%s" (if arr.(i + 2*j) then "*" else " ")
+        done ;
+        print_newline ()
+      done ;
 end
 
 module Action = struct
