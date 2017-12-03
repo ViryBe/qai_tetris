@@ -88,6 +88,7 @@ module Board = struct
       done ;
       Printf.fprintf fd "\n"
     done ;
+    close_out fd
 end
 
 module Tetromino = struct
