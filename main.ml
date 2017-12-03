@@ -43,6 +43,9 @@ let () =
     and alpha k = 1. /. (1. +. alphap *. float k)
     in
     (* Start training *)
+    Bolt.Logger.log "gnuplot_data" Bolt.Level.INFO
+      (Printf.sprintf "#ngames=%d:ntetr=%d:alphap=%f:gamma=%f:epsilon=%f"
+         ngames ntetr alphap gam eps) ;
     Agent.train qmat eps gam alpha ngames ntetr ;
     (* Save matrix if qsave path is specified *)
     may (Aio.Qio.save qmat) qsave

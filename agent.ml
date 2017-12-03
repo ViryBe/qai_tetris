@@ -96,9 +96,6 @@ let update_qmat qmat eps gam alpha ntetr =
 
 (** Train the Q matrix with ngames of nturns each *)
 let train qmat eps gam alpha ngames ntetr =
-  boltlog Bolt.Level.INFO
-    (Printf.sprintf "Session:ngames=%d:ntetr=%d:eps=%f:gam=%f"
-       ngames ntetr eps gam) ;
   for i = 0 to ngames do
     let fboard = (update_qmat qmat eps gam alpha ntetr) in
     let fheight = Game.Board.height fboard in
