@@ -68,6 +68,16 @@ module Board = struct
 
   (** Update height (in place) *)
   let update_height board new_height = board.stacked_height <- new_height
+
+  (** Writes board to a file *)
+  let to_file fname b =
+    let fd = open_out fname in
+    for i = b.stacked_height downto 0 do
+      for j = 0 to width - 1 do
+        Printf.fprintf fd "%s" (if b.board.(i).(j) then "*" else " ")
+      done ;
+      Printf.fprintf fd "\n"
+    done ;
 end
 
 module Tetromino = struct

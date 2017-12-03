@@ -22,6 +22,10 @@ module Board : sig
 
   (** Prints board to stdout *)
   val print : t -> unit
+
+  (** Saves representation of board to a file *)
+  val to_file : string -> t -> unit
+  (** [to_file fname b] saves board [b] to file [fname] *)
 end
 
 (** Manipulates tetrominos in the board *)
