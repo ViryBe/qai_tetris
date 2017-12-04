@@ -110,16 +110,51 @@ type translation = Column : int
 type t = {rot : rotation ; trans : translation}
 \end{lstlisting}
 
+\begin{lstlisting}[frame=L]
+(* Fonction int_from_translation : extrait d'une action une translation *)
+val int_from_translation : t -> int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction get_index : donne l'indice en 1D à partir de sindices 2D *)
+val get_index : int -> int -> int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction get_rotation : extrait d'une action une rotation *)
+val get_rotation : t -> rotation
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction make_rotation : donne l'indice 1D après rotation *)
+val make_rotation : rotation -> int -> int -> int
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Toutes les actions possibles *)
+t array set
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction collide : annonce si le tétromino (indiquer la rotation), peut être placé en (x,y) sur le plateau *)
+val collide : Board.t -> int -> int -> Tetromino.t -> rotation -> bool
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction place_tetromino : place le tétromino tourné en (x,y) sur le plateau *)
+val place_tetromino : Board.t -> Tetromino.t -> rotation -> int -> int -> Board.t
+\end{lstlisting}
+
+\begin{lstlisting}[frame=L]
+(* Fonction play : joue un coup *)
+val play : Board.t -> Tetromino.t -> Action.t -> Board.t
+\end{lstlisting}
+
 \subsection{Qio}
 
 
 \subsection{Types}
 
-
-\begin{lstlisting}[frame=L]
-(* Type piece (simple alias)  *)
-type piece = int array array
-\end{lstlisting}
 
 \subsection{Fonctions}
 
