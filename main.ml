@@ -41,6 +41,8 @@ let () =
     and alpha k = 1. /. (1. +. alphap *. float k)
     in
     (* Start training *)
+    Printf.printf "#ngames=%d:ntetr=%d:gamma=%f:alphap=%f:eps=%f\n"
+      ngames ntetr gam alphap eps ;
     Agent.train qmat eps gam alpha ngames ntetr ;
     (* Save matrix if qsave path is specified *)
     may (Aio.Qio.save qmat) qsave
