@@ -87,7 +87,7 @@ let update_qmat bheight qmat eps gam alpha ntetr =
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate ;
     height := nheight;
-    Display.draw_board (Game.Board.to_arr (max 0 (Game.Board.height board - 10)) (Game.Board.height board + 5) board) 3 4
+    (* Display.draw_board (Game.Board.to_arr (max 0 (Game.Board.height board - 10)) (Game.Board.height board + 5) board) 3 4 *)
     (* Game.Board.print board; *)
   done ;
   board
@@ -111,7 +111,13 @@ let play qmat ntetr =
     let action, _ = choose_action qmat 0. !state Game.Action.set in
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
-    state := get_state board !tetromino
+    state := get_state board !tetromino;
+    (* graphic part *)
+    Display.draw_board
+      (Game.Board.to_arr
+         (max 0 (Game.Board.height board - 10))
+         (Game.Board.height board + 5) board)
+      i (Game.Board.height board)
   done ;
   Printf.printf "%d Tetrominos: final height of %d\n" ntetr
     (Game.Board.height board) ;

@@ -141,7 +141,7 @@ module Action = struct
     | Column x -> x
 
   (** 2D to 1D Array - index match *)
-  let get_index i j = 2*i + j
+  let get_index i j = 2 * i + j
 
   let get_rotation action = action.rot
 
@@ -182,13 +182,11 @@ end
 
 let collide table x y tetromino rotation =
   let n = ref(false) in
-  for i=0 to 1 do
-    for j=0 to 1 do
-      if (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
-         (Board.get_board table).(x-i).(y+j) <> 0 then
-        begin
-          n:= true;
-        end
+  for i = 0 to 1 do
+    for j = 0 to 1 do
+      n := !n ||
+           (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
+           (Board.get_board table).(x-i).(y+j) <> 0;
     done;
   done;
   !n

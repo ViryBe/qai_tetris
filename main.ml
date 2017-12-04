@@ -12,8 +12,11 @@ let may ~f x =
   | Some x -> ignore (f x)
 
 let () =
-  let size = (" "^(string_of_int (100))^"x"^(string_of_int (100))) in
+  (* init graphics window *)
+  let size = (" "^(string_of_int (Display.total_width))
+              ^"x"^(string_of_int (Display.total_height))) in
   Graphics.open_graph (size);
+
   Random.self_init () ;
   (* Load command line parameters *)
   let clargs =
@@ -49,4 +52,5 @@ let () =
     (* Save matrix if qsave path is specified *)
     may (Aio.Qio.save qmat) qsave;
 
+  (* close window *)
   Graphics.close_graph ();;
