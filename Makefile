@@ -1,13 +1,10 @@
 TARGET = tetris_player
 DOC_DIR = doc
-CCOPT = ocamlfind ocamlopt -g
-CC = ocamlfind ocamlc -g
-PACKAGES = bolt
-OCAMLCOPT = $(CCOPT) -package $(PACKAGES) -linkpkg
-OCAMLC = $(CC) -package $(PACKAGES) -linkpkg
-DOCGEN = ocamlfind ocamldoc -package $(PACKAGES) -d $(DOC_DIR) -html
-DEPGEN = ocamlfind ocamldep -package $(PACKAGES)
-TOPGEN = ocamlfind ocamlmktop -package $(PACKAGES) -linkpkg
+OCAMLCOPT = ocamlopt
+OCAMLC = ocamlc -g
+DOCGEN = ocamldoc -d $(DOC_DIR) -html
+DEPGEN = ocamldep
+TOPGEN = ocamlmktop
 MODULES = game aio agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)

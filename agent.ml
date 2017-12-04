@@ -1,8 +1,5 @@
 (** Manages agent training and embodies the agent *)
 
-(** Logging shortcut, to log with adequate logger *)
-let boltlog lvl msg = Bolt.Logger.log "agent" lvl msg
-
 (** Auxiliary functions *)
 module Auxfct = struct
 
@@ -98,7 +95,7 @@ let train qmat eps gam alpha ngames ntetr =
   for i = 0 to ngames do
     let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
     let fheight = Game.Board.height fboard in
-    Aio.log_data (float fheight)
+    Printf.printf "%d\n" fheight
   done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)

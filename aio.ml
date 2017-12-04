@@ -24,14 +24,7 @@ module Qio = struct
     (Marshal.from_channel infile : t)
 end
 
-(** Saves a message as a game result
-    @param msg string containing the message *)
-let log_game msg = Bolt.Logger.log "gamesave" Bolt.Level.INFO msg
-
-(** Logs reward in a gnuplot friendly format *)
-let log_data dat = Bolt.Logger.log "gnuplot_data" Bolt.Level.INFO
-    (Printf.sprintf "%f" dat)
-
+(** Manages command line arguments *)
 module Clargs = struct
   (** Holds all the parameters *)
   type t = {

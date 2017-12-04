@@ -1,8 +1,6 @@
 (** Converts bool to int *)
 let int_of_bool b = if b then 1 else 0
 
-let boltlog lvl msg = Bolt.Logger.log "game" lvl msg
-
 module Board = struct
   (** The tetris board *)
   type t = {
