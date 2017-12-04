@@ -5,13 +5,13 @@ OCAMLC = ocamlc -g
 DOCGEN = ocamldoc -d $(DOC_DIR) -html
 DEPGEN = ocamldep
 TOPGEN = ocamlmktop
-MODULES = game aio agent
+MODULES = game aio display agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmo)
 OBJSOPT = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
-LIB = graphics
+LIB = graphics unix
 
 all: .depend byte opt top
 

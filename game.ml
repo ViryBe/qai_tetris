@@ -4,7 +4,7 @@ let int_of_bool b = if b then 1 else 0
 module Board = struct
   (** The tetris board *)
   type t = {
-      board : bool array array;
+      board : int array array;
       mutable stacked_height : int ;
       tot_height : int
   }
@@ -15,7 +15,7 @@ module Board = struct
   (** Creates an empty board *)
   let make h =
     {
-      board = Array.make_matrix h width false ;
+      board = Array.make_matrix h width 0 ;
       stacked_height = 0 ;
       tot_height = h
     }
@@ -29,17 +29,18 @@ module Board = struct
       if k > high then [| [| |] |] else
         Array.append [| board.board.(k) |] (loop (k+1))
     in
-    Array.map (fun arr -> Array.map int_of_bool arr) (loop low)
+    loop low
 
   (** Get the board, should be consistent with mutable policy *)
   let get_board b = b.board
 
   (** Checks whether line is full *)
-  let is_full board x = Array.fold_left ( && ) true board.(x)
+  let is_full board x =
+    Array.fold_left ( && ) true (Array.map (fun elt -> elt <> 0) board.(x))
 
   (** Returns height of board after placing a tetromino at (x, y) *)
   let assess_height board x y =
-    if not board.(x).(y) && not board.(x).(y+1) then (x-1) else x
+    if board.(x).(y) <> 0 || board.(x).(y+1) <> 0 then x else x-1
 
   (** Prints board to stdout *)
   let print ?low ?up board =
@@ -56,7 +57,7 @@ module Board = struct
     for i = ub downto max 0 lb do
       Printf.printf "%d:" i ;
       for j = 0 to width - 1 do
-        Printf.printf "%s" (if board.board.(i).(j) then "*" else " ")
+        Printf.printf "%s" (if board.board.(i).(j) <> 0 then "*" else " ")
       done ;
       print_newline ()
     done ;
@@ -73,7 +74,7 @@ module Board = struct
         begin
           Array.blit b.board (line+1) b.board line len;
           (* Reset upper copied line to avoid dependencies *)
-          b.board.(line + len) <- Array.make width false ;
+          b.board.(line + len) <- Array.make width 0 ;
           b.stacked_height <- b.stacked_height - 1
         end
     done
@@ -86,7 +87,7 @@ module Board = struct
     let fd = open_out fname in
     for i = b.stacked_height downto 0 do
       for j = 0 to width - 1 do
-        Printf.fprintf fd "%s" (if b.board.(i).(j) then "*" else " ")
+        Printf.fprintf fd "%s" (if b.board.(i).(j) <> 0 then "*" else " ")
       done ;
       Printf.fprintf fd "\n"
     done ;
@@ -184,7 +185,7 @@ let collide table x y tetromino rotation =
   for i=0 to 1 do
     for j=0 to 1 do
       if (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
-         (Board.get_board table).(x-i).(y+j) then
+         (Board.get_board table).(x-i).(y+j) <> 0 then
         begin
           n:= true;
         end
@@ -192,14 +193,19 @@ let collide table x y tetromino rotation =
   done;
   !n
 
+let arr_find arr elt =
+  let rec loop k =
+    if arr.(k) = elt then k else loop (k+1)
+  in
+  loop 0
+
 (** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
   for i = 0 to 1 do
     for j = 0 to 1 do
-      board.(x - i).(y + j) <-
-        board.(x - i).(y + j) ||
-        (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1
+      if (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1 then
+        board.(x - i).(y + j) <- (arr_find Tetromino.tetromino_list tetromino) + 1
     done;
   done;
   Board.update_height table (max (Board.assess_height board x y)

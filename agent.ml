@@ -22,7 +22,8 @@ module Auxfct = struct
 
   (** One to one mapping from bool array to digit *)
   let arr2dig arr =
-    Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 arr
+    let line_bin = Array.map (fun elt -> if elt = 0 then 0 else 1) arr in
+    Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 line_bin
 
   (** Outputs the two last lines of the board *)
   let get_board_top board =
@@ -36,6 +37,7 @@ module Auxfct = struct
       if arr.(k) = elt then k else loop (k+1)
     in
     loop 0
+
 end
 
 (** Reward function *)
@@ -84,7 +86,9 @@ let update_qmat bheight qmat eps gam alpha ntetr =
                               (reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate ;
-    height := nheight
+    height := nheight;
+    Display.draw_board (Game.Board.to_arr (max 0 (Game.Board.height board - 10)) (Game.Board.height board + 5) board) 3 4
+    (* Game.Board.print board; *)
   done ;
   board
 

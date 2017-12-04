@@ -1,7 +1,7 @@
 (** Main module of the tetris player, starts everything *)
 
 (** Number of states *)
-let state_card = 20480 
+let state_card = 20480
 
 (** Used for optional arguments:
     @param x the optional argument
@@ -12,6 +12,8 @@ let may ~f x =
   | Some x -> ignore (f x)
 
 let () =
+  let size = (" "^(string_of_int (100))^"x"^(string_of_int (100))) in
+  Graphics.open_graph (size);
   Random.self_init () ;
   (* Load command line parameters *)
   let clargs =
@@ -45,4 +47,6 @@ let () =
       ngames ntetr gam alphap eps ;
     Agent.train qmat eps gam alpha ngames ntetr ;
     (* Save matrix if qsave path is specified *)
-    may (Aio.Qio.save qmat) qsave
+    may (Aio.Qio.save qmat) qsave;
+
+  Graphics.close_graph ();;
