@@ -11,6 +11,7 @@ INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmo)
 OBJSOPT = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
+LIB = graphics
 
 all: .depend byte opt top
 
@@ -21,13 +22,13 @@ opt: $(TARGET).opt
 top: $(TARGET).top
 
 $(TARGET): $(CINT) $(OBJS) main.ml
-	$(OCAMLC) $(OBJS) main.ml -o $@
+	$(OCAMLC) $(LIB:=.cma) $(OBJS) main.ml -o $@
 
 $(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
-	$(OCAMLCOPT) $(OBJSOPT) main.ml -o $@
+	$(OCAMLCOPT) $(LIB:=.cmxa) $(OBJSOPT) main.ml -o $@
 
 $(TARGET).top: $(OBJS)
-	$(TOPGEN) $^ -o $@
+	$(TOPGEN) $(LIB:=.cma) $^ -o $@
 
 %.cmi: %.mli
 	$(OCAMLC) -c $<
