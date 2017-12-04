@@ -94,9 +94,9 @@ let update_qmat bheight qmat eps gam alpha ntetr =
 (** Train the Q matrix with ngames of nturns each *)
 let train qmat eps gam alpha ngames ntetr =
   (* Should ideally be updated during process, limiting height *)
-  let board_height = ref (2 * ntetr + 1) in
+  let bh = 2 * ntetr + 1 in
   for i = 0 to ngames do
-    let fboard = (update_qmat !board_height qmat eps gam alpha ntetr) in
+    let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
     let fheight = Game.Board.height fboard in
     Aio.log_data (float fheight)
   done

@@ -70,8 +70,12 @@ module Board = struct
     for i = 0 to 1 do
       let line = max 0 (x - i) in
       if is_full b.board line then
+        (* We must be sure to have a line of false in the blitted area *)
+        let len = height b - line + 1 in
         begin
-          Array.blit b.board (line+1) b.board line (b.tot_height - line - 1);
+          Array.blit b.board (line+1) b.board line len;
+          (* Reset upper copied line to avoid dependencies *)
+          b.board.(line + len) <- Array.make width false ;
           b.stacked_height <- b.stacked_height - 1
         end
     done
