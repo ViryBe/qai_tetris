@@ -5,8 +5,8 @@ module Board : sig
   (** The tetris board *)
   type t
 
-  (** Creates an empty board *)
-  val make : unit -> t
+  (** Creates an empty board of a given height *)
+  val make : int -> t
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
   val height : t -> int

@@ -65,9 +65,9 @@ let choose_action = fun q epsilon state action_set ->
   (action_set.(action_no), action_no)
 
 (** Function updating Q matrix, plays one game *)
-let update_qmat qmat eps gam alpha ntetr =
+let update_qmat bheight qmat eps gam alpha ntetr =
   (* Initialise state *)
-  let board = Game.Board.make ()
+  let board = Game.Board.make bheight
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let state = ref (get_state board !tetromino)
   and height = ref (Game.Board.height board) in
@@ -93,15 +93,17 @@ let update_qmat qmat eps gam alpha ntetr =
 
 (** Train the Q matrix with ngames of nturns each *)
 let train qmat eps gam alpha ngames ntetr =
+  (* Should ideally be updated during process, limiting height *)
+  let board_height = ref (2 * ntetr + 1) in
   for i = 0 to ngames do
-    let fboard = (update_qmat qmat eps gam alpha ntetr) in
+    let fboard = (update_qmat !board_height qmat eps gam alpha ntetr) in
     let fheight = Game.Board.height fboard in
     Aio.log_data (float fheight)
   done
 
 (** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
 let play qmat ntetr =
-  let board = Game.Board.make ()
+  let board = Game.Board.make (2 * ntetr + 1)
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let  state = ref (get_state board !tetromino) in
   for i = 0 to ntetr - 1 do

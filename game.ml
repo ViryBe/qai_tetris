@@ -7,19 +7,19 @@ module Board = struct
   (** The tetris board *)
   type t = {
       board : bool array array;
-      mutable stacked_height : int
+      mutable stacked_height : int ;
+      tot_height : int
   }
-
-  (** Total height of the board TODO eh eh, remove *)
-  let total_height = 20001
 
   (** Width of the board *)
   let width = 6
 
   (** Creates an empty board *)
-  let make () =
-    {board = Array.make_matrix total_height width false;
-     stacked_height = 0
+  let make h =
+    {
+      board = Array.make_matrix h width false ;
+      stacked_height = 0 ;
+      tot_height = h
     }
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
@@ -71,7 +71,7 @@ module Board = struct
       let line = max 0 (x - i) in
       if is_full b.board line then
         begin
-          Array.blit b.board (line+1) b.board line (total_height - line - 1);
+          Array.blit b.board (line+1) b.board line (b.tot_height - line - 1);
           b.stacked_height <- b.stacked_height - 1
         end
     done
