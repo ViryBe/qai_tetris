@@ -34,7 +34,9 @@ let () =
 
     match qload with
     | Some qpath -> let qmat = Aio.Qio.load qpath in
-        (Graphics.open_graph (size);ignore (Agent.play qmat ntetr);Graphics.close_graph ();)
+      (Graphics.open_graph (size);
+       ignore (Agent.play qmat ntetr);
+       Graphics.close_graph ();)
     | None -> raise (Arg.Bad "demo mode requires -qload")
   else
     (* Set Q matrix (load or create *)
