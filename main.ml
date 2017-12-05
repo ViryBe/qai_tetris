@@ -12,11 +12,6 @@ let may ~f x =
   | Some x -> ignore (f x)
 
 let () =
-  (* init graphics window *)
-  let size = (" "^(string_of_int (Display.total_width))
-              ^"x"^(string_of_int (Display.total_height))) in
-  Graphics.open_graph (size);
-
   Random.self_init () ;
   (* Load command line parameters *)
   let clargs =
@@ -32,11 +27,15 @@ let () =
   and ntetr = Aio.Clargs.rules clargs
   in
   (* Launching program *)
-  if demo (* Demo mode *)
-      then match qload with
-      | Some qpath -> let qmat = Aio.Qio.load qpath in
-          ignore (Agent.play qmat ntetr)
-      | None -> raise (Arg.Bad "demo mode requires -qload")
+  if demo then(* Demo mode *)
+  (* init graphics window *)
+    let size = (" "^(string_of_int (Display.total_width))
+              ^"x"^(string_of_int (Display.total_height))) in
+
+    match qload with
+    | Some qpath -> let qmat = Aio.Qio.load qpath in
+        (Graphics.open_graph (size);ignore (Agent.play qmat ntetr);Graphics.close_graph ();)
+    | None -> raise (Arg.Bad "demo mode requires -qload")
   else
     (* Set Q matrix (load or create *)
     let qmat =
@@ -51,6 +50,3 @@ let () =
     Agent.train qmat eps gam alpha ngames ntetr ;
     (* Save matrix if qsave path is specified *)
     may (Aio.Qio.save qmat) qsave;
-
-  (* close window *)
-  Graphics.close_graph ();;
