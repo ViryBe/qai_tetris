@@ -221,7 +221,7 @@ let collide table x y tetromino rotation =
       let tetrarr = Tetromino.to_arr tetromino
       and ind_afterot = Action.make_rotation rotation i j in
       n := !n ||
-           tetrarr.(ind_afterot) = 1 &&
+           tetrarr.(ind_afterot) > 0 &&
            (Board.get_board table).(x-i).(y+j) <> 0;
     done;
   done;
