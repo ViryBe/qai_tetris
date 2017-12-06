@@ -227,12 +227,6 @@ let collide table x y tetromino rotation =
   done;
   !n
 
-let arr_find arr elt =
-  let rec loop k =
-    if arr.(k) = elt then k else loop (k+1)
-  in
-  loop 0
-
 (** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
