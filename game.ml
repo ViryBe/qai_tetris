@@ -94,56 +94,25 @@ module Board = struct
     close_out fd
 end
 
-module Tetromino = struct
-  (** Tetromino type *)
-  type t = Piece of bool array
-
-  (* List of pieces of the game *)
-  let tetromino_list =
-    [|
-      Piece [|true;true;true;true|]; (* square *)
-      Piece [|true;false;true;false|]; (* line *)
-      Piece [|true;false;false;false|]; (* point *)
-      Piece [|true;false;true;true|]; (* L shape *)
-      Piece [|true;false;false;true|]  (* diag *)
-    |]
-
-  (** Generates a random tetromino *)
-  let make_rand () =
-    let n = Random.int (Array.length tetromino_list) in
-    tetromino_list.(n)
-
-  (** Outputs an array representation of a tetromino *)
-  let to_arr p = match p with
-    | Piece x -> Array.map int_of_bool x
-
-  (** Prints tetromino to stdout in default orientation *)
-  let print tetr =
-    match tetr with Piece arr ->
-      for i = 0 to 1 do
-        for j = 0 to 1 do
-          Printf.printf "%s" (if arr.(i + 2*j) then "*" else " ")
-        done ;
-        print_newline ()
-      done ;
-end
-
 module Action = struct
 
-  type rotation = North | South | East | West
-  type translation = Column of int (* Int between 0 and 4 *)
+  (** Available orientations for tetrominos *)
+  type rotation = 
+    | North
+    | South
+    | East
+    | West
 
   (** The type of an action *)
-  type t = {rot : rotation; trans : translation}
+  type t = {rot : rotation; trans : int}
 
   (** Extracts the translation component of an action *)
-  let int_from_translation action = match action.trans with
-    | Column x -> x
+  let int_from_translation action = action.trans
+
+  let get_rotation action = action.rot
 
   (** 2D to 1D Array - index match *)
   let get_index i j = 2 * i + j
-
-  let get_rotation action = action.rot
 
   (** Give the correct index for 1D Array after a rotation *)
   let make_rotation rotation i j =
@@ -154,38 +123,105 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
+  (** Associates an id to an action *)
+  let action_to_id act =
+    let rotint = match act.rot with
+      | North -> 0
+      | South -> 1
+      | East -> 2
+      | West -> 3
+    in
+    (act.trans lsl 2) + rotint
+
   (** The set of all possible actions *)
   let set =
-    [|{rot=North; trans = Column 0};
-      {rot=North; trans = Column 1};
-      {rot=North; trans = Column 2};
-      {rot=North; trans = Column 3};
-      {rot=North; trans = Column 4};
-      {rot=East; trans = Column 0};
-      {rot=East; trans = Column 1};
-      {rot=East; trans = Column 2};
-      {rot=East; trans = Column 3};
-      {rot=East; trans = Column 4};
-      {rot=South; trans = Column 0};
-      {rot=South; trans = Column 1};
-      {rot=South; trans = Column 2};
-      {rot=South; trans = Column 3};
-      {rot=South; trans = Column 4};
-      {rot=West; trans = Column 0};
-      {rot=West; trans = Column 1};
-      {rot=West; trans = Column 2};
-      {rot=West; trans = Column 3};
-      {rot=West; trans = Column 4}
+    [|
+      {rot = North; trans = 0};
+      {rot = North; trans = 1};
+      {rot = North; trans = 2};
+      {rot = North; trans = 3};
+      {rot = North; trans = 4};
+      {rot = East; trans = 0};
+      {rot = East; trans = 1};
+      {rot = East; trans = 2};
+      {rot = East; trans = 3};
+      {rot = East; trans = 4};
+      {rot = South; trans = 0};
+      {rot = South; trans = 1};
+      {rot = South; trans = 2};
+      {rot = South; trans = 3};
+      {rot = South; trans = 4};
+      {rot = West; trans = 0};
+      {rot = West; trans = 1};
+      {rot = West; trans = 2};
+      {rot = West; trans = 3};
+      {rot = West; trans = 4}
     |]
+end
 
+module Tetromino = struct
+  (** Tetromino type *)
+  type t =
+    | Square
+    | Lshaped
+    | Line
+    | Diag
+    | Dot
+
+  (** Number of tetrominos *)
+  let card = 5
+
+  (** Array representation of tetrominos *)
+  let to_arr = function
+    | Square -> [| 1 ; 1 ; 1 ; 1 |]
+    | Lshaped -> [| 2 ; 0 ; 2 ; 2 |]
+    | Line -> [| 3 ; 0 ; 3 ; 0 |]
+    | Diag -> [| 4 ; 0 ; 0 ; 4 |]
+    | Dot -> [| 5 ; 0 ; 0 ; 0 |]
+
+  (** Gives availbale actions for tetromino *)
+  let to_action_set tetr =
+    let ind_list = match tetr with
+      (* North only *)
+      | Square -> [0 ; 1 ; 2 ; 3 ; 4]
+      (* All ortientations *)
+      | Lshaped ->
+          [ 0 ; 1 ; 2 ; 3 ; 4 ; 5 ; 6 ; 7 ; 8 ; 9 ; 10 ; 11 ; 12 ; 13 ; 14 ;
+            15 ; 16 ; 17 ; 18 ; 19 ]
+      (* North, West and South *)
+      | Line -> [0 ; 1 ; 2 ; 3 ; 4 ; 15 ; 16 ; 17 ; 18 ; 10 ; 11 ; 12 ; 13]
+      (* North & West *)
+      | Diag | Dot -> [0 ; 1 ; 2 ; 3 ; 4 ; 15 ; 16 ; 17 ; 18 ]
+    in
+    let rec loop = function
+      | [] -> []
+      | hd :: tl -> Action.set.(hd) :: loop tl
+    in
+    Array.of_list (loop ind_list)
+
+  (** Converts tetromino to int *)
+  let to_int = function
+    | Square -> 1
+    | Lshaped -> 2
+    | Line -> 3
+    | Diag -> 4
+    | Dot -> 5
+
+  (** Generates a random tetromino *)
+  let make_rand () =
+    let n = Random.int card in
+    if n = 0 then Square else if n = 1 then Lshaped else if n = 2 then Line
+    else if n = 3 then Diag else Dot
 end
 
 let collide table x y tetromino rotation =
   let n = ref(false) in
   for i = 0 to 1 do
     for j = 0 to 1 do
+      let tetrarr = Tetromino.to_arr tetromino
+      and ind_afterot = Action.make_rotation rotation i j in
       n := !n ||
-           (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
+           tetrarr.(ind_afterot) = 1 &&
            (Board.get_board table).(x-i).(y+j) <> 0;
     done;
   done;
@@ -202,8 +238,10 @@ let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
   for i = 0 to 1 do
     for j = 0 to 1 do
-      if (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1 then
-        board.(x - i).(y + j) <- (arr_find Tetromino.tetromino_list tetromino) + 1
+      let tetrarr = Tetromino.to_arr tetromino in
+      let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
+      if tetrquarter > 0 then
+        board.(x - i).(y + j) <- tetrquarter
     done;
   done;
   Board.update_height table (max (Board.assess_height board x y)

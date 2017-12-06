@@ -49,11 +49,10 @@ let r x = if x >= 2 then -200.
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
   let board_repr = Auxfct.get_board_top board
-  and tetromino_repr = Auxfct.arr_find Game.Tetromino.tetromino_list
-      tetromino in
+  and intetr = Game.Tetromino.to_int tetromino - 1 in
   let board_one = Array.fold_left Array.append [| |] board_repr in
   let dig_board = Auxfct.arr2dig board_one in
-  tetromino_repr lsl (Game.Board.width * 2) + dig_board
+  intetr lsl (Game.Board.width * 2) + dig_board
 
 (** chose an action for the current state *)
 let choose_action = fun q epsilon state action_set ->

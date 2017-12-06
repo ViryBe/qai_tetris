@@ -33,17 +33,15 @@ module Tetromino : sig
   (** Tetromino type *)
   type t
 
-  (** Array of tetrominos *)
-  val tetromino_list : t array
+  (** Gives a one to one mapping from tetrominos to int *)
+  val to_int : t -> int
+  (** @return integer in \[0, 4\] *)
 
   (** Generates a random tetromino *)
   val make_rand : unit -> t
 
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
-
-  (** Prints tetromino to stdout with North orientation *)
-  val print : t -> unit
 end
 
 (** An action executed by the player *)
