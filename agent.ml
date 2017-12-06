@@ -72,7 +72,8 @@ let update_qmat bheight qmat eps gam alpha ntetr =
 
   for i = 0 to ntetr - 1 do
     (* Compute action *)
-    let action, act_ind = choose_action qmat eps !state Game.Action.set in
+    let action_set = Game.Tetromino.to_action_set !tetromino in
+    let action, act_ind = choose_action qmat eps !state action_set in
     (* Update board accordingly to action *)
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
@@ -85,9 +86,7 @@ let update_qmat bheight qmat eps gam alpha ntetr =
                               (reward +.
                                gam *. (Auxfct.flarray_max qmat.(nstate))) ;
     state := nstate ;
-    height := nheight;
-    (* Display.draw_board (Game.Board.to_arr (max 0 (Game.Board.height board - 10)) (Game.Board.height board + 5) board) 3 4 *)
-    (* Game.Board.print board; *)
+    height := nheight
   done ;
   board
 
@@ -101,7 +100,7 @@ let train qmat eps gam alpha ngames ntetr =
     Printf.printf "%f %d\n" (log (float_of_int (1 + i))) fheight
   done
 
-(** Plays a game of ntetr with qmat TODO factorise with update_qmat *)
+(** Plays a game of ntetr with qmat *)
 let play qmat ntetr =
   let board = Game.Board.make (2 * ntetr + 1)
   and tetromino = ref (Game.Tetromino.make_rand ()) in

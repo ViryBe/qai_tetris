@@ -28,6 +28,17 @@ module Board : sig
   (** [to_file fname b] saves board [b] to file [fname] *)
 end
 
+(** An action executed by the player *)
+module Action : sig
+
+  (** The type of an action *)
+  type t
+
+  (** list of all the actions *)
+  val set : t array
+
+end
+
 (** Manipulates tetrominos in the board *)
 module Tetromino : sig
   (** Tetromino type *)
@@ -42,17 +53,9 @@ module Tetromino : sig
 
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
-end
 
-(** An action executed by the player *)
-module Action : sig
-
-  (** The type of an action *)
-  type t
-
-  (** list of all the actions *)
-  val set : t array
-
+  (** Outputs the action set available for a tetromino *)
+  val to_action_set : t -> Action.t array
 end
 
 (** Plays a turn and gives updated board *)
