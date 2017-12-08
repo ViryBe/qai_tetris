@@ -54,13 +54,15 @@ let get_state board tetromino =
   let dig_board = Auxfct.arr2dig board_one in
   intetr lsl (Game.Board.width * 2) + dig_board
 
-(** chose an action for the current state *)
+(** chose an action for the current state
+    @return [(action, action_mo)] with action an Action.t and action_no the
+            id of the action *)
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
   let action_no = if tirage > epsilon then Auxfct.argmax_r q.(state)
-    else Random.int (Array.length action_set)
+    else Random.int (List.length action_set)
   in
-  (action_set.(action_no), action_no)
+  (Game.Action.from_int (List.nth action_set action_no), action_no)
 
 (** Function updating Q matrix, plays one game *)
 let update_qmat bheight qmat eps gam alpha ntetr =
@@ -72,8 +74,8 @@ let update_qmat bheight qmat eps gam alpha ntetr =
 
   for i = 0 to ntetr - 1 do
     (* Compute action *)
-    let action_set = Game.Tetromino.to_action_set !tetromino in
-    let action, act_ind = choose_action qmat eps !state action_set in
+    let idactions = Game.Tetromino.available_actids !tetromino in
+    let action, act_ind = choose_action qmat eps !state idactions in
     (* Update board accordingly to action *)
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
@@ -106,7 +108,8 @@ let play qmat ntetr =
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let  state = ref (get_state board !tetromino) in
   for i = 0 to ntetr - 1 do
-    let action, _ = choose_action qmat 0. !state Game.Action.set in
+    let actids = Game.Tetromino.available_actids !tetromino in
+    let action, _ = choose_action qmat 0. !state actids in
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
     state := get_state board !tetromino;

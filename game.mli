@@ -34,8 +34,14 @@ module Action : sig
   (** The type of an action *)
   type t
 
-  (** list of all the actions *)
-  val set : t array
+  (** Number of actions *)
+  val card : int
+
+  (** One to one, onto mapping from action to int *)
+  val to_int : t -> int
+
+  (** Inverse function of the above *)
+  val from_int : int -> t
 
 end
 
@@ -55,7 +61,7 @@ module Tetromino : sig
   val to_arr : t -> int array
 
   (** Outputs the action set available for a tetromino *)
-  val to_action_set : t -> Action.t array
+  val available_actids : t -> int list
 end
 
 (** Plays a turn and gives updated board *)
