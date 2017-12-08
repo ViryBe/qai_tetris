@@ -221,7 +221,7 @@ module Tetromino = struct
     let rec loop k =
       if k <= 0 then [] else Action.int_from_rot rot + (k lsl 2) :: loop (k-1)
     in
-    loop (Board.width - 1)
+    loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
 
   (** Gives available actions for tetromino *)
   (* TODO memoize *)
