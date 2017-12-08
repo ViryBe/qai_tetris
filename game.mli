@@ -40,7 +40,7 @@ module Action : sig
   (** One to one, onto mapping from action to int *)
   val to_int : t -> int
 
-  (** Inverse function of the above *)
+  (** One to one, onto mapping from int to actions *)
   val from_int : int -> t
 
 end
@@ -49,6 +49,9 @@ end
 module Tetromino : sig
   (** Tetromino type *)
   type t
+
+  (** Set of tetrominos *)
+  val set : t list
 
   (** Gives a one to one mapping from tetrominos to int *)
   val to_int : t -> int

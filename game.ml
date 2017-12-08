@@ -158,31 +158,6 @@ module Action = struct
       actset.(i) <- act
     done ;
     actset
-
-  (** The set of all possible actions *)
-  let set =
-    [|
-      {rot = North; trans = 0};
-      {rot = North; trans = 1};
-      {rot = North; trans = 2};
-      {rot = North; trans = 3};
-      {rot = North; trans = 4};
-      {rot = East; trans = 0};
-      {rot = East; trans = 1};
-      {rot = East; trans = 2};
-      {rot = East; trans = 3};
-      {rot = East; trans = 4};
-      {rot = South; trans = 0};
-      {rot = South; trans = 1};
-      {rot = South; trans = 2};
-      {rot = South; trans = 3};
-      {rot = South; trans = 4};
-      {rot = West; trans = 0};
-      {rot = West; trans = 1};
-      {rot = West; trans = 2};
-      {rot = West; trans = 3};
-      {rot = West; trans = 4}
-    |]
 end
 
 module Tetromino = struct
@@ -208,12 +183,15 @@ module Tetromino = struct
     | Diag -> [| 4 ; 0 ; 0 ; 4 |]
     | Dot -> [| 5 ; 0 ; 0 ; 0 |]
 
-  let available_rots = function
-    | Square -> [ Action.North ]
-    | Lshaped -> [ Action.North ; Action.West ; Action.South ; Action.East ]
-    | Line -> [ Action.North ; Action.West ; Action.South ]
-    | Diag -> [ Action.North ; Action.West ]
-    | Dot -> [ Action.North ; Action.West ]
+  (** Associative list mapping tetromino to its available orientations *)
+  let available_rots =
+    [
+      (Square, [ Action.North ]) ;
+      (Lshaped, [ Action.North ; Action.West ; Action.South ; Action.East ]) ;
+      (Line, [ Action.North ; Action.West ; Action.South ]) ;
+      (Diag, [ Action.North ; Action.West ]) ;
+      (Dot, [ Action.North ; Action.West ])
+    ]
 
   (* Gives all actions associated to rotation *)
   (* TODO factorise with to_int *)
@@ -223,80 +201,24 @@ module Tetromino = struct
     in
     loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
 
-  (** Gives available actions for tetromino *)
-  (* TODO memoize *)
-  let compute_action_set tetr =
-    let rec loop = function
-      | [] -> []
-      | rot :: tl -> act_set_from_rot rot :: loop tl
-    in
-    loop (available_rots tetr)
-
-  (*
-  let compute_action_set tetr =
-    let ind_list = match tetr with
-      (* North only *)
-      | Square -> [0 ; 1 ; 2 ; 3 ; 4]
-      (* All ortientations *)
-      | Lshaped ->
-          [ 0 ; 1 ; 2 ; 3 ; 4 ; 5 ; 6 ; 7 ; 8 ; 9 ; 10 ; 11 ; 12 ; 13 ; 14 ;
-            15 ; 16 ; 17 ; 18 ; 19 ]
-      (* North, West and South *)
-      | Line -> [0 ; 1 ; 2 ; 3 ; 4 ; 15 ; 16 ; 17 ; 18 ; 10 ; 11 ; 12 ; 13]
-      (* North & West *)
-      | Diag | Dot -> [0 ; 1 ; 2 ; 3 ; 4 ; 15 ; 16 ; 17 ; 18 ]
-    in
-    (* Adds action of Action.set which have the indexes set above *)
-    let rec loop = function
-      | [] -> []
-      | hd :: tl -> Action.set.(hd) :: loop tl
-    in
-    Array.of_list (loop ind_list)
-     *)
-
-  (** Memoized function to avoid recomputing the action set each time *)
-  let to_action_set tetr =
-    let memo = ref [] in
-    try
-      List.assoc tetr !memo
-    with
-    Not_found ->
-      let actset = compute_action_set tetr in
-      memo := (tetr, actset) :: !memo ;
-      actset
-
   (** Outputs actions ids of a tetromino *)
   let available_actids tetr =
-    let rots = available_rots tetr in
+    let rots = List.assoc tetr available_rots in
     List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots
 
   (** Converts tetromino to int *)
   let to_int = function
-    | Square -> 1
-    | Lshaped -> 2
-    | Line -> 3
-    | Diag -> 4
-    | Dot -> 5
+    | Square -> 0
+    | Lshaped -> 1
+    | Line -> 2
+    | Diag -> 3
+    | Dot -> 4
 
   (** Generates a random tetromino *)
   let make_rand () =
     let n = Random.int card in
     if n = 0 then Square else if n = 1 then Lshaped else if n = 2 then Line
     else if n = 3 then Diag else Dot
-
-  (** Puts zeros on usable actions in a Q matrix *)
-  let init_qmat qmat =
-    (* Writes zeros for a tetromino *)
-    let zeros_set tetr =
-      let startindex = 0 and actids = available_actids tetr in
-      List.iter (fun id ->
-          (* Each tetromino has 4096 associated stated possible *)
-          for i = startindex to startindex + 4095 do
-            qmat.(i).(id) <- 0.
-          done ;
-        ) actids
-    in
-    List.iter zeros_set set
 end
 
 let collide table x y tetromino rotation =

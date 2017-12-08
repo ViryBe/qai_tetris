@@ -1,5 +1,8 @@
 (** Manages agent training and embodies the agent *)
 
+(** Number of lines used to compute a state *)
+let line_per_state = 2
+
 (** Auxiliary functions *)
 module Auxfct = struct
 
@@ -49,7 +52,7 @@ let r x = if x >= 2 then -200.
 (** Outputs state from board repr and a tetromino *)
 let get_state board tetromino =
   let board_repr = Auxfct.get_board_top board
-  and intetr = Game.Tetromino.to_int tetromino - 1 in
+  and intetr = Game.Tetromino.to_int tetromino in
   let board_one = Array.fold_left Array.append [| |] board_repr in
   let dig_board = Auxfct.arr2dig board_one in
   intetr lsl (Game.Board.width * 2) + dig_board
@@ -64,6 +67,28 @@ let choose_action = fun q epsilon state action_set ->
       List.nth action_set rind
   in
   (Game.Action.from_int actionid, actionid)
+
+(** Puts zeros on usable actions in a Q matrix *)
+let init_qmat qmat =
+  let tetr_per_state = Game.Board.width * line_per_state in
+  let state_per_tetr = truncate (2. ** (float tetr_per_state)) in
+  let tetr_range_st = ref 0 in
+  (* Loops over tetrominos and writes zeros *)
+  let rec loop tset = match tset with
+    | [] -> ()
+    | tetr :: tl ->
+        let actids = Game.Tetromino.available_actids tetr in
+        begin
+          tetr_range_st := Game.Tetromino.to_int tetr * state_per_tetr ;
+          List.iter (fun id ->
+              (* Each tetromino has 4096 associated stated possible *)
+              for j = !tetr_range_st to !tetr_range_st + state_per_tetr - 1 do
+                qmat.(j).(id) <- 0.
+              done ;
+            ) actids
+        end ; loop tl
+  in
+  loop Game.Tetromino.set
 
 (** Function updating Q matrix, plays one game *)
 let update_qmat bheight qmat eps gam alpha ntetr =
