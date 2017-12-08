@@ -146,7 +146,7 @@ module Action = struct
   (** Inverse function of the above *)
   let from_int id =
     let rot = id land 3
-    and trans = id land 28 in
+    and trans = (id land 28) lsr 2 in
     {rot = rot_from_int rot ; trans = trans}
 
   (** The set of all possible actions *)

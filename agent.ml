@@ -60,7 +60,7 @@ let get_state board tetromino =
 let choose_action = fun q epsilon state action_set ->
   let tirage = Random.float 1. in
   let action_no = if tirage > epsilon then Auxfct.argmax_r q.(state)
-    else Random.int (List.length action_set)
+    else Random.int (List.length action_set - 1)
   in
   (Game.Action.from_int (List.nth action_set action_no), action_no)
 
