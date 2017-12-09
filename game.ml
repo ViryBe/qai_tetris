@@ -169,13 +169,20 @@ module Tetromino = struct
   (** A list of all tetrominos *)
   let set = [ Square ; Lshaped ; Line ; Diag ; Dot ]
 
+  (** Array representation of the tetrominos *)
+  let arr_repr = [
+    (Square, [| 1 ; 1 ; 1 ; 1 |]) ;
+    (Lshaped, [| 2 ; 0 ; 2 ; 2 |]) ;
+    (Line, [| 3 ; 0 ; 3 ; 0 |]) ;
+    (Diag, [| 4 ; 0 ; 0 ; 4 |]) ;
+    (Dot, [| 5 ; 0 ; 0 ; 0 |])
+  ]
+
+  (** Ids associated to tetrominos *)
+  let ids = [(Square, 0) ; (Lshaped, 1) ; (Line, 2) ; (Diag, 3) ; (Dot, 4)]
+
   (** Array representation of tetrominos *)
-  let to_arr = function
-    | Square -> [| 1 ; 1 ; 1 ; 1 |]
-    | Lshaped -> [| 2 ; 0 ; 2 ; 2 |]
-    | Line -> [| 3 ; 0 ; 3 ; 0 |]
-    | Diag -> [| 4 ; 0 ; 0 ; 4 |]
-    | Dot -> [| 5 ; 0 ; 0 ; 0 |]
+  let to_arr tetr = List.assoc tetr arr_repr
 
   (** Associative list mapping tetromino to its available orientations *)
   let available_rots =
@@ -201,12 +208,7 @@ module Tetromino = struct
     List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots
 
   (** Converts tetromino to int *)
-  let to_int = function
-    | Square -> 0
-    | Lshaped -> 1
-    | Line -> 2
-    | Diag -> 3
-    | Dot -> 4
+  let to_int tetr = List.assoc tetr ids
 
   (** Generates a random tetromino *)
   let make_rand () =
