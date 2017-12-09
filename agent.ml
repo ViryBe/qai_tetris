@@ -73,22 +73,21 @@ let init_qmat qmat =
   let tetr_per_state = Game.Board.width * line_per_state in
   let state_per_tetr = truncate (2. ** (float tetr_per_state)) in
   let tetr_range_st = ref 0 in
-  (* Loops over tetrominos and writes zeros *)
-  let rec loop tset = match tset with
-    | [] -> ()
-    | tetr :: tl ->
-        let actids = Game.Tetromino.get_actids tetr in
-        begin
-          tetr_range_st := Game.Tetromino.to_int tetr * state_per_tetr ;
-          List.iter (fun id ->
-              (* Each tetromino has 4096 associated stated possible *)
-              for j = !tetr_range_st to !tetr_range_st + state_per_tetr - 1 do
-                qmat.(j).(id) <- 0.
-              done ;
-            ) actids
-        end ; loop tl
+  (* Writes the zeros in the Q matrix for only one tetromino *)
+  let init_qmat_aux tetr =
+    let actids = Game.Tetromino.get_actids tetr in
+    begin
+      tetr_range_st := Game.Tetromino.to_int tetr * state_per_tetr ;
+      List.iter (fun id ->
+          (* Each tetromino has 4096 associated stated possible *)
+          for j = !tetr_range_st to !tetr_range_st + state_per_tetr - 1 do
+            qmat.(j).(id) <- 0.
+          done ;
+        ) actids
+    end
   in
-  loop Game.Tetromino.set
+  (* Loops over tetrominos and writes zeros *)
+  List.iter init_qmat_aux Game.Tetromino.set
 
 (** Function updating Q matrix, plays one game *)
 let update_qmat bheight qmat eps gam alpha ntetr =
