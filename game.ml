@@ -135,12 +135,7 @@ module Action = struct
 
   (** Associates an id to an action *)
   let to_int act =
-    let rotint = match act.rot with
-      | North -> 0
-      | South -> 1
-      | East -> 2
-      | West -> 3
-    in
+    let rotint = int_from_rot act.rot in
     (act.trans lsl 2) + rotint
 
   (** Inverse function of the above *)
@@ -150,7 +145,6 @@ module Action = struct
     {rot = rot_from_int rot ; trans = trans}
 
   (** The set of all possible actions *)
-  (* TODO memoize *)
   let set =
     let actset = Array.make card {rot = North ; trans = 0} in
     for i = 0 to card - 1 do
@@ -197,7 +191,8 @@ module Tetromino = struct
   (* TODO factorise with to_int *)
   let act_set_from_rot rot =
     let rec loop k =
-      if k <= 0 then [] else Action.int_from_rot rot + (k lsl 2) :: loop (k-1)
+      if k <= 0 then []
+      else Action.to_int {Action.rot = rot ; Action.trans = k} :: loop (k-1)
     in
     loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
 
@@ -217,8 +212,7 @@ module Tetromino = struct
   (** Generates a random tetromino *)
   let make_rand () =
     let n = Random.int card in
-    if n = 0 then Square else if n = 1 then Lshaped else if n = 2 then Line
-    else if n = 3 then Diag else Dot
+    List.nth set n
 end
 
 let collide table x y tetromino rotation =
