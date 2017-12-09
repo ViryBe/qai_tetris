@@ -203,9 +203,15 @@ module Tetromino = struct
     loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
 
   (** Outputs actions ids of a tetromino *)
-  let available_actids tetr =
+  let compute_actids tetr =
     let rots = List.assoc tetr available_rots in
-    List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots
+    (tetr, List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots)
+
+  (** Associative list mapping tetrominos to their actions ids *)
+  let t_to_actids = List.map compute_actids set
+
+  (** @return actions ids associated to tetromino *)
+  let get_actids tetr = List.assoc tetr t_to_actids
 
   (** Converts tetromino to int *)
   let to_int tetr = List.assoc tetr ids

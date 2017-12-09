@@ -63,8 +63,8 @@ module Tetromino : sig
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
 
-  (** Outputs the action set available for a tetromino *)
-  val available_actids : t -> int list
+  (** Outputs the list of available actions ids for the tetromino *)
+  val get_actids : t -> int list
 end
 
 (** Plays a turn and gives updated board *)

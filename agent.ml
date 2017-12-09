@@ -77,7 +77,7 @@ let init_qmat qmat =
   let rec loop tset = match tset with
     | [] -> ()
     | tetr :: tl ->
-        let actids = Game.Tetromino.available_actids tetr in
+        let actids = Game.Tetromino.get_actids tetr in
         begin
           tetr_range_st := Game.Tetromino.to_int tetr * state_per_tetr ;
           List.iter (fun id ->
@@ -100,7 +100,7 @@ let update_qmat bheight qmat eps gam alpha ntetr =
 
   for i = 0 to ntetr - 1 do
     (* Compute action *)
-    let idactions = Game.Tetromino.available_actids !tetromino in
+    let idactions = Game.Tetromino.get_actids !tetromino in
     let action, act_ind = choose_action qmat eps !state idactions in
     (* Update board accordingly to action *)
     Game.play board !tetromino action ;
@@ -134,7 +134,7 @@ let play qmat ntetr =
   and tetromino = ref (Game.Tetromino.make_rand ()) in
   let  state = ref (get_state board !tetromino) in
   for i = 0 to ntetr - 1 do
-    let actids = Game.Tetromino.available_actids !tetromino in
+    let actids = Game.Tetromino.get_actids !tetromino in
     let action, _ = choose_action qmat 0. !state actids in
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
