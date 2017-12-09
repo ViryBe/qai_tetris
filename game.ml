@@ -188,10 +188,9 @@ module Tetromino = struct
     ]
 
   (* Gives all actions associated to rotation *)
-  (* TODO factorise with to_int *)
   let act_set_from_rot rot =
     let rec loop k =
-      if k <= 0 then []
+      if k < 0 then []
       else Action.to_int {Action.rot = rot ; Action.trans = k} :: loop (k-1)
     in
     loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)

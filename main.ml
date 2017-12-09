@@ -46,13 +46,12 @@ let () =
     let qmat =
       match qload with
       | None ->
-          Array.make_matrix state_card Game.Action.card 0.
-          (*
+          (
             let proto_mat = Array.make_matrix state_card Game.Action.card
                 neg_infinity in
             Agent.init_qmat proto_mat ;
             proto_mat
-          *)
+          )
       | Some str -> Aio.Qio.load str
     and alpha k = 1. /. (1. +. alphap *. float k)
     in
