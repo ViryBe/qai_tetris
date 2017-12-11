@@ -124,7 +124,7 @@ let train qmat eps gam alpha ngames ntetr =
   for i = 0 to ngames do
     let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
     let fheight = Game.Board.height fboard in
-    Printf.printf "%f %d\n" (log (float_of_int (1 + i))) fheight
+    Printf.printf "%d\n" fheight
   done
 
 (** Plays a game of ntetr with qmat *)
