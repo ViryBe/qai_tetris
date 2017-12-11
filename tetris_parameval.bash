@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Set getopt options
 NAME='tetris_argeval.bash'
@@ -114,7 +114,7 @@ function make_values () {
 			;;
 		'nval')
 			nval=$RANGEPVAL
-			step=$(echo "($UP - $LOW) / $nval" | bc)
+			step=$(echo "($UP - $LOW) / $nval" | bc -l)
 			;;
 		*)
 			echo 'rangespec not properly set'
@@ -122,16 +122,17 @@ function make_values () {
 			;;
 	esac
 
-	for i in $(seq 1 $nval) ; do
-		nv=$(echo "$i * $step" | bc)
-		PVAL+=( $nv )
+	for i in $(seq 0 $nval) ; do
+		nv=$(echo "$LOW + $i * $step" | bc)
+		PVAL[$i]=$nv
 	done ;
 	return 0
 }
 
 function run_tetris () {
-	for p in $PVAL ; do
-		exec "$TETRIS_CMD -ngames 512 -ntetr 10000 -$PARAM $p"
+	for p in ${PVAL[*]} ; do
+		./$TETRIS_CMD -ngames 512 -ntetr 10000 -$PARAM $p
+		echo "Done training with $p"
 	done ;
 	return 0
 }
