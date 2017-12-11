@@ -5,7 +5,10 @@ NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
 OPTIONS=egal:u:s:n:
 # Long options, names separated with commas
-LONGOPTIONS=epsilon,gamma,alphap,low:,up:,step:,nval:
+LONGOPTIONS=epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:
+
+# Tetris player related options
+TETRIS_CMD='tetris_player.opt'
 
 # Options of the tetris_player
 PARAM='' 		# parameter to be tested
@@ -13,6 +16,8 @@ RANGESPEC='' 	# step or number of values
 RANGEPVAL=0		# value of parsing spec
 LOW=''			# low bound of the range
 UP=''			# up bound of the range
+PVAL=( )		# param values, array
+declare -A RHEIGHTS 	# heights in a matrix
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -99,3 +104,37 @@ while true; do
 			;;
 	esac
 done
+
+
+function make_values () {
+	case $RANGESPEC in
+		'step')
+			step=$RANGEPVAL
+			nval=$(echo "($UP - $LOW) / $step" | bc)
+			;;
+		'nval')
+			nval=$RANGEPVAL
+			step=$(echo "($UP - $LOW) / $nval" | bc)
+			;;
+		*)
+			echo 'rangespec not properly set'
+			exit 1
+			;;
+	esac
+
+	for i in $(seq 1 $nval) ; do
+		nv=$(echo "$i * $step" | bc)
+		PVAL+=( $nv )
+	done ;
+	return 0
+}
+
+function run_tetris () {
+	for p in $PVAL ; do
+		exec "$TETRIS_CMD -ngames 512 -ntetr 10000 -$PARAM $p"
+	done ;
+	return 0
+}
+
+make_values
+run_tetris
