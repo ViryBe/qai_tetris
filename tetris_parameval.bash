@@ -5,7 +5,7 @@ NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
 OPTIONS=hegal:u:s:n:
 # Long options, names separated with commas
-LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:
+LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:,ntetr:
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP [OPTIONS]
 Param: one of the following
@@ -25,14 +25,19 @@ Options:
 # Tetris player related options
 TETRIS_CMD='tetris_player.opt'
 
+BASEFNAME='gplot'
+OUTFILE='gplot_param.log'
+
 # Options of the tetris_player
 PARAM='' 		# parameter to be tested
 RANGESPEC='' 	# step or number of values
 RANGEPVAL=0		# value of parsing spec
 LOW=''			# low bound of the range
 UP=''			# up bound of the range
+NTETR=10000		# number of tetrominos to be played
+NGAMES=512		# number of games per training
 PVAL=( )		# param values, array
-declare -A RHEIGHTS 	# heights in a matrix
+FILES=( )		# name of files
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -118,6 +123,16 @@ while true; do
 			shift 2
 			continue
 			;;
+		'--ngames')
+			NGAMES=$2
+			shift 2
+			continue
+			;;
+		'--ntetr')
+			NTETR=$2
+			shift 2
+			continue
+			;;
 		'--')
 			shift
 			break
@@ -129,11 +144,7 @@ while true; do
 			;;
 	esac
 done
-
-
-function make_values () {
-	case $RANGESPEC in
-		'step')
+function make_values () { case $RANGESPEC in 'step')
 			step=$RANGEPVAL
 			nval=$(echo "($UP - $LOW) / $step" | bc)
 			;;
@@ -151,6 +162,7 @@ function make_values () {
 	for i in $(seq 0 $nval) ; do
 		nv=$(echo "$LOW + $i * $step" | bc)
 		PVAL[$i]=$nv
+		FILES[$i]="${BASEFNAME}$PARAM$i.log"
 	done ;
 	return 0
 }
@@ -158,13 +170,21 @@ function make_values () {
 function run_tetris () {
 	ntr=${#PVAL[@]}
 	cnt=0
-	for p in ${PVAL[*]} ; do
-		./$TETRIS_CMD -ngames 512 -ntetr 10000 -$PARAM $p
+	gamesarr=( )
+	for i in $(seq 0 $((ntr - 1))) ; do
+		./$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
+			"${FILES[$i]}"
+		
 		cnt=$((cnt + 1))
-		echo "Done training with $p ($cnt/$ntr)"
+		echo "Done training with $PARAM=${PVAL[$i]} ($cnt/$ntr)"
 	done ;
 	return 0
 }
 
 make_values
 run_tetris
+paste "${FILES[@]}" > "$OUTFILE"
+sed -i '/^#/d' "$BASEFNAME.tot.out"
+
+# plot
+gnuplot -p -e "set key outside ; plot for [col=1:${#PVAL[@]}] '$OUTFILE' using col"
