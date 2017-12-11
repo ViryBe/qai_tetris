@@ -3,9 +3,24 @@
 # Set getopt options
 NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
-OPTIONS=egal:u:s:n:
+OPTIONS=hegal:u:s:n:
 # Long options, names separated with commas
-LONGOPTIONS=epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:
+LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:
+# Usage string
+USAGE="Usage: $0 PARAM BOUNDS BOUNDSP [OPTIONS]
+Param: one of the following
+\t-e|--epsilon\tfrequency of random choice
+\t-g|--gamma|\tsight length of the agent
+\t-a|--alphap\tlearning rate parameter
+Bounds:
+\t-l|--low <low>\tlower bound
+\t-u|--up <up>\tguess what...
+Bounds parameters: one of the following
+\t-s|--step <float>\tthe step between two consecutive values
+\t-n|--nval <int>\tthe number of values desired
+Options:
+\t--ngames <int>\tnumber of games done in one training
+\t--ntetr <int>\tnumber of tetrominos in a game"
 
 # Tetris player related options
 TETRIS_CMD='tetris_player.opt'
@@ -30,10 +45,15 @@ eval set -- "$TEMP"
 unset TEMP
 while true; do
 	case "$1" in
+		'-h'|'--help')
+			echo -e "$USAGE"
+			exit 1
+			;;
 		'-e'|'--epsilon')
 			echo "selected epsilon"
 			if [[ $PARAM != '' ]]; then
 				echo 'parameter already set!'
+				echo "$USAGE"
 				exit 1
 			fi
 			PARAM='epsilon'
@@ -44,6 +64,7 @@ while true; do
 			echo "selected gamma"
 			if [[ $PARAM != '' ]]; then
 				echo 'parameter already set!'
+				echo "$USAGE"
 				exit 1
 			fi
 			PARAM='gamma'
@@ -54,6 +75,7 @@ while true; do
 			echo 'selected alpha'
 			if [[ $PARAM != '' ]]; then
 				echo 'parameter already set!'
+				echo "$USAGE"
 				exit 1
 			fi
 			PARAM='alphap'
@@ -76,6 +98,7 @@ while true; do
 			echo "step $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'number of values already specified'
+				echo "$USAGE"
 				exit 1
 			fi
 			RANGESPEC='step'
@@ -87,6 +110,7 @@ while true; do
 			echo "nval $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'step already specified'
+				echo "$USAGE"
 				exit 1
 			fi
 			RANGESPEC='nval'
@@ -100,6 +124,7 @@ while true; do
 			;;
 		*)
 			echo 'Internal error!' >&2
+			echo "$USAGE"
 			exit 1
 			;;
 	esac
@@ -113,11 +138,12 @@ function make_values () {
 			nval=$(echo "($UP - $LOW) / $step" | bc)
 			;;
 		'nval')
-			nval=$RANGEPVAL
-			step=$(echo "($UP - $LOW) / $nval" | bc -l)
+			nval=$((RANGEPVAL - 1))
+			step=$(echo "($UP - $LOW) / $nval" | bc -l) # -l for floating point
 			;;
 		*)
 			echo 'rangespec not properly set'
+			echo "$USAGE"
 			exit 1
 			;;
 	esac
@@ -130,9 +156,12 @@ function make_values () {
 }
 
 function run_tetris () {
+	ntr=${#PVAL[@]}
+	cnt=0
 	for p in ${PVAL[*]} ; do
 		./$TETRIS_CMD -ngames 512 -ntetr 10000 -$PARAM $p
-		echo "Done training with $p"
+		cnt=$((cnt + 1))
+		echo "Done training with $p ($cnt/$ntr)"
 	done ;
 	return 0
 }
