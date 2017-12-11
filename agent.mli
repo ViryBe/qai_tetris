@@ -1,5 +1,8 @@
 (** Agent module, builds the Q matrix used by policy *)
 
+(** Inits a Q matrix filled with -infinity, placing zeros on slots to be used *)
+val init_qmat : float array array -> unit
+
 (** Builds a Q matrix used by agent to determine actions *)
 val train : float array array -> float -> float -> (int -> float) -> int ->
   int -> unit

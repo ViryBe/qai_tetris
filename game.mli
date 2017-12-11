@@ -28,13 +28,34 @@ module Board : sig
   (** [to_file fname b] saves board [b] to file [fname] *)
 end
 
+(** An action executed by the player *)
+module Action : sig
+
+  (** The type of an action *)
+  type t
+
+  (** Number of actions *)
+  val card : int
+
+  (** One to one, onto mapping from action to int *)
+  val to_int : t -> int
+
+  (** One to one, onto mapping from int to actions *)
+  val from_int : int -> t
+
+end
+
 (** Manipulates tetrominos in the board *)
 module Tetromino : sig
   (** Tetromino type *)
   type t
 
-  (** Array of tetrominos *)
-  val tetromino_list : t array
+  (** Set of tetrominos *)
+  val set : t list
+
+  (** Gives a one to one mapping from tetrominos to int *)
+  val to_int : t -> int
+  (** @return integer in \[0, 4\] *)
 
   (** Generates a random tetromino *)
   val make_rand : unit -> t
@@ -42,19 +63,8 @@ module Tetromino : sig
   (** Outputs an array representation of a tetromino *)
   val to_arr : t -> int array
 
-  (** Prints tetromino to stdout with North orientation *)
-  val print : t -> unit
-end
-
-(** An action executed by the player *)
-module Action : sig
-
-  (** The type of an action *)
-  type t
-
-  (** list of all the actions *)
-  val set : t array
-
+  (** Outputs the list of available actions ids for the tetromino *)
+  val get_actids : t -> int list
 end
 
 (** Plays a turn and gives updated board *)

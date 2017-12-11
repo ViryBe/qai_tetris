@@ -1,6 +1,3 @@
-(** Converts bool to int *)
-let int_of_bool b = if b then 1 else 0
-
 module Board = struct
   (** The tetris board *)
   type t = {
@@ -94,56 +91,38 @@ module Board = struct
     close_out fd
 end
 
-module Tetromino = struct
-  (** Tetromino type *)
-  type t = Piece of bool array
-
-  (* List of pieces of the game *)
-  let tetromino_list =
-    [|
-      Piece [|true;true;true;true|]; (* square *)
-      Piece [|true;false;true;false|]; (* line *)
-      Piece [|true;false;false;false|]; (* point *)
-      Piece [|true;false;true;true|]; (* L shape *)
-      Piece [|true;false;false;true|]  (* diag *)
-    |]
-
-  (** Generates a random tetromino *)
-  let make_rand () =
-    let n = Random.int (Array.length tetromino_list) in
-    tetromino_list.(n)
-
-  (** Outputs an array representation of a tetromino *)
-  let to_arr p = match p with
-    | Piece x -> Array.map int_of_bool x
-
-  (** Prints tetromino to stdout in default orientation *)
-  let print tetr =
-    match tetr with Piece arr ->
-      for i = 0 to 1 do
-        for j = 0 to 1 do
-          Printf.printf "%s" (if arr.(i + 2*j) then "*" else " ")
-        done ;
-        print_newline ()
-      done ;
-end
-
 module Action = struct
 
-  type rotation = North | South | East | West
-  type translation = Column of int (* Int between 0 and 4 *)
+  (** Available orientations for tetrominos *)
+  type rotation = 
+    | North
+    | South
+    | East
+    | West
 
   (** The type of an action *)
-  type t = {rot : rotation; trans : translation}
+  type t = {rot : rotation; trans : int}
+
+  (** Number of actions *)
+  let card = 20
 
   (** Extracts the translation component of an action *)
-  let int_from_translation action = match action.trans with
-    | Column x -> x
+  let int_from_translation action = action.trans
+
+  let get_rotation action = action.rot
+
+  let rot_from_int k =
+    if k = 0 then North else if k = 1 then South else if k = 2 then East else
+    if k = 3 then West else failwith "invalid rotation integer"
+
+  let int_from_rot = function
+    | North -> 0
+    | South -> 1
+    | East -> 2
+    | West -> 3
 
   (** 2D to 1D Array - index match *)
   let get_index i j = 2 * i + j
-
-  let get_rotation action = action.rot
 
   (** Give the correct index for 1D Array after a rotation *)
   let make_rotation rotation i j =
@@ -154,56 +133,117 @@ module Action = struct
     | South -> [|3;2;1;0|].(n)
     | West -> [|1;3;0;2|].(n)
 
+  (** Associates an id to an action *)
+  let to_int act =
+    let rotint = int_from_rot act.rot in
+    (act.trans lsl 2) + rotint
+
+  (** Inverse function of the above *)
+  let from_int id =
+    let rot = id land 3
+    and trans = (id land 28) lsr 2 in
+    {rot = rot_from_int rot ; trans = trans}
+
   (** The set of all possible actions *)
   let set =
-    [|{rot=North; trans = Column 0};
-      {rot=North; trans = Column 1};
-      {rot=North; trans = Column 2};
-      {rot=North; trans = Column 3};
-      {rot=North; trans = Column 4};
-      {rot=East; trans = Column 0};
-      {rot=East; trans = Column 1};
-      {rot=East; trans = Column 2};
-      {rot=East; trans = Column 3};
-      {rot=East; trans = Column 4};
-      {rot=South; trans = Column 0};
-      {rot=South; trans = Column 1};
-      {rot=South; trans = Column 2};
-      {rot=South; trans = Column 3};
-      {rot=South; trans = Column 4};
-      {rot=West; trans = Column 0};
-      {rot=West; trans = Column 1};
-      {rot=West; trans = Column 2};
-      {rot=West; trans = Column 3};
-      {rot=West; trans = Column 4}
-    |]
+    let actset = Array.make card {rot = North ; trans = 0} in
+    for i = 0 to card - 1 do
+      let act = from_int i in
+      actset.(i) <- act
+    done ;
+    actset
+end
 
+module Tetromino = struct
+  (** Tetromino type *)
+  type t =
+    | Square
+    | Lshaped
+    | Line
+    | Diag
+    | Dot
+
+  (** Number of tetrominos *)
+  let card = 5
+
+  (** A list of all tetrominos *)
+  let set = [ Square ; Lshaped ; Line ; Diag ; Dot ]
+
+  (** Array representation of the tetrominos *)
+  let arr_repr = [
+    (Square, [| 1 ; 1 ; 1 ; 1 |]) ;
+    (Lshaped, [| 2 ; 0 ; 2 ; 2 |]) ;
+    (Line, [| 3 ; 0 ; 3 ; 0 |]) ;
+    (Diag, [| 4 ; 0 ; 0 ; 4 |]) ;
+    (Dot, [| 5 ; 0 ; 0 ; 0 |])
+  ]
+
+  (** Ids associated to tetrominos *)
+  let ids = [(Square, 0) ; (Lshaped, 1) ; (Line, 2) ; (Diag, 3) ; (Dot, 4)]
+
+  (** Array representation of tetrominos *)
+  let to_arr tetr = List.assoc tetr arr_repr
+
+  (** Associative list mapping tetromino to its available orientations *)
+  let available_rots =
+    [
+      (Square, [ Action.North ]) ;
+      (Lshaped, [ Action.North ; Action.West ; Action.South ; Action.East ]) ;
+      (Line, [ Action.North ; Action.West ; Action.South ]) ;
+      (Diag, [ Action.North ; Action.West ]) ;
+      (Dot, [ Action.North ; Action.West ])
+    ]
+
+  (* Gives all actions associated to rotation *)
+  let act_set_from_rot rot =
+    let rec loop k =
+      if k < 0 then []
+      else Action.to_int {Action.rot = rot ; Action.trans = k} :: loop (k-1)
+    in
+    loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
+
+  (** Outputs actions ids of a tetromino *)
+  let compute_actids tetr =
+    let rots = List.assoc tetr available_rots in
+    (tetr, List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots)
+
+  (** Associative list mapping tetrominos to their actions ids *)
+  let t_to_actids = List.map compute_actids set
+
+  (** @return actions ids associated to tetromino *)
+  let get_actids tetr = List.assoc tetr t_to_actids
+
+  (** Converts tetromino to int *)
+  let to_int tetr = List.assoc tetr ids
+
+  (** Generates a random tetromino *)
+  let make_rand () =
+    let n = Random.int card in
+    List.nth set n
 end
 
 let collide table x y tetromino rotation =
   let n = ref(false) in
   for i = 0 to 1 do
     for j = 0 to 1 do
+      let tetrarr = Tetromino.to_arr tetromino
+      and ind_afterot = Action.make_rotation rotation i j in
       n := !n ||
-           (Tetromino.to_arr tetromino).(Action.make_rotation rotation i j) = 1 &&
+           tetrarr.(ind_afterot) > 0 &&
            (Board.get_board table).(x-i).(y+j) <> 0;
     done;
   done;
   !n
-
-let arr_find arr elt =
-  let rec loop k =
-    if arr.(k) = elt then k else loop (k+1)
-  in
-  loop 0
 
 (** Places tetromino rotated at x y on board table *)
 let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
   for i = 0 to 1 do
     for j = 0 to 1 do
-      if (Tetromino.to_arr  tetromino).(Action.make_rotation rotation i j) = 1 then
-        board.(x - i).(y + j) <- (arr_find Tetromino.tetromino_list tetromino) + 1
+      let tetrarr = Tetromino.to_arr tetromino in
+      let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
+      if tetrquarter > 0 then
+        board.(x - i).(y + j) <- tetrquarter
     done;
   done;
   Board.update_height table (max (Board.assess_height board x y)
