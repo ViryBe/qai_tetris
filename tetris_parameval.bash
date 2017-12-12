@@ -3,14 +3,14 @@
 # Set getopt options
 NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
-OPTIONS=hegal:u:s:n:
+OPTIONS=hegal:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:,ntetr:
+LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:,ntetr:,out:
 # Usage string
-USAGE="Usage: $0 PARAM BOUNDS BOUNDSP [OPTIONS]
+USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o|--out <out> [OPTIONS]
 Param: one of the following
 \t-e|--epsilon\tfrequency of random choice
-\t-g|--gamma|\tsight length of the agent
+\t-g|--gamma\tsight length of the agent
 \t-a|--alphap\tlearning rate parameter
 Bounds:
 \t-l|--low <low>\tlower bound
@@ -80,7 +80,7 @@ while true; do
 			echo 'selected alpha'
 			if [[ $PARAM != '' ]]; then
 				echo 'parameter already set!'
-				echo "$USAGE"
+				echo -e "$USAGE"
 				exit 1
 			fi
 			PARAM='alphap'
@@ -115,7 +115,7 @@ while true; do
 			echo "nval $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'step already specified'
-				echo "$USAGE"
+				echo -e "$USAGE"
 				exit 1
 			fi
 			RANGESPEC='nval'
@@ -133,18 +133,25 @@ while true; do
 			shift 2
 			continue
 			;;
+		'-o'|'--out')
+			OUTFILE=$2
+			shift 2
+			continue
+			;;
 		'--')
 			shift
 			break
 			;;
 		*)
 			echo 'Internal error!' >&2
-			echo "$USAGE"
+			echo -e "$USAGE"
 			exit 1
 			;;
 	esac
 done
-function make_values () { case $RANGESPEC in 'step')
+function make_values () {
+	case $RANGESPEC in
+		'step')
 			step=$RANGEPVAL
 			nval=$(echo "($UP - $LOW) / $step" | bc)
 			;;
@@ -154,7 +161,7 @@ function make_values () { case $RANGESPEC in 'step')
 			;;
 		*)
 			echo 'rangespec not properly set'
-			echo "$USAGE"
+			echo -e "$USAGE"
 			exit 1
 			;;
 	esac
@@ -174,7 +181,7 @@ function run_tetris () {
 	for i in $(seq 0 $((ntr - 1))) ; do
 		./$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
 			"${FILES[$i]}"
-		
+
 		cnt=$((cnt + 1))
 		echo "Done training with $PARAM=${PVAL[$i]} ($cnt/$ntr)"
 	done ;
