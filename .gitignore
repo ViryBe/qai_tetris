@@ -51,4 +51,4 @@ tags
 
 # folder containing saved matrices
 data/
-*.dat # data files
+*.dat
