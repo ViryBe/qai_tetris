@@ -19,8 +19,17 @@
 \maketitle
 \tableofcontents
 
-
 \section*{Introduction}
+
+\section*{Notations}
+Seront not\'es dans tout l'ouvrage:
+\begin{itemize}
+  \item \(n_t\) le nombre de tetrominos par jeu,
+  \item \(\mathcal{S}\) l'ensemble des \'etats,
+  \item \(b_w, b_h\) la largeur et la hauteur du plateau.
+\end{itemize}
+Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10,000,
+b_w = 6\).
 
 \section{Tetris}
 
@@ -33,39 +42,32 @@ n'a pas de fin: le joueur perd la partie lorsqu'un tétrimino reste bloqué en
 haut.
 
 Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
-termine après que je jeu ai donné 10,000 tetrominos à placer. De plus notre
+termine apres avoir fourni 10,000 tetrominos à placer. De plus notre
 tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
 tetrominos différents (seulement 5) et des tetrominos plus petit (taille
 inférieur à 2).
 
-Pour placer le tetrominos le joueur peut choisir la colone et l'orientation de
-la pièce. Contrairement au tetris classique, les pièces ne défilent pas du haut
-de l'écran mais sont directement placé en jeu et l'on a plus d'emprise sur elle
-une fois l'action choisie.
+Un tetromino est plac\'e par le choix d'une colonne et d'une orientation.
 
 \subsection{L'impl\'ementation}
 
-\subsection{Representation}
+\subsubsection{Representation}
 
-\subsubsection{Plateau \textit{board}}
-Le plateau a été initialement représenté par une matrice de dimension
-\(20000\cdot 6\) (2 * nombre tetromino) d'entiers compris entre 0 et 5, 0
-emplacement vide.
-
-\subsubsection{Tetrominos}
-Les tetrominos sont des pièces de dimension  2 * 2 implémenté par des tableaux
-1 dimension de longueur 4.
-Le choix de tableau  à 1 dimension est motivé par l'application de rotation
-sur les pièces. En effet on a trouvé une modélisation simple pour cette
-représentation permettant d'appliquer une rotation sans créer de nouvelle pièce.
+\paragraph{Tetrominos}
+Les tetrominos sont tableaux longueur 4. L'unidimensionnalit\'e permet
+d'impl\'ementer les rotations comme des transformations d'indices, \'evitant la
+cr\'eation ou la modification de structures.
 
 IMAGE NED EED\\
-Les tetrominos sont tous de même dimension par soucis d'homogeneite et cela
-peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
-un choix d'action spécifique à chaque pièce (cf partie x).
+Les tetrominos sont tous de même dimension par souci d'homogeneite.
+
+\paragraph{Plateau \texttt{Board}}
+Le plateau est repr\'esent\'e par une matrice de dimension
+\(2\cdot n_t\cdot 6\) d'entiers dans lequel on inscrit les tetrominos. Les
+manipulations du plateau se font en place.
 
 
-\subsubsection{Actions}
+\paragraph{Actions}
 Composée d'une rotation et d'une translation. Elles permettent d'agir sur les
 tetrominos. Les rotations sont representées par les points cardinaux
 (North, South, East, West) et les translations par un entier entre 0 et 4
@@ -86,6 +88,15 @@ pièce.
 Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais
 la taille totale du plateau reste la même.
 
+\subsection{Drawbacks}
+\subsubsection{fct collide}
+L'implementation actuelle oblige l'accessibilit\'e de la position finale depuis
+le haut du plateau car la pi\`ece ne peut pas \^etre gliss\'ee au dernier moment
+sous une autre.
+\subsubsection{tetromino}
+Les tetrominos sont tous de même dimension par souci d'homogeneite et cela
+peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
+un choix d'action spécifique à chaque pièce (cf partie x).
 \section{Q learning}
 
 \subsection{Representation des etats}
