@@ -5,7 +5,7 @@ NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
 OPTIONS=hp:l:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,param,low:,up:,step:,nval:,ngames:,ntetr:,out:
+LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o <out> [OPTIONS]
 Param:
