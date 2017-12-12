@@ -2,8 +2,13 @@
 \usepackage{fontspec}
 \usepackage{polyglossia}
 \usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{unicode-math}
+\usepackage{amsmath}
 
 \setmainlanguage{french}
+
+\DeclareMathOperator{\card}{card}
 
 \title{Ocaml---IA\\Tetris par Qlearning}
 \author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
@@ -19,7 +24,53 @@
 
 \section{Tetris}
 
+\subsection{Le jeu et sa simplification}
+Tetris met le joueur au défi de réaliser des lignes complètes en déplaçant des
+pièces de formes différentes, les tétrominos, qui défilent depuis le haut
+jusqu'au bas de l'écran. Les lignes complétées disparaissent tout en rapportant
+des points et le joueur peut de nouveau remplir les cases libérées. Le jeu
+n'a pas de fin: le joueur perd la partie lorsqu'un tétrimino reste bloqué en
+haut.
+
+Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
+termine après que je jeu ai donné 10,000 tetrominos à placer. De plus notre
+tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
+tetrominos différents (seulement 5) et des tetrominos plus petit (taille
+inférieur à 2).
+
+Pour placer le tetrominos le joueur peut choisir la colone et l'orientation de
+la pièce. Contrairement au tetris classique, les pièces ne défilent pas du haut
+de l'écran mais sont directement placé en jeu et l'on a plus d'emprise sur elle
+une fois l'action choisie.
+
+\subsection{L'impl\'ementation}
+
+\subsection{Representation}
+
+\subsubsection{Plateau \textit{board}}
+
+\subsubsection{Tetrominos}
+
 \section{Q learning}
+
+\subsection{Representation des etats}
+\subsubsection{Composition}
+Intuitivement, un etat correspond a la piece donnee a jouer et la disposition
+des pieces sur le plateau. En notant \(n_t\) le nombre de tetrominos et \(w\) la
+largeur du plateau, on obtient \(5 \cdot 2^{wn_t}\) etats possibles.
+
+Pour reduire le nombre d'etats, on ne considere que les deux plus hautes lignes
+contenant au moins un tetromino. On obtient \(5\cdot 2^{w+1}\) etats possibles,
+soit \(20,480\) pour une largeur de 6.
+
+\subsubsection{Codage}
+Comme chaque etat correspond \textit{in fine} a une ligne de la matrice, il est
+necessaire d'avoir une bijection entre l'ensemble des etats et les entiers. La
+bijection genere deux representations entieres, une pour les deux lignes de
+l'etat et l'autre pour la piece et les combine en un etat entier final,
+\[
+  \texttt{get\_state}\colon [0,4]\times [0, 2^{12} - 1] \to [0, 5\cdot 2^{12}].
+\]
 
 \section{Difficultes rencontrees}
 
