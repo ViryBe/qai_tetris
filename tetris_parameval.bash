@@ -189,6 +189,6 @@ done ;
 paste "${FILES[@]}" > "$OUTFILE"
 
 # plot
-gnuplot -p -e "set key outside autotitle columnheader;\
+gnuplot -p -e "set key autotitle columnheader;\
 	set title '$PARAM' ;\
 	plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
