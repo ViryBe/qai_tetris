@@ -108,10 +108,10 @@ let update_qmat bheight qmat eps gam alpha ntetr =
     let reward = r (nheight - !height)
     and nstate = get_state board !tetromino in
     (* Update Q matrix *)
-    qmat.(!state).(act_ind) <- (1. -. alpha i) *. qmat.(!state).(act_ind) +.
-                              (alpha i) *.
-                              (reward +.
-                               gam *. (Auxfct.flarray_max qmat.(nstate))) ;
+    qmat.(!state).(act_ind) <- qmat.(!state).(act_ind) +.
+                               (alpha i) *.  (reward +.
+                                gam *. (Auxfct.flarray_max qmat.(nstate)) -.
+                                qmat.(!state).(act_ind));
     state := nstate ;
     height := nheight
   done ;
