@@ -149,6 +149,8 @@ while true; do
 			;;
 	esac
 done
+
+# Fills an array with to be tested parameter values
 function make_values () {
 	case $RANGESPEC in
 		'step')
@@ -174,16 +176,14 @@ function make_values () {
 	return 0
 }
 
+# Run tetris_player and save output to files
 function run_tetris () {
 	ntr=${#PVAL[@]}
-	cnt=0
-	gamesarr=( )
 	for i in $(seq 0 $((ntr - 1))) ; do
 		./$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
 			"${FILES[$i]}"
 
-		cnt=$((cnt + 1))
-		echo "Done training with $PARAM=${PVAL[$i]} ($cnt/$ntr)"
+		echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
 	done ;
 	return 0
 }
