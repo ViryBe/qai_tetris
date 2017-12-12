@@ -7,18 +7,18 @@ OPTIONS=hp:l:u:s:n:o:
 # Long options, names separated with commas
 LONGOPTIONS=help,param,low:,up:,step:,nval:,ngames:,ntetr:,out:
 # Usage string
-USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o|--out <out> [OPTIONS]
+USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o <out> [OPTIONS]
 Param:
-\t-p, --param\t<epsilon|gamma|alphap>
+\t-p|--param\t<epsilon|gamma|alphap>\tthe parameter tested
 Bounds:
-\t-l|--low <low>\tlower bound
-\t-u|--up <up>\tguess what...
+\t-l|--low\t<low>\tlower bound
+\t-u|--up\t\t<up>\tguess what...
 Bounds parameters: one of the following
-\t-s|--step <float>\tthe step between two consecutive values
-\t-n|--nval <int>\tthe number of values desired
+\t-s|--step\t<float>\tthe step between two consecutive values
+\t-n|--nval\t<int>\tthe number of values desired
 Options:
-\t--ngames <int>\tnumber of games done in one training
-\t--ntetr <int>\tnumber of tetrominos in a game"
+\t--ngames\t<int>\tnumber of games done in one training
+\t--ntetr\t\t<int>\tnumber of tetrominos in a game"
 
 # Tetris player related options
 TETRIS_CMD='tetris_player.opt'
@@ -48,10 +48,6 @@ eval set -- "$TEMP"
 unset TEMP
 while true; do
 	case "$1" in
-		'-h'|'--help')
-			echo -e "$USAGE"
-			exit 1
-			;;
 		'-p'|'--param')
 			PARAM=$2
 			shift 2
@@ -112,8 +108,7 @@ while true; do
 			shift
 			break
 			;;
-		*)
-			echo 'Internal error!' >&2
+		'-h'|'--help'|*)
 			echo -e "$USAGE"
 			exit 1
 			;;
