@@ -14,11 +14,11 @@ let draw_board = fun board nb_t height->
   for i = 0 to Array.length board -1 do
     for j = 0 to Array.length board.(i) -1 do
       Graphics.set_color (
-        if board.(i).(j) = 1 then Graphics.red else
-        if board.(i).(j) = 2 then Graphics.blue else
-        if board.(i).(j) = 3 then Graphics.green else
-        if board.(i).(j) = 4 then Graphics.cyan else
-        if board.(i).(j) = 5 then Graphics.yellow else
+        if board.(i).(j) = 1 then Graphics.yellow else
+        if board.(i).(j) = 2 then Graphics.red else
+        if board.(i).(j) = 3 then Graphics.cyan else
+        if board.(i).(j) = 4 then Graphics.green else
+        if board.(i).(j) = 5 then Graphics.magenta else
                                   Graphics.black;
       );
       Graphics.fill_rect (j*std_len) (i*std_len) std_len std_len
