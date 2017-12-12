@@ -6,8 +6,8 @@ let minisleep (sec: float) =
 
 (* cst values related to graphical mesures *)
 let std_len = 30
-let total_width = 100
-let total_height = 100
+let total_width = 400
+let total_height = 700
 
 (** Display the board with a different color for each tetromino *)
 let draw_board = fun board nb_t height->
