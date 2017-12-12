@@ -21,19 +21,34 @@ Pour placer le tetrominos le joueur peut choisir la colone et l'orientation de l
 
 ### L'implémentation
 
-#### Représenation
+#### Représenation par les types
 
-##### Le plateau (Board)
+##### Le plateau (type Board)
 
 Le plateau a été initialement représenté par une matrice de dimension 20000 * 6 (2 * nombre tetromino) d'entiers compris entre 0 et 5, 0 emplacement vide.
 
-##### Les tetrominos
+##### Les tetrominos (type Tetromino)
 
 Les tetrominos sont des pièces de dimension  2 * 2 implémenté par des tableaux 1 dimension de longueur 4.
-Le choix de tableau  à 1 dimension est motivé par l'application de rotation sur les pièces (North, South, East et West). En effet on a trouvé une modélisation simple pour cette représentation permettant d'appliquer une rotation sans créer de nouvelle pièce.
+Le choix de tableau  à 1 dimension est motivé par l'application de rotation sur les pièces. En effet on a trouvé une modélisation simple pour cette représentation permettant d'appliquer une rotation sans créer de nouvelle pièce.
 
 <center>
 passage 2 * 2 -> 1 * 4
 </center>
 
-Les tetrominos sont tous de même dimension par soucis d'homogeneite et et cela peut entrainer un probleme de "tetromino flottant". Ce probleme est traité par un choix d'action spécifique à chaque pièce (cf partie x).
+Les tetrominos sont tous de même dimension par soucis d'homogeneite et cela peut entrainer un probleme de "tetromino flottant". Ce problème est traité par un choix d'action spécifique à chaque pièce (cf partie x).
+
+
+##### Les actions (type Action)
+
+Composée d'une rotation et d'une translation. Elles permettent d'agir sur les tetrominos. Les rotations sont representées par les points cardinaux (North, South, East, West) et les translations par un entier entre 0 et 4 correspondant à l'indice du coin superieur gauche du tetromino.
+
+<center>
+point de ref
+</center>
+
+#### Déroulement d'une partie
+
+Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur le plateau de jeu. Il est donc nécessaire d'utiliser une fonction play qui permet de placer une piece sur le plateau. La pièce "tombe" donc dans la colonne sélectionnée tant qu'elle ne rencontre pas d'obstacle (fond du plateau ou un autre tétromino). Pour cela, il y a besoin d'une fonction de test de collision, qui renvoie si l'emplacement testé peut accueillir le Tetromino. S'il y a collision, on sélectionne le dernier emplacement libre et on place la pièce.
+
+Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais la taille totale du plateau reste la même.
