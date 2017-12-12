@@ -3,15 +3,13 @@
 # Set getopt options
 NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
-OPTIONS=hegal:u:s:n:o:
+OPTIONS=hp:l:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,epsilon,gamma,alphap,low:,up:,step:,nval:,ngames:,ntetr:,out:
+LONGOPTIONS=help,param,low:,up:,step:,nval:,ngames:,ntetr:,out:
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o|--out <out> [OPTIONS]
-Param: one of the following
-\t-e|--epsilon\tfrequency of random choice
-\t-g|--gamma\tsight length of the agent
-\t-a|--alphap\tlearning rate parameter
+Param:
+\t-p, --param\t<epsilon|gamma|alphap>
 Bounds:
 \t-l|--low <low>\tlower bound
 \t-u|--up <up>\tguess what...
@@ -54,37 +52,9 @@ while true; do
 			echo -e "$USAGE"
 			exit 1
 			;;
-		'-e'|'--epsilon')
-			echo "selected epsilon"
-			if [[ $PARAM != '' ]]; then
-				echo 'parameter already set!'
-				echo "$USAGE"
-				exit 1
-			fi
-			PARAM='epsilon'
-			shift
-			continue
-			;;
-		'-g'|'--gamma')
-			echo "selected gamma"
-			if [[ $PARAM != '' ]]; then
-				echo 'parameter already set!'
-				echo "$USAGE"
-				exit 1
-			fi
-			PARAM='gamma'
-			shift
-			continue
-			;;
-		'-a'|'--alphap')
-			echo 'selected alpha'
-			if [[ $PARAM != '' ]]; then
-				echo 'parameter already set!'
-				echo -e "$USAGE"
-				exit 1
-			fi
-			PARAM='alphap'
-			shift
+		'-p'|'--param')
+			PARAM=$2
+			shift 2
 			continue
 			;;
 		'-l'|'--low')
