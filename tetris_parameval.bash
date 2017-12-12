@@ -183,8 +183,12 @@ function run_tetris () {
 
 make_values
 run_tetris
+for i in $(seq 0 $((${#PVAL[@]} - 1))); do
+	sed -i "s/^#.*$/${PVAL[$i]}/" "${FILES[$i]}"
+done ;
 paste "${FILES[@]}" > "$OUTFILE"
-sed -i '/^#/d' "$BASEFNAME.tot.out"
 
 # plot
-gnuplot -p -e "set key outside ; plot for [col=1:${#PVAL[@]}] '$OUTFILE' using col"
+gnuplot -p -e "set key outside autotitle columnheader;\
+	set title '$PARAM' ;\
+	plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
