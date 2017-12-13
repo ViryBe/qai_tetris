@@ -6,7 +6,7 @@ INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmo)
 OBJSOPT = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
-LIB = graphics unix
+LIB = graphics
 # ocamlfind parameters
 FINDLIBS = lacaml
 OFIND_FLAGS = -package $(FINDLIBS) -linkpkg
@@ -14,8 +14,8 @@ OFIND_FLAGS = -package $(FINDLIBS) -linkpkg
 OCAMLCOPT = ocamlfind ocamlopt $(OFIND_FLAGS)
 OCAMLC = ocamlfind ocamlc -g $(OFIND_FLAGS)
 DOCGEN = ocamlfind ocamldoc -d $(DOC_DIR) -html
-DEPGEN = ocamldep
-TOPGEN = ocamlfind ocamlmktop
+DEPGEN = ocamlfind ocamldep $(OFIND_FLAGS)
+TOPGEN = ocamlfind ocamlmktop $(OFIND_FLAGS)
 
 all: .depend byte opt top
 
