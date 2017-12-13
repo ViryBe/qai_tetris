@@ -9,6 +9,8 @@
 
 \setmainlanguage{french}
 
+\newcommand{\R}{\mathbb{R}}
+
 \DeclareMathOperator{\card}{card}
 
 \title{Ocaml---IA\\Tetris par Qlearning}
@@ -122,7 +124,35 @@ l'etat et l'autre pour la piece et les combine en un etat entier final,
 
 \subsection{Algorithmes}
 
-\subsection{Choix des param\`etres}
+\subsection{Param\`etres}
+\subsubsection{Pr\'esentation}
+L'apprentissage est parametre par les trois variables,
+\begin{itemize}
+  \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
+  \item \(\epsilon \in [0, 1]\) la frequence de coups aleatoires effectues,
+  \item \(\gamma \in [0, 1]\) la vision de l'agent.
+\end{itemize}
+
+Pour assurer la convergence de la matrice vers la matrice optimale,
+le taux d'apprentissage evolue au cours des entrainements, est utilisee une
+suite \( (\alpha_k)_k \). D'apres~\cite{watkins92}, la suite \(
+(\alpha_k)_k \) doit verifier \( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
+\sum_{k=0}^\infty \alpha_k^2 \in \R \). La suite choisie est donc, pour tout
+\( k \in \mathbb{N} \) et avec \( C \in \R \)
+\[
+  \alpha_k = \frac{1}{1 + Ck}.
+\]
+Le taux d'apprentissage reste manipulable via le parametre \( C \).
+
+
+Le parametre \(\epsilon\) pourra \'egalement varier au cours des jeux effectues.
+En effet, intuitivement, un \(\epsilon\) grand permet une exporation rapide de
+l'ensemble des etats possibles mais devient nuisible lorsque la matrice est bien
+entrainee.
+
+\subsubsection{Valeurs}
+Par defaut les valeurs utilisees
+
 
 \section{Difficultes rencontrees}
 
@@ -132,5 +162,16 @@ l'etat et l'autre pour la piece et les combine en un etat entier final,
 
 \appendix
 \section{Deep Q learning}
+
+\begin{thebibliography}{9}
+    \bibitem{watkins92}
+    Christopher~J.C.H.~Watkins, Peter~Dayan
+    \textit{Q-Learning, Machine Learning}
+    1992.
+    \bibitem{deepmind}
+    Voloddymyr~Mnih, Koray Kavukcuoghlu, David Silver, Alex Graves, Ioannis
+    Antonoglou, Daan Wierstra, Martin Riedmiller,
+    \textit{Playing Atari with Deep Reinforcement Learning}
+\end{thebibliography}
 
 \end{document}
