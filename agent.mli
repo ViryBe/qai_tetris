@@ -19,6 +19,10 @@ module type AgentTools =
 
     (** Outputs state from the board and, if supplied, the tetromino *)
     val get_state : ?tetr:Game.Tetromino.t -> Game.Board.t -> int
+
+    (** Gives available actions *)
+    val get_rewards : t -> int -> float array
+    (** [get_action a s] gives the actions [a] can achieve from state [s] *)
   end
 
 (** Module signature of the output of the functor *)

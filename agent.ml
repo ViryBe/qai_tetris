@@ -7,6 +7,8 @@ module type AgentTools =
     val update : t -> float -> float -> float -> int -> Game.Board.t
 
     val get_state : ?tetr:Game.Tetromino.t -> Game.Board.t -> int
+
+    val get_rewards : t -> int -> float array
   end
 
 module type S =
@@ -41,7 +43,7 @@ struct
     let  state = ref (Ag.get_state ~tetr:!tetromino board) in
     for i = 0 to ntetr - 1 do
       let actids = Game.Tetromino.get_actids !tetromino in
-      let action, _ = Game.Action.choose (ag !state) 0. actids in
+      let action, _ = Game.Action.choose (Ag.get_rewards ag !state) 0. actids in
       Game.play board !tetromino action ;
       tetromino := Game.Tetromino.make_rand () ;
       state := Ag.get_state ~tetr:!tetromino board;
