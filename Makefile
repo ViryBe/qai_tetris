@@ -52,7 +52,7 @@ clean:
 	rm -f *.cm[xio] *.o *~
 
 tags:
-	otags -vi *.ml *.mli
+	ctags *.ml *.mli Makefile *.bash latex/*.tex
 
 .depend: $(SOURCES) $(INTERFACES)
 	$(DEPGEN) $^ > .depend
