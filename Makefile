@@ -1,17 +1,21 @@
 TARGET = tetris_player
 DOC_DIR = doc
-OCAMLCOPT = ocamlopt
-OCAMLC = ocamlc -g
-DOCGEN = ocamldoc -d $(DOC_DIR) -html
-DEPGEN = ocamldep
-TOPGEN = ocamlmktop
-MODULES = game aio display agent
+MODULES = auxfct game aio display agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmo)
 OBJSOPT = $(MODULES:=.cmx)
 CINT = $(MODULES:=.cmi)
 LIB = graphics unix
+# ocamlfind parameters
+FINDLIBS = lacaml
+OFIND_FLAGS = -package $(FINDLIBS) -linkpkg
+# Build commands
+OCAMLCOPT = ocamlfind ocamlopt $(OFIND_FLAGS)
+OCAMLC = ocamlfind ocamlc -g $(OFIND_FLAGS)
+DOCGEN = ocamlfind ocamldoc -d $(DOC_DIR) -html
+DEPGEN = ocamldep
+TOPGEN = ocamlfind ocamlmktop
 
 all: .depend byte opt top
 
