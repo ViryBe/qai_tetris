@@ -24,13 +24,6 @@ let arr2dig arr =
   let line_bin = Array.map (fun elt -> if elt = 0 then 0 else 1) arr in
   Array.fold_left (fun acc elt -> (acc lsl 1) + elt) 0 line_bin
 
-(** Outputs the two last lines of the board *)
-let get_board_top board =
-  let height = Game.Board.height board in
-  if height >= 2 then
-    Game.Board.to_arr (height - 1) height board else
-    Game.Board.to_arr 0 height board
-
 let arr_find arr elt =
   let rec loop k =
     if arr.(k) = elt then k else loop (k+1)
