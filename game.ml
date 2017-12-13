@@ -152,6 +152,14 @@ module Action = struct
       actset.(i) <- act
     done ;
     actset
+
+  let choose = fun rewards epsilon action_set ->
+    let tirage = Random.float 1. in
+    let actionid = if tirage > epsilon then Auxfct.argmax_r rewards
+      else let rind = Random.int (List.length action_set - 1) in
+        List.nth action_set rind
+    in
+    (from_int actionid, actionid)
 end
 
 module Tetromino = struct

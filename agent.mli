@@ -1,12 +1,18 @@
 (** Agent module, builds the Q matrix used by policy *)
 
+(** Module signature of an agent *)
 module type AgentTools =
   sig
     (** The type of the agent, matrix or function *)
     type t
 
+    (** Makes an agent *)
+    val make : ?act_card:int -> int -> t
+    (** [make a s] makes an agent suitable for a model with [a] actions
+        available and [s] possible states *)
+
     (** Function updating the agent *)
-    val update : t -> float -> float -> float -> int -> Game.Board.t -> unit
+    val update : t -> float -> float -> float -> int -> Game.Board.t
     (** [update t e g a n ] trains the agent through a game of [n] tetrominos
         with a frequency [e] of random action, a sight length of [g] and a
         learning rate of [a] *)
@@ -15,13 +21,14 @@ module type AgentTools =
     val get_state : ?tetr:Game.Tetromino.t -> Game.Board.t -> int
   end
 
+(** Module signature of the output of the functor *)
 module type S =
   sig
     type t
 
     (** Inits a Q matrix filled with -infinity, placing zeros on slots to
         be used *)
-    val make : unit -> t
+    val make : ?act_card:int -> int -> t
 
     (** Builds a Q matrix used by agent to determine actions *)
     val train : t -> float -> float -> (int -> float) -> int ->
@@ -36,10 +43,10 @@ module type S =
     *)
 
     (** Plays a game *)
-    val play : float array array -> int -> Game.Board.t
+    val play : t -> int -> Game.Board.t
     (** [play q nt] gives the final board of the game composed of [nt]
         tetrominos
         played with matrix [q] *)
   end
 
-module Make : functor (Ag : AgentTools) -> S
+module Make : functor (Ag : AgentTools) -> S with type t = Ag.t

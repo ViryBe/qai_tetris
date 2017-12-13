@@ -24,17 +24,6 @@ let get_state board tetromino =
   let dig_board = Auxfct.arr2dig board_one in
   intetr lsl (Game.Board.width * 2) + dig_board
 
-(** chose an action for the current state
-    @return [(action, action_mo)] with action an Action.t and action_no the
-            id of the action *)
-let choose_action = fun rewards epsilon action_set ->
-  let tirage = Random.float 1. in
-  let actionid = if tirage > epsilon then Auxfct.argmax_r rewards
-    else let rind = Random.int (List.length action_set - 1) in
-      List.nth action_set rind
-  in
-  (Game.Action.from_int actionid, actionid)
-
 (** Puts zeros on usable actions in a Q matrix *)
 let init_qmat qmat =
   let tetr_per_state = Game.Board.width * line_per_state in
@@ -67,7 +56,7 @@ let update_qmat bheight qmat eps gam alpha ntetr =
   for i = 0 to ntetr - 1 do
     (* Compute action *)
     let idactions = Game.Tetromino.get_actids !tetromino in
-    let action, act_ind = choose_action qmat.(!state) eps idactions in
+    let action, act_ind = Game.Action.choose qmat.(!state) eps idactions in
     (* Update board accordingly to action *)
     Game.play board !tetromino action ;
     tetromino := Game.Tetromino.make_rand () ;
@@ -82,36 +71,4 @@ let update_qmat bheight qmat eps gam alpha ntetr =
     state := nstate ;
     height := nheight
   done ;
-  board
-
-(** Train the Q matrix with ngames of nturns each *)
-let train qmat eps gam alpha ngames ntetr =
-  (* Should ideally be updated during process, limiting height *)
-  let bh = 2 * ntetr + 1 in
-  for i = 0 to ngames do
-    let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
-    let fheight = Game.Board.height fboard in
-    Printf.printf "%d\n" fheight
-  done
-
-(** Plays a game of ntetr with qmat *)
-let play qmat ntetr =
-  let board = Game.Board.make (2 * ntetr + 1)
-  and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let  state = ref (get_state board !tetromino) in
-  for i = 0 to ntetr - 1 do
-    let actids = Game.Tetromino.get_actids !tetromino in
-    let action, _ = choose_action qmat.(!state) 0. actids in
-    Game.play board !tetromino action ;
-    tetromino := Game.Tetromino.make_rand () ;
-    state := get_state board !tetromino;
-    (* graphic part *)
-    Display.draw_board
-      (Game.Board.to_arr
-         (max 0 (Game.Board.height board - 10))
-         (Game.Board.height board + 5) board)
-      i (Game.Board.height board)
-  done ;
-  Printf.printf "%d Tetrominos: final height of %d\n" ntetr
-    (Game.Board.height board) ;
   board

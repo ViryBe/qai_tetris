@@ -14,7 +14,7 @@ OFIND_FLAGS = -package $(FINDLIBS) -linkpkg
 OCAMLCOPT = ocamlfind ocamlopt $(OFIND_FLAGS)
 OCAMLC = ocamlfind ocamlc -g $(OFIND_FLAGS)
 DOCGEN = ocamlfind ocamldoc -d $(DOC_DIR) -html
-DEPGEN = ocamlfind ocamldep $(OFIND_FLAGS)
+DEPGEN = ocamlfind ocamldep
 TOPGEN = ocamlfind ocamlmktop $(OFIND_FLAGS)
 
 all: .depend byte opt top
