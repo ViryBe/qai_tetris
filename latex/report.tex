@@ -29,10 +29,14 @@ Seront not\'es dans tout l'ouvrage:
 \begin{itemize}
   \item \(n_t\) le nombre de tetrominos par jeu,
   \item \(\mathcal{S}\) l'ensemble des \'etats,
-  \item \(b_w, b_h\) la largeur et la hauteur du plateau.
+  \item \(b_w, b_h\) la largeur et la hauteur totale du plateau.
 \end{itemize}
 Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10,000,
-b_w = 6\).
+b_w = 6\). Seront distingu\'ees la hauteur totale \(b_h\) et la hauteur relative
+a un instant de jeu \(h\) du plateau, la premiere correspond a la hauteur
+theorique maximale atteignable quand la deuxieme concerne la hauteur
+effectivement atteinte a un instant de jeu, i.e.\ le nombre de lignes non vides
+sur le plateau.
 
 \section{Tetris}
 
@@ -155,6 +159,21 @@ Par defaut les valeurs utilisees
 
 
 \section{Difficultes rencontrees}
+
+\subsection{Le fl\'eau de la mutabilit\'e}
+L'usage du \texttt{Array.blit} s'est revele plus delicat que prevu. En
+considerant que la ligne \(l\) doit etre supprimee et en notant \(h\) la hauteur
+actuelle du plateau, le principe est de copier la section de tableau incluant
+les lignes \(l+1\) jusqu'a \(h+1\) une ligne en dessous, i.e.\ translater le
+bloc d'une ligne vers le bas.
+
+Cette demarche engendre des comportements anormaux car la ligne \(h+1\) n'est
+pas copiee sur la ligne \(h\), elles partagent la meme adresse memoire. Ainsi,
+il etait observe quelques coups apres un blit un dedoublement de carres de
+tetrominos, faisant augmenter la hauteur.
+
+Pour pallier ce probleme de partage d'adresse memoire, la ligne \(h\) est
+recreee a chaque blit.
 
 \section{R\'esultats du projet}
 
