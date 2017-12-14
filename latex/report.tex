@@ -101,11 +101,11 @@ la taille totale du plateau reste la même.
 
 \subsection{Drawbacks}
 \subsubsection{Fonction collide}
-L'implémentation actuelle oblige l'accessibilit\'e de la position finale depuis
+L'implementation actuelle oblige l'accessibilit\'e de la position finale depuis
 le haut du plateau car la pi\`ece ne peut pas \^etre gliss\'ee au dernier moment
 sous une autre.
 \subsubsection{Tetromino}
-Les tetrominos sont tous de même dimension par souci d'homogénéite et cela
+Les tetrominos sont tous de même dimension par souci d'homogeneite et cela
 peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
 un choix d'action spécifique à chaque pièce (cf partie x).
 \section{Q learning}
@@ -116,7 +116,7 @@ Intuitivement, un état correspond à la pièce donnée à jouer et la dispositi
 des pièces sur le plateau. En notant \(n_t\) le nombre de tetrominos et \(w\) la
 largeur du plateau, on obtient \(5 \cdot 2^{wn_t}\) états possibles.
 
-Pour réduire le nombre d'états, on ne considère que les deux plus hautes lignes
+Pour reduire le nombre d'états, on ne considère que les deux plus hautes lignes
 contenant au moins un tetromino. On obtient \(5\cdot 2^{w+1}\) états possibles,
 soit \(20,480\) pour une largeur de 6.
 
@@ -165,20 +165,19 @@ recompenses des coups suivants qu'a la recompense immediate.
     [1]
     \Procedure{Update}{$Q$, $\epsilon$, $\gamma$, $\alpha$}
     \Repeat{}
-    \State initialisation de \(s\)
+    \State{} initialisation de \(s\)
     \Repeat{}
-    \State \(a \gets\) ChooseAction$(Q, s, \mathcal{A}, \epsilon)$
-    \State jouer \(a\), observer \(r\) et le nouvel \'etat \(s'\),
-    \State \(Q(s, a) \gets Q(s, a) + \alpha\left[ r + \gamma \max_{a'} Q(s', a')
-    - Q(s, a)\right]\)
+    \State{} \(a \gets\) ChooseAction$(Q, s, \mathcal{A}, \epsilon)$
+    \State{} jouer \(a\), observer \(r\) et le nouvel \'etat \(s'\),
+    \State{} \(Q(s, a) \gets Q(s, a) + \alpha\left[ r + \gamma \max_{a'}
+      Q(s', a') - Q(s, a)\right]\)
     \Until{$s$ est terminal}
-    \Until{entra\^inement fini}
+    \Until{entrainement fini}
     \EndProcedure{}
   \end{algorithmic}
 \end{algorithm}
 
 \subsubsection{Param\`etres}
-\paragraph{Pr\'esentation}
 L'apprentissage est paramétré par les trois variables,
 \begin{itemize}
   \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
@@ -187,9 +186,9 @@ L'apprentissage est paramétré par les trois variables,
 \end{itemize}
 %TODO ne veut rien dire !!!!
 Pour assurer la convergence de la matrice vers la matrice optimale,
-le taux d'apprentissage évolue au cours des entrainements, est utilisée une
-suite \( (\alpha_k)_k \). D'après~\cite{watkins92}, la suite \(
-(\alpha_k)_k \) doit vérifier \( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
+le taux d'apprentissage doit évoluer au cours des entrainements.
+D'après~\cite{watkins92}, la suite \( (\alpha_k)_k \) doit vérifier
+\( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
 \sum_{k=0}^\infty \alpha_k^2 \in \R \). La suite choisie est donc, pour tout
 \( k \in \mathbb{N} \) et avec \( C \in \R \)
 \[
@@ -204,13 +203,25 @@ l'ensemble des états possibles mais devient nuisible lorsque la matrice est bie
 entrainée.
 
 \paragraph{Valeurs}
-Par défaut les valeurs utilisées
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[only marks, mark size = 0.2,
+        legend entries={0.001,0.018,0.26,0.35,0.47,0.59}
+      ]
+      \foreach \i in {0,1,...,5}{%
+        \addplot+ table [x expr = \lineno, y index = \i] {data/gamma.dat};
+      }
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Influence du parametre \(\gamma\)}
+\end{figure}
 
 
 \section{Difficultés rencontrées}
 
 \subsection{Le fl\'eau de la mutabilit\'e}
-L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
+L'usage du \texttt{Array.blit} s'est revélé plus delicat que prevu. En
 considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
 actuelle du plateau, le principe est de copier la section de tableau incluant
 les lignes \(l+1\) jusqu'à \(h+1\) une ligne en dessous, i.e.\ translater le
@@ -223,15 +234,6 @@ tetrominos, faisant augmenter la hauteur.
 
 Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
 recréée à chaque blit.
-
-\subsection{Le hollandais volant}
-La fonction collide permet de tester la collision du tetromino avec les autres
-pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
-on testait donc toutes les positions possibles pour déposer les pièces de
-dimension 2x2 sur le fond du plateau s'il n'y avait pas eu de collision.
-Malheureusement, certaines pièces comme le point ou la ligne pouvaient avoir
-une "ligne vide" en bas sous certaines rotations. Pour résoudre ce problème
-qui est devenu évident après la résolution du problème de \texttt{Array.blit}
 
 \section{R\'esultats du projet}
 
