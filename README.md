@@ -30,8 +30,7 @@ Pour un entrainement de 500 parties de 10k tetrominos:
 * ```./tetris_player``` ~ 2 minutes
 * ```./tetris_player.opt``` ~ 15 secondes
 
-
-## Visualisation d'un jeu
+## Visualisation d'un jeu
 
 A partir d'une matrice 'qmat.save':
 
