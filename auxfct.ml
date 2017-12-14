@@ -29,3 +29,11 @@ let arr_find arr elt =
     if arr.(k) = elt then k else loop (k+1)
   in
   loop 0
+
+let fold_left2_array f x a1 a2 =
+  assert(Array.length a1 = Array.length a2);
+  let accu = ref x in
+  for i = 0 to Array.length a1 -1 do
+    accu := f !accu a1.(i) a2.(i)
+  done;
+  !accu
