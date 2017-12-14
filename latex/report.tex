@@ -33,9 +33,9 @@ Seront not\'es dans tout l'ouvrage:
 \end{itemize}
 Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10,000,
 b_w = 6\). Seront distingu\'ees la hauteur totale \(b_h\) et la hauteur relative
-a un instant de jeu \(h\) du plateau, la premiere correspond a la hauteur
-theorique maximale atteignable quand la deuxieme concerne la hauteur
-effectivement atteinte a un instant de jeu, i.e.\ le nombre de lignes non vides
+à un instant de jeu \(h\) du plateau, la première correspond à la hauteur
+théorique maximale atteignable quand la deuxieme concerne la hauteur
+effectivement atteinte à un instant de jeu, i.e.\ le nombre de lignes non vides
 sur le plateau.
 
 \section{Tetris}
@@ -51,41 +51,41 @@ haut.
 Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
 termine apres avoir fourni 10,000 tetrominos à placer. De plus notre
 tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
-tetrominos différents (seulement 5) et des tetrominos plus petit (taille
-inférieur à 2).
+tetrominos différents (seulement 5) et des tetrominos plus petits (taille
+inférieure à 2).
 
 Un tetromino est plac\'e par le choix d'une colonne et d'une orientation.
 
 \subsection{L'impl\'ementation}
 
-\subsubsection{Representation}
+\subsubsection{Représentation}
 
 \paragraph{Tetrominos}
-Les tetrominos sont tableaux longueur 4. L'unidimensionnalit\'e permet
+Les tetrominos sont tableaux de longueur 4. L'unidimensionnalit\'e permet
 d'impl\'ementer les rotations comme des transformations d'indices, \'evitant la
 cr\'eation ou la modification de structures.
 
 IMAGE NED EED\\
-Les tetrominos sont tous de même dimension par souci d'homogeneite.
+Les tetrominos sont tous de même dimension par souci d'homogénéite.
 
 \paragraph{Plateau \texttt{Board}}
 Le plateau est repr\'esent\'e par une matrice de dimension
-\(2\cdot n_t\cdot 6\) d'entiers dans lequel on inscrit les tetrominos. Les
+\(2\cdot n_t\cdot 6\) d'entiers dans laquelle on inscrit les tetrominos. Les
 manipulations du plateau se font en place.
 
 
 \paragraph{Actions}
-Composée d'une rotation et d'une translation. Elles permettent d'agir sur les
+Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
 tetrominos. Les rotations sont representées par les points cardinaux
-(North, South, East, West) et les translations par un entier entre 0 et 4
-correspondant à l'indice du coin superieur gauche du tetromino.
+(North, South, East, West) et les translations par un entier compris entre 0 et
+4 correspondant à l'indice du coin supérieur gauche du tetromino.
 
 POINT DE REF
 
 \subsection{D\'eroulement d'une partie}
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
-le plateau de jeu. Il est donc nécessaire d'utiliser une fonction play qui
-permet de placer une piece sur le plateau. La pièce ``tombe'' donc dans la
+le plateau de jeu. Il est donc nécessaire d'utiliser une fonction \texttt{play}
+qui permet de placer une pièce sur le plateau. La pièce ``tombe'' donc dans la
 colonne sélectionnée tant qu'elle ne rencontre pas d'obstacle (fond du plateau
 ou un autre tétromino). Pour cela, il y a besoin d'une fonction de test de
 collision, qui renvoie si l'emplacement testé peut accueillir le tetromino.
@@ -96,31 +96,31 @@ Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais
 la taille totale du plateau reste la même.
 
 \subsection{Drawbacks}
-\subsubsection{fct collide}
+\subsubsection{Fonction collide}
 L'implementation actuelle oblige l'accessibilit\'e de la position finale depuis
 le haut du plateau car la pi\`ece ne peut pas \^etre gliss\'ee au dernier moment
 sous une autre.
-\subsubsection{tetromino}
+\subsubsection{Tetromino}
 Les tetrominos sont tous de même dimension par souci d'homogeneite et cela
 peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
 un choix d'action spécifique à chaque pièce (cf partie x).
 \section{Q learning}
 
-\subsection{Representation des etats}
+\subsection{Représentation des états}
 \subsubsection{Composition}
-Intuitivement, un etat correspond a la piece donnee a jouer et la disposition
-des pieces sur le plateau. En notant \(n_t\) le nombre de tetrominos et \(w\) la
-largeur du plateau, on obtient \(5 \cdot 2^{wn_t}\) etats possibles.
+Intuitivement, un état correspond à la pièce donnée à jouer et la disposition
+des pièces sur le plateau. En notant \(n_t\) le nombre de tetrominos et \(w\) la
+largeur du plateau, on obtient \(5 \cdot 2^{wn_t}\) états possibles.
 
-Pour reduire le nombre d'etats, on ne considere que les deux plus hautes lignes
-contenant au moins un tetromino. On obtient \(5\cdot 2^{w+1}\) etats possibles,
+Pour reduire le nombre d'états, on ne considère que les deux plus hautes lignes
+contenant au moins un tetromino. On obtient \(5\cdot 2^{w+1}\) états possibles,
 soit \(20,480\) pour une largeur de 6.
 
 \subsubsection{Codage}
-Comme chaque etat correspond \textit{in fine} a une ligne de la matrice, il est
-necessaire d'avoir une bijection entre l'ensemble des etats et les entiers. La
-bijection genere deux representations entieres, une pour les deux lignes de
-l'etat et l'autre pour la piece et les combine en un etat entier final,
+Comme chaque état correspond \textit{in fine} à une ligne de la matrice, il est
+nécessaire d'avoir une bijection entre l'ensemble des états et les entiers. La
+bijection genère deux représentations entières, une pour les deux lignes de
+l'état et l'autre pour la pièce et les combine en un état entier final,
 \[
   \texttt{get\_state}\colon [0,4]\times [0, 2^{12} - 1] \to [0, 5\cdot 2^{12}].
 \]
@@ -130,50 +130,50 @@ l'etat et l'autre pour la piece et les combine en un etat entier final,
 
 \subsection{Param\`etres}
 \subsubsection{Pr\'esentation}
-L'apprentissage est parametre par les trois variables,
+L'apprentissage est paramétré par les trois variables,
 \begin{itemize}
   \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
-  \item \(\epsilon \in [0, 1]\) la frequence de coups aleatoires effectues,
+  \item \(\epsilon \in [0, 1]\) la fréquence de coups aléatoires effectués,
   \item \(\gamma \in [0, 1]\) la vision de l'agent.
 \end{itemize}
-
+%TODO ne veut rien dire !!!!
 Pour assurer la convergence de la matrice vers la matrice optimale,
-le taux d'apprentissage evolue au cours des entrainements, est utilisee une
-suite \( (\alpha_k)_k \). D'apres~\cite{watkins92}, la suite \(
-(\alpha_k)_k \) doit verifier \( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
+le taux d'apprentissage évolue au cours des entrainements, est utilisée une
+suite \( (\alpha_k)_k \). D'après~\cite{watkins92}, la suite \(
+(\alpha_k)_k \) doit vérifier \( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
 \sum_{k=0}^\infty \alpha_k^2 \in \R \). La suite choisie est donc, pour tout
 \( k \in \mathbb{N} \) et avec \( C \in \R \)
 \[
   \alpha_k = \frac{1}{1 + Ck}.
 \]
-Le taux d'apprentissage reste manipulable via le parametre \( C \).
+Le taux d'apprentissage reste manipulable via le paramètre \( C \).
 
 
-Le parametre \(\epsilon\) pourra \'egalement varier au cours des jeux effectues.
-En effet, intuitivement, un \(\epsilon\) grand permet une exporation rapide de
-l'ensemble des etats possibles mais devient nuisible lorsque la matrice est bien
-entrainee.
+Le paramètre \(\epsilon\) pourra \'egalement varier au cours des jeux effectués.
+En effet, intuitivement, un \(\epsilon\) grand permet une exploration rapide de
+l'ensemble des états possibles mais devient nuisible lorsque la matrice est bien
+entrainée.
 
 \subsubsection{Valeurs}
-Par defaut les valeurs utilisees
+Par défaut les valeurs utilisées
 
 
-\section{Difficultes rencontrees}
+\section{Difficultés rencontrées}
 
 \subsection{Le fl\'eau de la mutabilit\'e}
-L'usage du \texttt{Array.blit} s'est revele plus delicat que prevu. En
-considerant que la ligne \(l\) doit etre supprimee et en notant \(h\) la hauteur
+L'usage du \texttt{Array.blit} s'est revélé plus delicat que prevu. En
+considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
 actuelle du plateau, le principe est de copier la section de tableau incluant
-les lignes \(l+1\) jusqu'a \(h+1\) une ligne en dessous, i.e.\ translater le
+les lignes \(l+1\) jusqu'à \(h+1\) une ligne en dessous, i.e.\ translater le
 bloc d'une ligne vers le bas.
 
-Cette demarche engendre des comportements anormaux car la ligne \(h+1\) n'est
-pas copiee sur la ligne \(h\), elles partagent la meme adresse memoire. Ainsi,
-il etait observe quelques coups apres un blit un dedoublement de carres de
+Cette démarche engendre des comportements anormaux car la ligne \(h+1\) n'est
+pas copiée sur la ligne \(h\), elles partagent la même adresse mémoire. Ainsi,
+il etait observé quelques coups après un blit un dédoublement de carrés de
 tetrominos, faisant augmenter la hauteur.
 
-Pour pallier ce probleme de partage d'adresse memoire, la ligne \(h\) est
-recreee a chaque blit.
+Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
+recréée à chaque blit.
 
 \section{R\'esultats du projet}
 
