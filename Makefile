@@ -1,6 +1,6 @@
 TARGET = tetris_player
 DOC_DIR = doc
-MODULES = auxfct game aio display agent
+MODULES = auxfct game aio display qmat agent
 SOURCES = $(MODULES:=.ml) main.ml
 INTERFACES = $(MODULES:=.mli)
 OBJS = $(MODULES:=.cmo)

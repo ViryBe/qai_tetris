@@ -7,22 +7,22 @@ module type AgentTools =
     type t
 
     (** Makes an agent *)
-    val make : ?act_card:int -> int -> t
-    (** [make a s] makes an agent suitable for a model with [a] actions
-        available and [s] possible states *)
+    val make : int -> t
+    (** [make s] makes an agent suitable for a model with [s] possible states *)
 
     (** Function updating the agent *)
-    val update : t -> float -> float -> float -> int -> Game.Board.t
+    val update : t -> float -> float -> (int -> float) -> int -> Game.Board.t
     (** [update t e g a n ] trains the agent through a game of [n] tetrominos
         with a frequency [e] of random action, a sight length of [g] and a
-        learning rate of [a] *)
+        learning rate of [a] (which is a function) *)
 
     (** Outputs state from the board and, if supplied, the tetromino *)
-    val get_state : ?tetr:Game.Tetromino.t -> Game.Board.t -> int
+    val get_state : Game.Tetromino.t -> Game.Board.t -> int
 
-    (** Gives available actions *)
+    (** Gives rewards currently associated to a state *)
     val get_rewards : t -> int -> float array
-    (** [get_action a s] gives the actions [a] can achieve from state [s] *)
+    (** [get_rewards a s] returns an array containing reward expectancies
+        currently known by the agent *)
   end
 
 (** Module signature of the output of the functor *)
@@ -30,9 +30,18 @@ module type S =
   sig
     type t
 
-    (** Inits a Q matrix filled with -infinity, placing zeros on slots to
-        be used *)
-    val make : ?act_card:int -> int -> t
+    (** Gives birth to an agent, eager to learn *)
+    val make : int -> t
+    (** [make ?a s] prepares the agent for a game with [s] states *)
+
+    (** Loads a t datum from the disk *)
+    val load : string -> t
+    (** [load s] returns data contained in file [s]; type check is done when
+        loading from file (with [Marshal.from_channel i : t]) *)
+
+    (** Saves the agent to disk *)
+    val save : t -> string -> unit
+    (** [save a f] saves the agent [a] to file name [f] *)
 
     (** Builds a Q matrix used by agent to determine actions *)
     val train : t -> float -> float -> (int -> float) -> int ->

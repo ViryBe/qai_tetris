@@ -1,18 +1,6 @@
 (** Manages all inputs and outputs needed for the program, the learning
     part and the tetris part *)
 
-module Qio : sig
-
-  (** Basic type of the Q matrix *)
-  type t = float array array
-
-  (** Saves any matrix to disk*)
-  val save : t -> string -> unit
-
-  (** Loads a marshalled matrix from file fpath*)
-  val load : string -> t
-end
-
 (** Manages command line *)
 module Clargs : sig
   (** Type of the parameters *)
