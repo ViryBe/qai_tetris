@@ -54,20 +54,23 @@ struct
     let board = Game.Board.make (2 * ntetr)
     and tetromino = ref (Game.Tetromino.make_rand ()) in
     let state = ref (Ag.get_state !tetromino board)
+    and prevboard = Game.Board.make (2 * ntetr)
+    and prevtetromino = ref !tetromino
     in
     for i = 0 to ntetr - 1 do
       (* Compute actions *)
       let idactions = Game.Tetromino.get_actids !tetromino in
       let action, act_ind = Ag.choose_act (Ag.get_reward_exps ag !state) eps
           idactions in
-      (* Make a backup of the board *)
-      let backboard = board in
-        (* Update board accordingly to action *)
+      (* Update board accordingly to action *)
       Game.play board !tetromino action ;
       tetromino := Game.Tetromino.make_rand () ;
-      let reward = Ag.r backboard board
+      let reward = Ag.r prevboard board
       and nstate = Ag.get_state !tetromino board in
       Ag.update ag !state act_ind nstate reward gam par i;
+      (* Update everything *)
+      Game.play prevboard !prevtetromino action ;
+      prevtetromino := !tetromino ;
       state := nstate
     done ;
     board
