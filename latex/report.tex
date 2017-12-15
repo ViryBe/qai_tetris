@@ -108,7 +108,12 @@ tetrominos. Les rotations sont representées par les points cardinaux
   \caption{Point de reference de tetromini, ici hachure}\label{fig:tetref}
 \end{figure}
 
-POINT DE REF
+La geometrie de certains tetromini rend certaines orientations redondantes. Par
+exemple le carre est invariant par rotation, et utiliser les quatre rotations
+ne fait qu'augmenter inutilement le nombre d'actions possibles, et augmente par
+consequent la quantite d'information que l'agent doit apprendre. Pour pallier
+cette redondance, chaque tetromino dispose de son propre ensemble de rotations
+applicables.
 
 \subsection{D\'eroulement d'une partie}
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
