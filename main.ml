@@ -45,11 +45,10 @@ let () =
       match qload with
       | None -> Ag.make state_card
       | Some str -> Ag.load str
-    and alpha k = 1. /. (1. +. alphap *. float k)
     in
     (* Start training *)
     Printf.printf "#ngames=%d:ntetr=%d:gamma=%f:alphap=%f:eps=%f\n"
       ngames ntetr gam alphap eps ;
-    Ag.train qag eps gam alpha ngames ntetr ;
+    Ag.train qag eps gam alphap ngames ntetr ;
     (* Save matrix if qsave path is specified *)
     may (Ag.save qag) qsave;

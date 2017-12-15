@@ -3,6 +3,9 @@
 (* Type of the Q matrix *)
 type t = float array array
 
+(* State are a line of the qmat and therefore int *)
+type s = int
+
 (** Number of lines used to compute a state *)
 let line_per_state = 2
 
@@ -14,7 +17,9 @@ let get_board_top board =
     Game.Board.to_arr 0 height board
 
 (** Reward function *)
-let r x = if x >= 2 then -200.
+let r backboard board =
+  let x = Game.Board.height board - Game.Board.height backboard in
+  if x >= 2 then -200.
   else if x = 1 then -100.
   else if x = 0 then 1.
   else 100. *. (float (abs x))
@@ -26,6 +31,15 @@ let get_state tetromino board =
   let board_one = Array.fold_left Array.append [| |] board_repr in
   let dig_board = Auxfct.arr2dig board_one in
   intetr lsl (Game.Board.width * 2) + dig_board
+
+(* Chooses an action *)
+let choose_act = fun reward_exps epsilon action_set ->
+  let tirage = Random.float 1. in
+  let actionid = if tirage > epsilon then Auxfct.argmax_r reward_exps
+    else let rind = Random.int (List.length action_set - 1) in
+      List.nth action_set rind
+  in
+  (Game.Action.from_int actionid, actionid)
 
 (* The matrix is filled with neg_infinity where actions are not possible and
  * zeros else *)
@@ -51,33 +65,13 @@ let make scard =
   List.iter init_qmat_aux Game.Tetromino.set ;
   qmat
 
-let get_rewards qmat state = qmat.(state)
+let get_reward_exps qmat state = qmat.(state)
 
 (** Function updating Q matrix, plays one game *)
-let update qmat eps gam alpha ntetr =
-  (* Initialise state *)
-  let board = Game.Board.make (2 * ntetr)
-  and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let state = ref (get_state !tetromino board)
-  and height = ref (Game.Board.height board) in
-
-  for i = 0 to ntetr - 1 do
-    (* Compute action *)
-    let idactions = Game.Tetromino.get_actids !tetromino in
-    let action, act_ind = Game.Action.choose (get_rewards qmat !state) eps
-        idactions in
-    (* Update board accordingly to action *)
-    Game.play board !tetromino action ;
-    tetromino := Game.Tetromino.make_rand () ;
-    let nheight = Game.Board.height board in
-    let reward = r (nheight - !height)
-    and nstate = get_state !tetromino board in
-    (* Update Q matrix *)
-    qmat.(!state).(act_ind) <- qmat.(!state).(act_ind) +.
-                               (alpha i) *.  (reward +.
-                                gam *. (Auxfct.flarray_max qmat.(nstate)) -.
-                                qmat.(!state).(act_ind));
-    state := nstate ;
-    height := nheight
-  done ;
-  board
+let update qmat state act_ind nstate reward gam par i =
+  let alpha = 1. /. (1. +. par *. float i) in
+  qmat.(state).(act_ind) <- qmat.(state).(act_ind) +.
+                            alpha *.  (
+                              reward +.
+                              gam *. (Auxfct.flarray_max qmat.(nstate)) -.
+                              qmat.(state).(act_ind))
