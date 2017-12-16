@@ -2,13 +2,19 @@ module type AgentTools =
   sig
     type t
 
+    type s
+
     val make : int -> t
 
-    val update : t -> float -> float -> (int -> float) -> int -> Game.Board.t
+    val update : t -> s -> int -> s -> float -> float -> float -> int -> unit
 
-    val get_state : Game.Tetromino.t -> Game.Board.t -> int
+    val get_state : Game.Tetromino.t -> Game.Board.t -> s
 
-    val get_rewards : t -> int -> float array
+    val get_reward_exps : t -> s -> float array
+
+    val r : Game.Board.t -> Game.Board.t -> float
+
+    val choose_act : float array -> float -> int list -> Game.Action.t * int
   end
 
 module type S =
@@ -21,8 +27,7 @@ module type S =
 
     val save : t -> string -> unit
 
-    val train : t -> float -> float -> (int -> float) -> int ->
-      int -> unit
+    val train : t -> float -> float -> float -> int -> int -> unit
 
     val play : t -> int -> Game.Board.t
   end
@@ -45,9 +50,34 @@ struct
     let outfile = open_out dest in
     Marshal.to_channel outfile data []
 
+  let update ag eps gam par ntetr =
+    let board = Game.Board.make (2 * ntetr)
+    and tetromino = ref (Game.Tetromino.make_rand ()) in
+    let state = ref (Ag.get_state !tetromino board)
+    and prevboard = Game.Board.make (2 * ntetr)
+    and prevtetromino = ref !tetromino
+    in
+    for i = 0 to ntetr - 1 do
+      (* Compute actions *)
+      let idactions = Game.Tetromino.get_actids !tetromino in
+      let action, act_ind = Ag.choose_act (Ag.get_reward_exps ag !state) eps
+          idactions in
+      (* Update board accordingly to action *)
+      Game.play board !tetromino action ;
+      tetromino := Game.Tetromino.make_rand () ;
+      let reward = Ag.r prevboard board
+      and nstate = Ag.get_state !tetromino board in
+      Ag.update ag !state act_ind nstate reward gam par i;
+      (* Update everything *)
+      Game.play prevboard !prevtetromino action ;
+      prevtetromino := !tetromino ;
+      state := nstate
+    done ;
+    board
+
   let train ag eps gam alpha ngames ntetr =
     for i = 0 to ngames - 1 do
-      let fboard = Ag.update ag eps gam alpha ntetr in
+      let fboard = update ag eps gam alpha ntetr in
       let fheight = Game.Board.height fboard in
       Printf.printf "%d\n" fheight
     done
@@ -58,7 +88,8 @@ struct
     let  state = ref (Ag.get_state !tetromino board) in
     for i = 0 to ntetr - 1 do
       let actids = Game.Tetromino.get_actids !tetromino in
-      let action, _ = Game.Action.choose (Ag.get_rewards ag !state) 0. actids in
+      let action, _ = Ag.choose_act (Ag.get_reward_exps ag !state) 0.
+          actids in
       Game.play board !tetromino action ;
       tetromino := Game.Tetromino.make_rand () ;
       state := Ag.get_state !tetromino board;

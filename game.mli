@@ -21,7 +21,7 @@ module Board : sig
       one if the square is occupied by a tetromino else zero *)
 
   (** Prints board to stdout from [low] to [up] if precised *)
-  val print : ?low:int -> ?up:int -> t -> unit
+  val print : ?low : int -> ?up : int -> t -> unit
 
   (** Saves representation of board to a file *)
   val to_file : string -> t -> unit
@@ -39,13 +39,6 @@ module Action : sig
 
   (** One to one, onto mapping from int to actions *)
   val from_int : int -> t
-
-  (** Chooses the best action considering rewards *)
-  val choose : float array -> float -> int list -> t * int
-  (** [choose r e a] chooses with probability [1-e] the action in [a] with the
-      highest reward in [r] else chooses randomly
-      @return [(aid, a)] the tuple of the action id and the action *)
-
 end
 
 (** Manipulates tetrominos in the board *)

@@ -6,23 +6,38 @@ module type AgentTools =
     (** The type of the agent, matrix or function *)
     type t
 
+    (** Representation of the state *)
+    type s
+
     (** Makes an agent *)
     val make : int -> t
     (** [make s] makes an agent suitable for a model with [s] possible states *)
 
-    (** Function updating the agent *)
-    val update : t -> float -> float -> (int -> float) -> int -> Game.Board.t
-    (** [update t e g a n ] trains the agent through a game of [n] tetrominos
-        with a frequency [e] of random action, a sight length of [g] and a
-        learning rate of [a] (which is a function) *)
+    (** Function updating the agent in place *)
+    val update : t -> s -> int -> s -> float -> float -> float -> int -> unit
+    (** [update ag s a ns r g p i] updates the agent [ag] for the [i]th time
+        in the game during the transition from state [s] to state [ns] through
+        action [a] generating reward [r] with a sight length of [g] and a
+        parameter [p].
+    *)
 
     (** Outputs state from the board and, if supplied, the tetromino *)
-    val get_state : Game.Tetromino.t -> Game.Board.t -> int
+    val get_state : Game.Tetromino.t -> Game.Board.t -> s
 
     (** Gives rewards currently associated to a state *)
-    val get_rewards : t -> int -> float array
+    val get_reward_exps : t -> s -> float array
     (** [get_rewards a s] returns an array containing reward expectancies
         currently known by the agent *)
+
+    (** Reward function *)
+    val r : Game.Board.t -> Game.Board.t -> float
+
+    (** Chooses an action considering reward expectancies *)
+    val choose_act : float array -> float -> int list -> Game.Action.t * int
+    (** [choose_act re e as] chooses an action among the action set [as] coded
+        as int with a probability [e] of choosing randomly with [re] the list
+        of reward expectancies
+        @return [(a, aid)] the tuple of the action id and the action *)
   end
 
 (** Module signature of the output of the functor *)
@@ -44,13 +59,12 @@ module type S =
     (** [save a f] saves the agent [a] to file name [f] *)
 
     (** Builds a Q matrix used by agent to determine actions *)
-    val train : t -> float -> float -> (int -> float) -> int ->
-      int -> unit
-    (** [train q e g ak ng nt] trains the matrix [q] with [e] the frequency of
+    val train : t -> float -> float -> float -> int -> int -> unit
+    (** [train q e g a ng nt] trains the matrix [q] with [e] the frequency of
         random choice,
         [g] the sight length of the agent, i.e. weight given to future turns to
         make an action,
-        [ak : int -> float] the learning rate,
+        [a] a parameter used during learning
         [ng] the number of games played to train,
         [nt] number of tetrominos played in each game
     *)
