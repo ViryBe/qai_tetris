@@ -1,5 +1,41 @@
+let nb_adjacent_empty_cell row =
+  let ret = ref 0 in
+  if row.(0) = 0 then incr ret;
+  for i = 0 to Array.length row -1 do
+    if (i = Array.length row -1 && row.(i) = 0)
+    || (i <> Array.length row -1) && (row.(i) = 0 && row.(i+1) <> 0)
+    || (i <> Array.length row -1) && (row.(i) <> 0 && row.(i+1) = 0)
+    then
+      incr ret
+  done;
+  !ret
 
-let phi_arr = [|(fun x -> 3.)|]
+module Phis = struct
+  let phi_1 b = 4.
+
+  let phi_2 b = 4.
+
+  let phi_3 b =
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    float (Array.fold_left (fun accu elt ->
+        max accu (nb_adjacent_empty_cell elt)
+      ) 0 tab)
+
+  let phi_4 b = 4.
+
+  let phi_5 b = 4.
+
+  let phi_6 b = 4.
+
+  let phi_7 b = 4.
+
+  let phi_8 b = 4.
+
+
+  (** Array of all phis functions *)
+  let phi_arr = [|phi_1; phi_2; phi_3; phi_4; phi_5; phi_6; phi_7; phi_8|]
+end
+
 
 (** transition between 2 states *)
 type transition = {
@@ -41,10 +77,10 @@ let update weights epsilon gamma eta ntetro batch_size =
     let idactions = Game.Tetromino.get_actids tetromino in
     let action, act_ind = choose_action epsilon gamma idactions in
     let old_height = Game.Board.height board in
-    let old_features = phi board phi_arr in
+    let old_features = phi board Phis.phi_arr in
     Game.play board tetromino action;
     let new_height = Game.Board.height board in
-    let new_features = phi board phi_arr in
+    let new_features = phi board Phis.phi_arr in
     memory.(i) <- { s_t = old_features;
                     a_t = act_ind;
                     r_t = r (new_height - old_height);
