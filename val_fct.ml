@@ -31,7 +31,20 @@ module Phis = struct
         max accu (nb_adjacent_empty_cell elt)
       ) 0 tab)
 
-  let phi_4 b = 4.
+  (* Same as #4 but with columns *)
+  let phi_4 b =
+    let ret = ref 0 in
+    let h = Game.Board.height b in
+    let tab = Game.Board.to_arr 0 h b in
+    for c = 0 to Game.Board.width - 1 do
+      let col = Array.make h 0 in
+      for r = 0 to h do
+        col.(r) <- tab.(r).(c)
+      done;
+      ret := max !ret (nb_adjacent_empty_cell col)
+    done;
+    float !ret
+
 
   (** the number of filled cells above holes  *)
   let phi_5 b =
@@ -40,7 +53,7 @@ module Phis = struct
     for i = 0 to Array.length tab -2 do
       accu := !accu + nb_full_top tab.(i) tab.(i+1)
     done;
-    float (!accu)
+    float !accu
 
   let phi_6 b = 4.
 
@@ -55,7 +68,7 @@ module Phis = struct
     for i = 0 to Array.length tab -2 do
       if nb_full_top tab.(i) tab.(i+1) > 0 then incr accu
     done;
-    float (!accu)
+    float !accu
 
 
   (** Array of all phis functions *)
