@@ -30,10 +30,33 @@ let arr_find arr elt =
   in
   loop 0
 
-let fold_left2_array f x a1 a2 =
-  assert(Array.length a1 = Array.length a2);
+let fold_left2 f x a b =
+  assert(Array.length a = Array.length b);
   let accu = ref x in
-  for i = 0 to Array.length a1 -1 do
-    accu := f !accu a1.(i) a2.(i)
+  for i = 0 to Array.length a -1 do
+    accu := f !accu a.(i) b.(i)
   done;
   !accu
+
+
+let dot a b =
+  fold_left2 (fun accu e1 e2 -> accu +.e1 *.e2 ) 0. a b
+
+
+(** implementation from :
+  * https://github.com/ocaml/ocaml/blob/trunk/stdlib/array.ml
+  *)
+let map2 f a b =
+  let la = Array.length a in
+  let lb = Array.length b in
+  if la <> lb then
+    invalid_arg "Array.map2: arrays must have the same length"
+  else begin
+    if la = 0 then [||] else begin
+      let r = Array.make la (f (Array.unsafe_get a 0) (Array.unsafe_get b 0)) in
+      for i = 1 to la - 1 do
+        Array.unsafe_set r i (f (Array.unsafe_get a i) (Array.unsafe_get b i))
+      done;
+      r
+    end
+  end
