@@ -26,6 +26,7 @@ let () =
   and demo = Aio.Clargs.demo_mode clargs
   and ntetr = Aio.Clargs.rules clargs
   in
+  let module Ag = Agent.Make(Qmat) in
   (* Launching program *)
   if demo then(* Demo mode *)
   (* init graphics window *)
@@ -33,28 +34,21 @@ let () =
               ^"x"^(string_of_int (Display.total_height))) in
 
     match qload with
-    | Some qpath -> let qmat = Aio.Qio.load qpath in
+    | Some qpath -> let qag = Ag.load qpath in
       (Graphics.open_graph (size);
-       ignore (Agent.play qmat ntetr);
+       ignore (Ag.play qag ntetr);
        Graphics.close_graph ();)
     | None -> raise (Arg.Bad "demo mode requires -qload")
   else
     (* Set Q matrix (load or create *)
-    let qmat =
+    let qag =
       match qload with
-      | None ->
-          (
-            let proto_mat = Array.make_matrix state_card Game.Action.card
-                neg_infinity in
-            Agent.init_qmat proto_mat ;
-            proto_mat
-          )
-      | Some str -> Aio.Qio.load str
-    and alpha k = 1. /. (1. +. alphap *. float k)
+      | None -> Ag.make state_card
+      | Some str -> Ag.load str
     in
     (* Start training *)
     Printf.printf "#ngames=%d:ntetr=%d:gamma=%f:alphap=%f:eps=%f\n"
       ngames ntetr gam alphap eps ;
-    Agent.train qmat eps gam alpha ngames ntetr ;
+    Ag.train qag eps gam alphap ngames ntetr ;
     (* Save matrix if qsave path is specified *)
-    may (Aio.Qio.save qmat) qsave;
+    may (Ag.save qag) qsave;

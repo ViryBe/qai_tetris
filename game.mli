@@ -21,7 +21,7 @@ module Board : sig
       one if the square is occupied by a tetromino else zero *)
 
   (** Prints board to stdout from [low] to [up] if precised *)
-  val print : ?low:int -> ?up:int -> t -> unit
+  val print : ?low : int -> ?up : int -> t -> unit
 
   (** Saves representation of board to a file *)
   val to_file : string -> t -> unit
@@ -37,12 +37,8 @@ module Action : sig
   (** Number of actions *)
   val card : int
 
-  (** One to one, onto mapping from action to int *)
-  val to_int : t -> int
-
   (** One to one, onto mapping from int to actions *)
   val from_int : int -> t
-
 end
 
 (** Manipulates tetrominos in the board *)
