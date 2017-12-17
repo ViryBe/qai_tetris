@@ -87,11 +87,44 @@ type transition = {
 (* TODO: find a more elegent solution *)
 let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
 
-let fuct_V s w =
-  Auxfct.fold_left2_array (fun accu e1 e2 -> accu +.e1 *.e2 ) 0. s w
+(* TODO: global var ? *)
+let weights = [|0.|]
 
 let phi board phi_arr =
   Array.map (fun f -> f board) phi_arr
+
+
+let v_from_phis phis =
+  Auxfct.dot phis weights
+
+(** gives V(board) *)
+let v_from_board board =
+  let s = phi board Phis.phi_arr in
+  v_from_phis s
+
+(** compute delta for a given transition t *)
+let delta t gamma =
+  t.r_t +. gamma *. (v_from_phis t.s_t1) -. (v_from_phis t.s_t)
+
+(** compute loss function L for a mini-batch B *)
+(** useful ? not sure  *)
+let loss_f batch gamma =
+  1. /. (2. *. float(Array.length batch)) *.
+  Array.fold_left (fun accu elt -> accu +. (delta elt gamma)**2.) 0. batch
+
+(** compute \nabla L with respect to w for a given batch*)
+let grad_L batch gamma weights =
+  let card_b = float (Array.length batch) in
+  Array.mapi (fun index _ ->
+      1. /. card_b *. (Array.fold_left (fun accu elt ->
+          (delta elt gamma) *.
+          (gamma *. v_from_phis elt.s_t1 -. v_from_phis elt.s_t)
+        )) 0. batch
+    ) weights
+
+(** updates weights according to the gradient gard *)
+let update_weights grad eta =
+  Auxfct.map2 (fun a b -> a -. eta *. b) weights grad
 
 (** Reward function *)
 (* TODO: in aux function ? *)
