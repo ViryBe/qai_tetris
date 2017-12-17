@@ -45,6 +45,7 @@ let dot a b =
 
 (** implementation from :
   * https://github.com/ocaml/ocaml/blob/trunk/stdlib/array.ml
+  * Not yet in in our current version
   *)
 let map2 f a b =
   let la = Array.length a in
@@ -60,3 +61,16 @@ let map2 f a b =
       r
     end
   end
+
+
+(** implementation from :
+  * https://github.com/ocaml/ocaml/blob/trunk/stdlib/array.ml
+  * Not yet in in our current version
+  *)
+let iter2 f a b =
+  if Array.length a <> Array.length b then
+    invalid_arg "Array.iter2: arrays must have the same length"
+  else
+    for i = 0 to Array.length a - 1 do
+      f (Array.unsafe_get a i) (Array.unsafe_get b i)
+    done
