@@ -33,9 +33,9 @@ module Phis = struct
   (* convinient way to compute the dot production in L *)
   let zero _ = 1.
 
-  let one b = 4.
+  let one b = 18.
 
-  let two b = 4.
+  let two b = 18.
 
   (** max nb of 'neighbors' for all empty cells  in b*)
   let three b =
@@ -68,7 +68,7 @@ module Phis = struct
     done;
     float !accu
 
-  let six b = 4.
+  let six b = 18.
 
   (** TODO: find the diff between f5 and f7  *)
   let seven b =
@@ -106,7 +106,12 @@ let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
 (* ================================ *)
 
 (* TODO: global var ? *)
-let weights = [|0.|]
+let weights = [|0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.|]
+
+(** weights initialization between -1 and 1 *)
+let init_weights () =
+  Array.iteri (fun i _ -> weights.(i) <- Random.float 2. -.1.) weights
+
 
 let phi board phi_arr =
   Array.map (fun f -> f board) phi_arr
@@ -159,6 +164,9 @@ let r x = if x >= 2 then -200.
 
 (** how to chosse the next action *)
 (* TODO *)
+(* besoin d'une fonction de signature:
+   val simulation : Board -> Tetromino -> Rotation -> transition
+qui ne modifie pas en place le plateau*)
 let choose_action epsilon gamma idactions =
   Game.Action
 
