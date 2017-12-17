@@ -1,3 +1,13 @@
+
+(* TODO:
+   * finir les phis
+   * fonction choose action
+* *)
+
+(* ================================ *)
+(*  useful functions for los phis   *)
+(* ================================ *)
+
 (** gives the number of 'neighbors' for all empty cells in a row  *)
 let nb_adjacent_empty_cell row =
   let ret = ref 0 in
@@ -20,19 +30,22 @@ let nb_full_top  row_0 row_1 =
   !ret
 
 module Phis = struct
-  let phi_1 b = 4.
+  (* convinient way to compute the dot production in L *)
+  let zero _ = 1.
 
-  let phi_2 b = 4.
+  let one b = 4.
+
+  let two b = 4.
 
   (** max nb of 'neighbors' for all empty cells  in b*)
-  let phi_3 b =
+  let three b =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     float (Array.fold_left (fun accu elt ->
         max accu (nb_adjacent_empty_cell elt)
       ) 0 tab)
 
   (* Same as #4 but with columns *)
-  let phi_4 b =
+  let four b =
     let ret = ref 0 in
     let h = Game.Board.height b in
     let tab = Game.Board.to_arr 0 h b in
@@ -47,7 +60,7 @@ module Phis = struct
 
 
   (** the number of filled cells above holes  *)
-  let phi_5 b =
+  let five b =
     let accu = ref 0 in
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     for i = 0 to Array.length tab -2 do
@@ -55,14 +68,14 @@ module Phis = struct
     done;
     float !accu
 
-  let phi_6 b = 4.
+  let six b = 4.
 
   (** TODO: find the diff between f5 and f7  *)
-  let phi_7 b =
-    phi_5 b
+  let seven b =
+    five b
 
   (** nb of rox with, at least, 1 hole *)
-  let phi_8 b =
+  let eight b =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     let accu = ref 0 in
     for i = 0 to Array.length tab -2 do
@@ -72,7 +85,7 @@ module Phis = struct
 
 
   (** Array of all phis functions *)
-  let phi_arr = [|phi_1; phi_2; phi_3; phi_4; phi_5; phi_6; phi_7; phi_8|]
+  let phi_arr = [|zero; one; two; three; four; five; six; seven; eight|]
 end
 
 
@@ -87,6 +100,11 @@ type transition = {
 (* TODO: find a more elegent solution *)
 let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
 
+
+(* ================================ *)
+(*  Everything about loss function  *)
+(* ================================ *)
+
 (* TODO: global var ? *)
 let weights = [|0.|]
 
@@ -94,10 +112,12 @@ let phi board phi_arr =
   Array.map (fun f -> f board) phi_arr
 
 
+(** gives V(\phi(board)) *)
 let v_from_phis phis =
   Auxfct.dot phis weights
 
 (** gives V(board) *)
+(** useful ? not sure  *)
 let v_from_board board =
   let s = phi board Phis.phi_arr in
   v_from_phis s
@@ -124,7 +144,10 @@ let grad_L batch gamma weights =
 
 (** updates weights according to the gradient gard *)
 let update_weights grad eta =
-  Auxfct.map2 (fun a b -> a -. eta *. b) weights grad
+  Array.iteri (fun i elt -> weights.(i) <- weights.(i) -. eta *. elt) grad
+
+(*  ===============================  *)
+(*  ===============================  *)
 
 (** Reward function *)
 (* TODO: in aux function ? *)
@@ -141,20 +164,26 @@ let choose_action epsilon gamma idactions =
 
 let update weights epsilon gamma eta ntetro batch_size =
   let board = Game.Board.make (2 * ntetro) in
-  let memory = Array.make ntetro empty_trans in
+  let memory = Array.make batch_size empty_trans in
 
-  (* fill the memory with some transitions *)
-  for i = 0 to batch_size - 1 do
-    let tetromino = Game.Tetromino.make_rand () in
-    let idactions = Game.Tetromino.get_actids tetromino in
-    let action, act_ind = choose_action epsilon gamma idactions in
-    let old_height = Game.Board.height board in
-    let old_features = phi board Phis.phi_arr in
-    Game.play board tetromino action;
-    let new_height = Game.Board.height board in
-    let new_features = phi board Phis.phi_arr in
-    memory.(i) <- { s_t = old_features;
-                    a_t = act_ind;
-                    r_t = r (new_height - old_height);
-                    s_t1= new_features}
+  for i = 0 to 100000 do
+
+
+    (* fill the memory with some transitions *)
+    for i = 0 to batch_size - 1 do
+      let tetromino = Game.Tetromino.make_rand () in
+      let idactions = Game.Tetromino.get_actids tetromino in
+      let action, act_ind = choose_action epsilon gamma idactions in
+      let old_height = Game.Board.height board in
+      let old_features = phi board Phis.phi_arr in
+      Game.play board tetromino action;
+      let new_height = Game.Board.height board in
+      let new_features = phi board Phis.phi_arr in
+      memory.(i) <- { s_t = old_features;
+                      a_t = act_ind;
+                      r_t = r (new_height - old_height);
+                      s_t1= new_features}
+    done; (* memory is full *)
+    let grad = grad_L memory gamma weights in
+    update_weights grad eta
   done
