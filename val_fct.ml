@@ -1,3 +1,4 @@
+(** gives the number of 'neighbors' for all empty cells in a row  *)
 let nb_adjacent_empty_cell row =
   let ret = ref 0 in
   if row.(0) = 0 then incr ret;
@@ -10,11 +11,20 @@ let nb_adjacent_empty_cell row =
   done;
   !ret
 
+(* TODO: find a better name *)
+let nb_full_top  row_0 row_1 =
+  let ret = ref 0 in
+  for i = 0 to Array.length row_0 -1 do
+    if row_0.(i) = 0 && row_1.(i) <> 0 then incr ret
+  done;
+  !ret
+
 module Phis = struct
   let phi_1 b = 4.
 
   let phi_2 b = 4.
 
+  (** max nb of 'neighbors' for all empty cells  in b*)
   let phi_3 b =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     float (Array.fold_left (fun accu elt ->
@@ -23,13 +33,29 @@ module Phis = struct
 
   let phi_4 b = 4.
 
-  let phi_5 b = 4.
+  (** the number of filled cells above holes  *)
+  let phi_5 b =
+    let accu = ref 0 in
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    for i = 0 to Array.length tab -2 do
+      accu := !accu + nb_full_top tab.(i) tab.(i+1)
+    done;
+    float (!accu)
 
   let phi_6 b = 4.
 
-  let phi_7 b = 4.
+  (** TODO: find the diff between f5 and f7  *)
+  let phi_7 b =
+    phi_5 b
 
-  let phi_8 b = 4.
+  (** nb of rox with, at least, 1 hole *)
+  let phi_8 b =
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    let accu = ref 0 in
+    for i = 0 to Array.length tab -2 do
+      if nb_full_top tab.(i) tab.(i+1) > 0 then incr accu
+    done;
+    float (!accu)
 
 
   (** Array of all phis functions *)
