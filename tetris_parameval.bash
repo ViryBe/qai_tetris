@@ -22,7 +22,7 @@ Options:
 \t-o|--out\t\tfile to output"
 
 # Tetris player related options
-TETRIS_CMD='tetris_player.opt'
+TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
 
 BASEFNAME='gplot'   # beginning of file names
 BCSCALE=4           # number of decimals after dot
@@ -144,10 +144,15 @@ function make_values () {
 function run_tetris () {
 	ntr=${#PVAL[@]}
 	for i in $(seq 0 $((ntr - 1))) ; do
-		./$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
+		$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
 			"${FILES[$i]}"
 
-		echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
+        if [[ $? -eq 0 ]] ; then
+          echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
+        else
+          echo "Error calling function"
+          exit 1
+        fi
 	done ;
 	return 0
 }
