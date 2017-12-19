@@ -213,7 +213,6 @@ L'apprentissage est paramétré par les trois variables,
   \item \(\epsilon \in [0, 1]\) la fréquence de coups aléatoires effectués,
   \item \(\gamma \in [0, 1]\) la vision de l'agent.
 \end{itemize}
-%TODO ne veut rien dire !!!!
 Pour assurer la convergence de la matrice vers la matrice optimale,
 le taux d'apprentissage doit évoluer au cours des entrainements.
 D'après~\cite{watkins92}, la suite \( (\alpha_k)_k \) doit vérifier
@@ -235,11 +234,11 @@ entrainée.
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \begin{axis}[only marks, mark size = 0.2,
-        legend entries={0.001,0.018,0.26,0.35,0.47,0.59}
+    \begin{axis}[only marks, mark size = 0.1,
+        legend entries={0.80,0.84,0.88,0.92,0.96,1.00}
       ]
       \foreach \i in {0,1,...,5}{%
-        \addplot+ table [x expr = \lineno, y index = \i] {data/gamma.dat};
+        \addplot+ table [x expr = {log2(\lineno)}, y index = \i] {data/gamma.dat};
       }
     \end{axis}
   \end{tikzpicture}
