@@ -18,13 +18,14 @@ Bounds parameters: one of the following
 \t-n|--nval\t<int>\tthe number of values desired
 Options:
 \t--ngames\t<int>\tnumber of games done in one training
-\t--ntetr\t\t<int>\tnumber of tetrominos in a game"
+\t--ntetr\t\t<int>\tnumber of tetrominos in a game
+\t-o|--out\t\tfile to output"
 
 # Tetris player related options
 TETRIS_CMD='tetris_player.opt'
 
-BASEFNAME='gplot'
-OUTFILE='gplot_param.log'
+BASEFNAME='gplot'   # beginning of file names
+BCSCALE=4           # number of decimals after dot
 
 # Options of the tetris_player
 PARAM='' 		# parameter to be tested
@@ -36,6 +37,7 @@ NTETR=10000		# number of tetrominos to be played
 NGAMES=512		# number of games per training
 PVAL=( )		# param values, array
 FILES=( )		# name of files
+OUTFILE=''      # name of output file
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -54,19 +56,16 @@ while true; do
 			continue
 			;;
 		'-l'|'--low')
-			echo "low bound: $2"
 			LOW=$2
 			shift 2
 			continue
 			;;
 		'-u'|'--up')
-			echo "up bound: $2"
 			UP=$2
 			shift 2
 			continue
 			;;
 		'-s'|'--step')
-			echo "step $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'number of values already specified'
 				echo "$USAGE"
@@ -78,7 +77,6 @@ while true; do
 			continue
 			;;
 		'-n'|'--nval')
-			echo "nval $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'step already specified'
 				echo -e "$USAGE"
@@ -124,7 +122,8 @@ function make_values () {
 			;;
 		'nval')
 			nval=$((RANGEPVAL - 1))
-			step=$(echo "($UP - $LOW) / $nval" | bc -l) # -l for floating point
+            # -l for floating point
+			step=$(echo "scale=$BCSCALE ; ($UP - $LOW) / $nval" | bc -l)
 			;;
 		*)
 			echo 'rangespec not properly set'
@@ -134,7 +133,7 @@ function make_values () {
 	esac
 
 	for i in $(seq 0 $nval) ; do
-		nv=$(echo "$LOW + $i * $step" | bc)
+		nv=$(echo "scale=$BCSCALE ; $LOW + $i * $step" | bc -l)
 		PVAL[$i]=$nv
 		FILES[$i]="${BASEFNAME}$PARAM$i.log"
 	done ;
@@ -152,6 +151,11 @@ function run_tetris () {
 	done ;
 	return 0
 }
+
+# Set name if not provided
+if [[ $OUTFILE == '' ]] ; then
+  OUTFILE="$BASEFNAME_$PARAM.dat"
+fi
 
 make_values
 run_tetris
