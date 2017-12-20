@@ -6,12 +6,16 @@
 \usepackage{unicode-math}
 \usepackage{amsmath}
 \usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \setmainlanguage{french}
 
 \newcommand{\R}{\mathbb{R}}
 
 \DeclareMathOperator{\card}{card}
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\uniform}{Uniform}
 
 \title{Ocaml---IA\\Tetris par Qlearning}
 \author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
@@ -128,8 +132,52 @@ l'état et l'autre pour la pièce et les combine en un état entier final,
 
 \subsection{Algorithmes}
 
-\subsection{Param\`etres}
-\subsubsection{Pr\'esentation}
+L'algorithme~\ref{alg:action} concerne la maniere dont l'agent choisit les
+actions parmi l'ensemble des actions possibles \(\mathcal{A}\), etant donne un
+etat \(s\). Le parametre \(\epsilon\) definit la frequence de choix aleatoire.
+\begin{algorithm}
+  \caption{Choix de l'action}\label{alg:action}
+  \begin{algorithmic}
+    [1]
+    \Procedure{ChooseAction}{$Q$, $s$, $\mathcal{A}$}
+    \State{} tirage \(\gets \uniform([0, 1])\)
+    \If{tirage \(> \epsilon\)}
+    \Return{\(\argmax_{a\in\mathcal{A}} Q(s, a)\)}\Comment{Choix de l'action
+    maximisant l'esperance de recompense}
+    \Else{}
+    \Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aleatoire}
+    \EndIf{}
+    \EndProcedure{}
+  \end{algorithmic}
+\end{algorithm}
+
+
+L'algorithme~\ref{alg:qlearning} definit la maniere dont l'agent se met a jour
+afin de maximiser l'esperance de gain. Est notee \(\gamma\) la vision de
+l'agent correspondant a l'importance que l'agent attribue aux recompenses
+futures par rapport a la recompense immediate. Un \(\gamma\) de zero cree un
+agent myope ne choisissant son action que par rapport a la recompense immediate
+tandis qu'un \(\gamma\) tendant vers un associe autant d'importance aux
+recompenses des coups suivants qu'a la recompense immediate.
+\begin{algorithm}
+  \caption{Algorithme de \textit{Q-learning}}\label{alg:qlearning}
+  \begin{algorithmic}
+    [1]
+    \Procedure{Update}{$Q$, $\epsilon$, $\gamma$, $\alpha$}
+    \Repeat{}
+    \State{} initialisation de \(s\)
+    \Repeat{}
+    \State{} \(a \gets\) ChooseAction$(Q, s, \mathcal{A}, \epsilon)$
+    \State{} jouer \(a\), observer \(r\) et le nouvel \'etat \(s'\),
+    \State{} \(Q(s, a) \gets Q(s, a) + \alpha\left[ r + \gamma \max_{a'}
+      Q(s', a') - Q(s, a)\right]\)
+    \Until{$s$ est terminal}
+    \Until{entrainement fini}
+    \EndProcedure{}
+  \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Param\`etres}
 L'apprentissage est paramétré par les trois variables,
 \begin{itemize}
   \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
@@ -138,9 +186,9 @@ L'apprentissage est paramétré par les trois variables,
 \end{itemize}
 %TODO ne veut rien dire !!!!
 Pour assurer la convergence de la matrice vers la matrice optimale,
-le taux d'apprentissage évolue au cours des entrainements, est utilisée une
-suite \( (\alpha_k)_k \). D'après~\cite{watkins92}, la suite \(
-(\alpha_k)_k \) doit vérifier \( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
+le taux d'apprentissage doit évoluer au cours des entrainements.
+D'après~\cite{watkins92}, la suite \( (\alpha_k)_k \) doit vérifier
+\( \sum_{k=0}^\infty \alpha_k = \infty \) et \(
 \sum_{k=0}^\infty \alpha_k^2 \in \R \). La suite choisie est donc, pour tout
 \( k \in \mathbb{N} \) et avec \( C \in \R \)
 \[
@@ -154,8 +202,20 @@ En effet, intuitivement, un \(\epsilon\) grand permet une exploration rapide de
 l'ensemble des états possibles mais devient nuisible lorsque la matrice est bien
 entrainée.
 
-\subsubsection{Valeurs}
-Par défaut les valeurs utilisées
+\paragraph{Valeurs}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[only marks, mark size = 0.2,
+        legend entries={0.001,0.018,0.26,0.35,0.47,0.59}
+      ]
+      \foreach \i in {0,1,...,5}{%
+        \addplot+ table [x expr = \lineno, y index = \i] {data/gamma.dat};
+      }
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Influence du parametre \(\gamma\)}
+\end{figure}
 
 
 \section{Difficultés rencontrées}
