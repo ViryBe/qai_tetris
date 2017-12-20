@@ -168,6 +168,9 @@ for i in $(seq 0 $((${#PVAL[@]} - 1))); do
 	sed -i "s/^#.*$/${PVAL[$i]}/" "${FILES[$i]}"
 done ;
 paste "${FILES[@]}" > "$OUTFILE"
+for file in ${FILES[@]} ; do
+  rm $file
+done;
 
 # plot
 gnuplot -p -e "set key autotitle columnheader;\
