@@ -11,11 +11,11 @@ $(TARGET): $(SRC) $(GRAPHFILES)
 	$(CC) $(FLAGS) $<
 
 $(GRAPHDIR)/gamma.dat:
-	$(PARAMEVAL) -p gamma -l 0.8 -u 1 -n 6 -o $@
+	$(PARAMEVAL) -p gamma -l 0.8 -u 1 -n 6 -q -o $@
 	sed -i '1s/^/%/' $@	# Comment first line containing param values
 
 $(GRAPHDIR)/alphap.dat:
-	$(PARAMEVAL) -p alphap -l 0.001 -u 0.005 -n 6 -o $@
+	$(PARAMEVAL) -p alphap -l 0.001 -u 0.005 -n 6 -q -o $@
 	sed -i '1s/^/%/' $@
 
 .PHONY: clean

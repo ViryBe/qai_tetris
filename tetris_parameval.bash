@@ -3,9 +3,9 @@
 # Set getopt options
 NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
-OPTIONS=hp:l:u:s:n:o:
+OPTIONS=hqp:l:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:
+LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:,quiet
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o <out> [OPTIONS]
 Param:
@@ -19,7 +19,8 @@ Bounds parameters: one of the following
 Options:
 \t--ngames\t<int>\tnumber of games done in one training
 \t--ntetr\t\t<int>\tnumber of tetrominos in a game
-\t-o|--out\t\tfile to output"
+\t-o|--out\t\tfile to output
+\t-q|--quiet\t\tdo not print to stdout"
 
 # Tetris player related options
 TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
@@ -38,6 +39,7 @@ NGAMES=512		# number of games per training
 PVAL=( )		# param values, array
 FILES=( )		# name of files
 OUTFILE=''      # name of output file
+QUIET=false
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -102,6 +104,11 @@ while true; do
 			shift 2
 			continue
 			;;
+          '-q'|'--quiet')
+            QUIET=true
+            shift 1
+            continue
+            ;;
 		'--')
 			shift
 			break
@@ -143,13 +150,15 @@ function make_values () {
 # Run tetris_player and save output to files
 function run_tetris () {
 	ntr=${#PVAL[@]}
+    rstate=0
 	for i in $(seq 0 $((ntr - 1))) ; do
 		$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
 			"${FILES[$i]}"
+        rstate=$?
 
-        if [[ $? -eq 0 ]] ; then
+        if [[ ($rstate -eq 0) && ($QUIET = false) ]] ; then
           echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
-        else
+        elif [[ $rstate -ne 0 ]] ; then
           echo "Error calling function"
           exit 1
         fi
@@ -158,7 +167,7 @@ function run_tetris () {
 }
 
 # Set name if not provided
-if [[ $OUTFILE == '' ]] ; then
+if [[ $OUTFILE = '' ]] ; then
   OUTFILE="$BASEFNAME_$PARAM.dat"
 fi
 
@@ -173,6 +182,8 @@ for file in ${FILES[@]} ; do
 done;
 
 # plot
-gnuplot -p -e "set key autotitle columnheader;\
-	set title '$PARAM' ;\
+if [[ "$QUIET" = false ]] ; then
+  gnuplot -p -e "set key autotitle columnheader;\
+    set title '$PARAM' ;\
 	plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
+fi
