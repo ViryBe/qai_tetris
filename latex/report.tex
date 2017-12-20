@@ -179,10 +179,15 @@ recréée à chaque blit.
 La fonction collide permet de tester la collision du tetromino avec les autres
 pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
 on testait donc toutes les positions possibles pour déposer les pièces de
-dimension 2x2 sur le fond du plateau s'il n'y avait pas eu de collision.
-Malheureusement, certaines pièces comme le point ou la ligne pouvaient avoir
-une "ligne vide" en bas sous certaines rotations. Pour résoudre ce problème
-qui est devenu évident après la résolution du problème de \texttt{Array.blit}
+dimension 2 \(\times \) 2 sur le fond du plateau s'il n'y avait pas eu de
+collision. Malheureusement, certaines pièces comme le point ou la ligne
+pouvaient avoir une ``ligne vide'' en bas sous certaines rotations. Pour
+résoudre ce problème qui est devenu évident après la résolution du problème de
+\texttt{Array.blit}, nous avons décidé de restreindre les états possibles dans
+la Q-matrice. En effet lors de l'initialisation de la Q-matrice, tous les états
+accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
+initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
+rotations \textt{South} et \textt{West}.
 
 \section{R\'esultats du projet}
 
