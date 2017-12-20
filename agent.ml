@@ -143,7 +143,7 @@ let play qmat ntetr =
       (Game.Board.to_arr
          (max 0 (Game.Board.height board - 10))
          (Game.Board.height board + 5) board)
-      i (Game.Board.height board)
+      i ((Game.Board.height board) +1)  (* gives real height *)
   done ;
   Printf.printf "%d Tetrominos: final height of %d\n" ntetr
     (Game.Board.height board) ;

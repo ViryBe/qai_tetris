@@ -94,7 +94,7 @@ end
 module Action = struct
 
   (** Available orientations for tetrominos *)
-  type rotation = 
+  type rotation =
     | North
     | South
     | East
@@ -191,7 +191,7 @@ module Tetromino = struct
       (Lshaped, [ Action.North ; Action.West ; Action.South ; Action.East ]) ;
       (Line, [ Action.North ; Action.West ; Action.South ]) ;
       (Diag, [ Action.North ; Action.West ]) ;
-      (Dot, [ Action.North ; Action.West ])
+      (Dot, [ Action.South ; Action.West ])
     ]
 
   (* Gives all actions associated to rotation *)

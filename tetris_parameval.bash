@@ -3,9 +3,9 @@
 # Set getopt options
 NAME='tetris_argeval.bash'
 # Short options, add a column for required arg, two for optional
-OPTIONS=hp:l:u:s:n:o:
+OPTIONS=hqp:l:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:
+LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:,quiet
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o <out> [OPTIONS]
 Param:
@@ -18,13 +18,15 @@ Bounds parameters: one of the following
 \t-n|--nval\t<int>\tthe number of values desired
 Options:
 \t--ngames\t<int>\tnumber of games done in one training
-\t--ntetr\t\t<int>\tnumber of tetrominos in a game"
+\t--ntetr\t\t<int>\tnumber of tetrominos in a game
+\t-o|--out\t\tfile to output
+\t-q|--quiet\t\tdo not print to stdout"
 
 # Tetris player related options
-TETRIS_CMD='tetris_player.opt'
+TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
 
-BASEFNAME='gplot'
-OUTFILE='gplot_param.log'
+BASEFNAME='gplot'   # beginning of file names
+BCSCALE=4           # number of decimals after dot
 
 # Options of the tetris_player
 PARAM='' 		# parameter to be tested
@@ -36,6 +38,8 @@ NTETR=10000		# number of tetrominos to be played
 NGAMES=512		# number of games per training
 PVAL=( )		# param values, array
 FILES=( )		# name of files
+OUTFILE=''      # name of output file
+QUIET=false
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -54,19 +58,16 @@ while true; do
 			continue
 			;;
 		'-l'|'--low')
-			echo "low bound: $2"
 			LOW=$2
 			shift 2
 			continue
 			;;
 		'-u'|'--up')
-			echo "up bound: $2"
 			UP=$2
 			shift 2
 			continue
 			;;
 		'-s'|'--step')
-			echo "step $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'number of values already specified'
 				echo "$USAGE"
@@ -78,7 +79,6 @@ while true; do
 			continue
 			;;
 		'-n'|'--nval')
-			echo "nval $2"
 			if [[ $RANGESPEC != '' ]]; then
 				echo 'step already specified'
 				echo -e "$USAGE"
@@ -104,6 +104,11 @@ while true; do
 			shift 2
 			continue
 			;;
+          '-q'|'--quiet')
+            QUIET=true
+            shift 1
+            continue
+            ;;
 		'--')
 			shift
 			break
@@ -124,7 +129,8 @@ function make_values () {
 			;;
 		'nval')
 			nval=$((RANGEPVAL - 1))
-			step=$(echo "($UP - $LOW) / $nval" | bc -l) # -l for floating point
+            # -l for floating point
+			step=$(echo "scale=$BCSCALE ; ($UP - $LOW) / $nval" | bc -l)
 			;;
 		*)
 			echo 'rangespec not properly set'
@@ -134,7 +140,7 @@ function make_values () {
 	esac
 
 	for i in $(seq 0 $nval) ; do
-		nv=$(echo "$LOW + $i * $step" | bc)
+		nv=$(echo "scale=$BCSCALE ; $LOW + $i * $step" | bc -l)
 		PVAL[$i]=$nv
 		FILES[$i]="${BASEFNAME}$PARAM$i.log"
 	done ;
@@ -144,14 +150,26 @@ function make_values () {
 # Run tetris_player and save output to files
 function run_tetris () {
 	ntr=${#PVAL[@]}
+    rstate=0
 	for i in $(seq 0 $((ntr - 1))) ; do
-		./$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
+		$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -$PARAM ${PVAL[$i]} > \
 			"${FILES[$i]}"
+        rstate=$?
 
-		echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
+        if [[ ($rstate -eq 0) && ($QUIET = false) ]] ; then
+          echo "Done training with $PARAM=${PVAL[$i]} ($((i + 1))/$ntr)"
+        elif [[ $rstate -ne 0 ]] ; then
+          echo "Error calling function"
+          exit 1
+        fi
 	done ;
 	return 0
 }
+
+# Set name if not provided
+if [[ $OUTFILE = '' ]] ; then
+  OUTFILE="$BASEFNAME_$PARAM.dat"
+fi
 
 make_values
 run_tetris
@@ -159,8 +177,13 @@ for i in $(seq 0 $((${#PVAL[@]} - 1))); do
 	sed -i "s/^#.*$/${PVAL[$i]}/" "${FILES[$i]}"
 done ;
 paste "${FILES[@]}" > "$OUTFILE"
+for file in ${FILES[@]} ; do
+  rm $file
+done;
 
 # plot
-gnuplot -p -e "set key autotitle columnheader;\
-	set title '$PARAM' ;\
+if [[ "$QUIET" = false ]] ; then
+  gnuplot -p -e "set key autotitle columnheader;\
+    set title '$PARAM' ;\
 	plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
+fi

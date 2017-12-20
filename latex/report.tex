@@ -8,6 +8,9 @@
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{subfig}
+
+\usetikzlibrary{patterns}
 
 \setmainlanguage{french}
 
@@ -83,8 +86,34 @@ Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
 tetrominos. Les rotations sont representées par les points cardinaux
 (North, South, East, West) et les translations par un entier compris entre 0 et
 4 correspondant à l'indice du coin supérieur gauche du tetromino.
+\begin{figure}
+  \centering
+  \subfloat[Diagonale] {%
+    \begin{tikzpicture}
+      \fill[color=magenta] (0,0) rectangle (1,1);
+      \fill[color=magenta] (0,0) rectangle (-1,-1);
+      \draw[pattern = north west lines] (0,0) rectangle (-1,1);
+      \draw (0,0) rectangle (1,-1);
+    \end{tikzpicture}
+  }\qquad
+  \subfloat[L] {%
+    \begin{tikzpicture}
+      \fill[color=cyan] (0,0) rectangle (1,1);
+      \fill[color=cyan] (0,0) rectangle (-1,-1);
+      \fill[color=cyan] (0,0) rectangle (-1,1);
+      \draw[pattern = north west lines] (0,0) rectangle (-1,1);
+      \draw (0,0) rectangle (1,-1);
+    \end{tikzpicture}
+  }
+  \caption{Point de reference de tetromini, ici hachure}\label{fig:tetref}
+\end{figure}
 
-POINT DE REF
+La geometrie de certains tetromini rend certaines orientations redondantes. Par
+exemple le carre est invariant par rotation, et utiliser les quatre rotations
+ne fait qu'augmenter inutilement le nombre d'actions possibles, et augmente par
+consequent la quantite d'information que l'agent doit apprendre. Pour pallier
+cette redondance, chaque tetromino dispose de son propre ensemble de rotations
+applicables.
 
 \subsection{D\'eroulement d'une partie}
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
@@ -184,7 +213,6 @@ L'apprentissage est paramétré par les trois variables,
   \item \(\epsilon \in [0, 1]\) la fréquence de coups aléatoires effectués,
   \item \(\gamma \in [0, 1]\) la vision de l'agent.
 \end{itemize}
-%TODO ne veut rien dire !!!!
 Pour assurer la convergence de la matrice vers la matrice optimale,
 le taux d'apprentissage doit évoluer au cours des entrainements.
 D'après~\cite{watkins92}, la suite \( (\alpha_k)_k \) doit vérifier
@@ -206,11 +234,11 @@ entrainée.
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \begin{axis}[only marks, mark size = 0.2,
-        legend entries={0.001,0.018,0.26,0.35,0.47,0.59}
+    \begin{axis}[only marks, mark size = 0.1,
+        legend entries={0.80,0.84,0.88,0.92,0.96,1.00}
       ]
       \foreach \i in {0,1,...,5}{%
-        \addplot+ table [x expr = \lineno, y index = \i] {data/gamma.dat};
+        \addplot+ table [x expr = {log2(\lineno)}, y index = \i] {data/gamma.dat};
       }
     \end{axis}
   \end{tikzpicture}
@@ -256,15 +284,55 @@ rotations \textt{South} et \textt{West}.
 \appendix
 \section{Deep Q learning}
 
+Pour s'affranchir de la limite de memoire due au nombre d'etats possibles, la
+matrice est remplacee par une fonction lineaire, avec \(n \in \mathbb{N}, V
+\colon \R^n \to \R\). En notant \(w = (w_0\, w_1\, \dots\, w_n)^\top\) les poids
+de \(V\) et \(x = (x_1\, \dots\, x_n)\), \(V\) s'exprime
+\[
+  V \colon x \mapsto w_0 + \sum_{i=1}^n w_i x_i.
+\]
+
+La fonction \(V\) sera appliquee aux caracteristiques du plateau de jeu
+(\textit{features} en anglais). Elles seront obtenues par le biais d'une
+fonction \(\phi\colon \mathcal{S} \to \R^n\). Les caracteristiques utilisees
+sont decrites dans~\cite{boumaza13}.
+\begin{algorithm}
+  \caption{Algorithme d'apprentissage d'une fonction lineaire}\label{alg:linfct}
+  \begin{algorithmic}
+    [1]
+    \Procedure{Update}{$V$, $\epsilon$, $\gamma$, $\eta$, $\eta$}
+    \Repeat{}
+    \State{} initialisation de \(s\)
+    \Repeat{}
+    \For{1 to $B$}
+    \State{} \(a \gets \mathup{ChooseAction}(V, s, \mathcal{A}, \epsilon)\)
+    \State{} joue \(a\), observer \(r\) et le nouvel \'etat \(s'\)
+    \State{} ajouter a la memoire \( \left(\phi(s), a, r, \phi(s')\right) \)
+    \EndFor{}
+    \State{} Chosir aleatoirement \(B\) quadruplets depuis la memoire
+    \State{} \(y_t \gets r_t + \gamma V\left(\phi(s_t')\right)\)
+    \State{} \(\delta_t \gets y_t - V \left(\phi(s_t)\right)\)
+    \State{} \(\mathcal{L} \gets \frac{1}{2B}\sum_{k=1}^B \delta_t^2\)
+    \State{} \(w \gets w - \eta \nabla_w \mathcal{L}\)
+    \Until{$s$ est terminal}
+    \Until{Entrainement fini}
+    \EndProcedure{}
+  \end{algorithmic}
+\end{algorithm}
+
 \begin{thebibliography}{9}
     \bibitem{watkins92}
-    Christopher~J.C.H.~Watkins, Peter~Dayan
+    Christopher~J.C.H.~Watkins, Peter~Dayan,
     \textit{Q-Learning, Machine Learning}
     1992.
     \bibitem{deepmind}
     Voloddymyr~Mnih, Koray Kavukcuoghlu, David Silver, Alex Graves, Ioannis
     Antonoglou, Daan Wierstra, Martin Riedmiller,
     \textit{Playing Atari with Deep Reinforcement Learning}
+    \bibitem{boumaza13}
+    Amine Boumaza,
+    \textit{How to design good Tetris players}
+    2013.
 \end{thebibliography}
 
 \end{document}
