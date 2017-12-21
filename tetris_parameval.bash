@@ -101,6 +101,11 @@ while true; do
 			;;
 		'-o'|'--out')
 			OUTFILE=$2
+			# Create output dir if needed
+			dir=$(dirname $OUTFILE)
+			if [[ ! -e "$dir" ]] ; then
+				mkdir -p "$dir"
+			fi
 			shift 2
 			continue
 			;;
