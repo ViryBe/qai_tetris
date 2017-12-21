@@ -85,7 +85,7 @@ manipulations du plateau se font en place.
 Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
 tetrominos. Les rotations sont representées par les points cardinaux
 (North, South, East, West) et les translations par un entier compris entre 0 et
-4 correspondant à l'indice du coin supérieur gauche du tetromino.
+\(w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino.
 \begin{figure}
   \centering
   \subfloat[Diagonale] {%
@@ -116,6 +116,13 @@ cette redondance, chaque tetromino dispose de son propre ensemble de rotations
 applicables.
 
 \subsection{D\'eroulement d'une partie}
+Un tetromino choisi aleatoirement parmi les cinq disponibles est donne au
+joueur. Ce dernier doit alors choisir ou et comment le placer. Une fois ce
+choix effectue, le tetromino est place en respectant les contraintes du jeu. Le
+plateau est ensuite mis a jour: les lignes completes sont supprimees et la
+hauteur est reevaluee. Un nouveau tetromino est donne et le jeu continue.
+
+
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
 le plateau de jeu. Il est donc nécessaire d'utiliser une fonction \texttt{play}
 qui permet de placer une pièce sur le plateau. La pièce ``tombe'' donc dans la
@@ -205,6 +212,13 @@ recompenses des coups suivants qu'a la recompense immediate.
     \EndProcedure{}
   \end{algorithmic}
 \end{algorithm}
+
+Pour realiser une mise a jour, l'agent commence par choisir l'action qui, a un
+etat donne fournit l'esperance de recompense maximale, selon les connaissances
+actuelles de l'agent. Une fois le coup joue, l'agent recoit une recompense
+evaluant evaluant l'impact du coup choisi sur l'environnement. L'agent utilise
+cette recompense et sa connaissance des etats resultants pour affiner
+l'esperance de recompense associee au coup qu'il vient de realiser.
 
 \subsubsection{Param\`etres}
 L'apprentissage est paramétré par les trois variables,
