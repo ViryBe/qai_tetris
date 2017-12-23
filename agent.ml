@@ -4,9 +4,14 @@ module type AgentTools =
 
     type s
 
+    type mem
+
     val make : int -> t
 
-    val update : t -> s -> int -> s -> float -> float -> float -> int -> unit
+    val mem_make : unit -> mem
+
+    val update : t -> s -> int -> s -> float -> float -> float -> mem ->
+      int -> unit
 
     val get_state : Game.Tetromino.t -> Game.Board.t -> s
 
@@ -51,7 +56,8 @@ struct
     Marshal.to_channel outfile data []
 
   let update ag eps gam par ntetr =
-    let board = Game.Board.make (2 * ntetr)
+    let mem = Ag.mem_make ()
+    and board = Game.Board.make (2 * ntetr)
     and tetromino = ref (Game.Tetromino.make_rand ()) in
     let state = ref (Ag.get_state !tetromino board)
     and prevboard = Game.Board.make (2 * ntetr)
@@ -67,7 +73,7 @@ struct
       tetromino := Game.Tetromino.make_rand () ;
       let reward = Ag.r prevboard board
       and nstate = Ag.get_state !tetromino board in
-      Ag.update ag !state act_ind nstate reward gam par i;
+      Ag.update ag !state act_ind nstate reward gam par mem i;
       (* Update everything *)
       Game.play prevboard !prevtetromino action ;
       prevtetromino := !tetromino ;

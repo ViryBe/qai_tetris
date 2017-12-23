@@ -6,16 +6,23 @@ type t
 (** State encodding *)
 type s
 
+(** Memory, none with Q matrix *)
+type mem
+
 (** Creates a matrix *)
 val make : int -> t
 (** The matrix is filled with [neg_infinity] with zeros where actions are
     available *)
 
+(** Creates the memory, does nothing in the case of Q matrix *)
+val mem_make : _ -> mem
+
 (** Based on the difference of height between the two boards *)
 val r : Game.Board.t -> Game.Board.t -> float
 
 (** Updates the matrix in place *)
-val update : t -> s -> int -> s -> float -> float -> float -> int -> unit
+val update : t -> s -> int -> s -> float -> float -> float -> mem -> int ->
+  unit
 
 (** Gets the required information from the board to choose action *)
 val get_state : Game.Tetromino.t -> Game.Board.t -> s

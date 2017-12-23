@@ -6,6 +6,12 @@ type t = float array array
 (* State are a line of the qmat and therefore int *)
 type s = int
 
+(* No memory for Q matrix *)
+type mem = unit
+
+(* No memory for Q matrix *)
+let mem_make _ = ()
+
 (** Number of lines used to compute a state *)
 let line_per_state = 2
 
@@ -68,7 +74,7 @@ let make scard =
 let get_reward_exps qmat state = qmat.(state)
 
 (** Function updating Q matrix, plays one game *)
-let update qmat state act_ind nstate reward gam par i =
+let update qmat state act_ind nstate reward gam par _ i =
   let alpha = 1. /. (1. +. par *. float i) in
   qmat.(state).(act_ind) <- qmat.(state).(act_ind) +.
                             alpha *.  (

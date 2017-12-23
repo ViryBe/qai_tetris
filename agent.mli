@@ -1,4 +1,4 @@
-(** Agent module, builds the Q matrix used by policy *)
+(** Agent module, makes the agent given an operating mode and tools *)
 
 (** Module signature of an agent *)
 module type AgentTools =
@@ -9,16 +9,23 @@ module type AgentTools =
     (** Representation of the state *)
     type s
 
+    (** An auxiliary memory which can be used by the agent *)
+    type mem
+
     (** Makes an agent *)
     val make : int -> t
     (** [make s] makes an agent suitable for a model with [s] possible states *)
 
+    (** Makes the memory of the agent of the given size *)
+    val mem_make : int -> mem
+
     (** Function updating the agent in place *)
-    val update : t -> s -> int -> s -> float -> float -> float -> int -> unit
-    (** [update ag s a ns r g p i] updates the agent [ag] for the [i]th time
+    val update : t -> s -> int -> s -> float -> float -> float -> mem -> int ->
+      unit
+    (** [update ag s a ns r g p m i] updates the agent [ag] for the [i]th time
         in the game during the transition from state [s] to state [ns] through
-        action [a] generating reward [r] with a sight length of [g] and a
-        parameter [p].
+        action [a] generating reward [r] with a sight length of [g], a
+        parameter [p] and a memory [m].
     *)
 
     (** Outputs state from the board and, if supplied, the tetromino *)
@@ -47,7 +54,7 @@ module type S =
 
     (** Gives birth to an agent, eager to learn *)
     val make : int -> t
-    (** [make ?a s] prepares the agent for a game with [s] states *)
+    (** [make s] prepares the agent for a game with [s] states *)
 
     (** Loads a t datum from the disk *)
     val load : string -> t
@@ -71,9 +78,8 @@ module type S =
 
     (** Plays a game *)
     val play : t -> int -> Game.Board.t
-    (** [play q nt] gives the final board of the game composed of [nt]
-        tetrominos
-        played with matrix [q] *)
+    (** [play ag nt] gives the final board of the game composed of [nt]
+        tetrominos played by agent [ag] *)
   end
 
 module Make : functor (Ag : AgentTools) -> S with type t = Ag.t
