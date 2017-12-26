@@ -2,6 +2,12 @@
    * finir les phis
    * fonction choose action
    * decide how to deal with the 'playspec' thing
+   * ps could be val ps : { x : int ; y : int ; b : int ; ln : int ; un : int }
+   * where: x, y are the coordinates of the positioned tetromino
+   * b is the number of blits
+   * ln/un is the number of squares on the lower/upper line
+   * or no ln/un but a function Tetromino -> Action -> (ln, un)
+   * or f : Tetromino -> Action -> bool array array (2d matrix)
 *)
 
 (* ================================ *)
@@ -40,6 +46,12 @@ module Features = struct
 
   (* The type of a feature *)
   type feat_sig = float -> data -> Game.Board.t -> Game.Action.ps -> int
+  (* with [feat p d b ps] returns the feature with [p] the previous feature
+     (often needed to speed up computation), [d] miscellaneous data needed to
+     compute features, [b] the board and [ps] the play specifications *)
+
+  (* Updates data *)
+  let data_update d b ps = d
 
   (* convenient way to compute the dot product in L *)
   let zero _ _ _ _ = 1.
@@ -102,10 +114,11 @@ module Features = struct
   (** Number of features considered *)
   let card = Array.length arr
 
-  (* Compute all features *)
-  let compute b ps = Array.map (fun f -> f b ps) arr
+  (* Compute all features and returns updated data *)
+  let compute pf d b ps =
+    let newdata = data_update d b ps in
+    (Array.mapi (fun i f -> f pf.(i) newdata b ps) arr, newdata)
 end
-
 
 (** transition between 2 states *)
 type transition = {
@@ -177,6 +190,7 @@ let r backboard board =
 qui ne modifie pas en place le plateau*)
 let choose_action epsilon gamma idactions = Game.Action.from_int 0, 0
 
+(* Has to be verified, regarding new data, old data et caetera *)
 let update weights epsilon gamma eta ntetr batch_size =
   let memory = Array.make batch_size empty_trans
   and board = Game.Board.make (2 * ntetr)
@@ -188,10 +202,12 @@ let update weights epsilon gamma eta ntetr batch_size =
       let tetromino = Game.Tetromino.make_rand () in
       let idactions = Game.Tetromino.get_actids tetromino in
       let action, act_ind = choose_action epsilon gamma idactions in
-      let prevfeatures = Features.compute board ps in
+      let prevfeatures, feat_data =
+        Features.compute prevfeatures feat_data board ps in
       (* From here, prev for previous is for var not impacted by Game.play *)
       Game.play board tetromino action;
-      let features = Features.compute board ps in
+      let features, feat_data =
+        Features.compute prevfeatures feat_data board ps in
       memory.(i) <- { s_t = prevfeatures;
                       a_t = act_ind;
                       r_t = r prevboard board;
