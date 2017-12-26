@@ -1,8 +1,7 @@
-
-(* TODO:
+(* TODO
    * finir les phis
    * fonction choose action
-* *)
+*)
 
 (* ================================ *)
 (*  useful functions for los phis   *)
@@ -70,7 +69,7 @@ module Phis = struct
 
   let six b = 18.
 
-  (** TODO: find the diff between f5 and f7  *)
+  (** TODO find the diff between f5 and f7  *)
   let seven b =
     five b
 
@@ -104,9 +103,6 @@ let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
 (* ================================ *)
 (*  Everything about loss function  *)
 (* ================================ *)
-
-(* TODO: global var ? *)
-let weights = [|0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.|]
 
 (** weights initialization between -1 and 1 *)
 let init_weights () =
@@ -148,7 +144,7 @@ let grad_L batch gamma weights =
     ) weights
 
 (** updates weights according to the gradient gard *)
-let update_weights grad eta =
+let update_weights weights grad eta =
   Array.iteri (fun i elt -> weights.(i) <- weights.(i) -. eta *. elt) grad
 
 (*  ===============================  *)
@@ -156,7 +152,9 @@ let update_weights grad eta =
 
 (** Reward function *)
 (* TODO: in aux function ? *)
-let r x = if x >= 2 then -200.
+let r backboard board =
+  let x = Game.Board.height board - Game.Board.height backboard in
+  if x >= 2 then -200.
   else if x = 1 then -100.
   else if x = 0 then 1.
   else 100. *. (float (abs x))
@@ -170,28 +168,28 @@ qui ne modifie pas en place le plateau*)
 let choose_action epsilon gamma idactions =
   Game.Action
 
-let update weights epsilon gamma eta ntetro batch_size =
-  let board = Game.Board.make (2 * ntetro) in
-  let memory = Array.make batch_size empty_trans in
-
-  for i = 0 to 100000 do
-
-
+let update weights epsilon gamma eta ntetr batch_size =
+  let memory = Array.make batch_size empty_trans
+  and board = Game.Board.make (2 * ntetr)
+  and prevboard = Game.Board.make (2 * ntetr)
+  in
+  for i = 0 to ntetr - 1 do
     (* fill the memory with some transitions *)
     for i = 0 to batch_size - 1 do
       let tetromino = Game.Tetromino.make_rand () in
       let idactions = Game.Tetromino.get_actids tetromino in
       let action, act_ind = choose_action epsilon gamma idactions in
-      let old_height = Game.Board.height board in
-      let old_features = phi board Phis.phi_arr in
+      let prevfeatures = phi board Phis.phi_arr in
+      (* From here, prev for previous is for var not impacted by Game.play *)
       Game.play board tetromino action;
-      let new_height = Game.Board.height board in
-      let new_features = phi board Phis.phi_arr in
-      memory.(i) <- { s_t = old_features;
+      let features = phi board Phis.phi_arr in
+      memory.(i) <- { s_t = prevfeatures;
                       a_t = act_ind;
-                      r_t = r (new_height - old_height);
-                      s_t1= new_features}
+                      r_t = r prevboard board;
+                      s_t1= features} ;
+      (* Update everything *)
+      Game.play prevboard tetromino action ;
     done; (* memory is full *)
     let grad = grad_L memory gamma weights in
-    update_weights grad eta
+    update_weights weights grad eta
   done
