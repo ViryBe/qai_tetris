@@ -1,117 +1,197 @@
-(** Manages agent training and embodies the agent *)
 
-(** Number of lines used to compute a state *)
-let line_per_state = 2
+(* TODO:
+   * finir les phis
+   * fonction choose action
+* *)
 
-(** Outputs the two last lines of the board *)
-let get_board_top board =
-  let height = Game.Board.height board in
-  if height >= 2 then
-    Game.Board.to_arr (height - 1) height board else
-    Game.Board.to_arr 0 height board
+(* ================================ *)
+(*  useful functions for los phis   *)
+(* ================================ *)
+
+(** gives the number of 'neighbors' for all empty cells in a row  *)
+let nb_adjacent_empty_cell row =
+  let ret = ref 0 in
+  if row.(0) = 0 then incr ret;
+  for i = 0 to Array.length row -1 do
+    if (i = Array.length row -1 && row.(i) = 0)
+    || (i <> Array.length row -1) && (row.(i) = 0 && row.(i+1) <> 0)
+    || (i <> Array.length row -1) && (row.(i) <> 0 && row.(i+1) = 0)
+    then
+      incr ret
+  done;
+  !ret
+
+(* TODO: find a better name *)
+let nb_full_top  row_0 row_1 =
+  let ret = ref 0 in
+  for i = 0 to Array.length row_0 -1 do
+    if row_0.(i) = 0 && row_1.(i) <> 0 then incr ret
+  done;
+  !ret
+
+module Phis = struct
+  (* convinient way to compute the dot production in L *)
+  let zero _ = 1.
+
+  let one b = 18.
+
+  let two b = 18.
+
+  (** max nb of 'neighbors' for all empty cells  in b*)
+  let three b =
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    float (Array.fold_left (fun accu elt ->
+        max accu (nb_adjacent_empty_cell elt)
+      ) 0 tab)
+
+  (* Same as #4 but with columns *)
+  let four b =
+    let ret = ref 0 in
+    let h = Game.Board.height b in
+    let tab = Game.Board.to_arr 0 h b in
+    for c = 0 to Game.Board.width - 1 do
+      let col = Array.make h 0 in
+      for r = 0 to h do
+        col.(r) <- tab.(r).(c)
+      done;
+      ret := max !ret (nb_adjacent_empty_cell col)
+    done;
+    float !ret
+
+
+  (** the number of filled cells above holes  *)
+  let five b =
+    let accu = ref 0 in
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    for i = 0 to Array.length tab -2 do
+      accu := !accu + nb_full_top tab.(i) tab.(i+1)
+    done;
+    float !accu
+
+  let six b = 18.
+
+  (** TODO: find the diff between f5 and f7  *)
+  let seven b =
+    five b
+
+  (** nb of rox with, at least, 1 hole *)
+  let eight b =
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    let accu = ref 0 in
+    for i = 0 to Array.length tab -2 do
+      if nb_full_top tab.(i) tab.(i+1) > 0 then incr accu
+    done;
+    float !accu
+
+
+  (** Array of all phis functions *)
+  let phi_arr = [|zero; one; two; three; four; five; six; seven; eight|]
+end
+
+
+(** transition between 2 states *)
+type transition = {
+  s_t : float array;
+  a_t : int;
+  r_t : float;
+  s_t1: float array
+}
+
+(* TODO: find a more elegent solution *)
+let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
+
+
+(* ================================ *)
+(*  Everything about loss function  *)
+(* ================================ *)
+
+(* TODO: global var ? *)
+let weights = [|0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.; 0.|]
+
+(** weights initialization between -1 and 1 *)
+let init_weights () =
+  Array.iteri (fun i _ -> weights.(i) <- Random.float 2. -.1.) weights
+
+
+let phi board phi_arr =
+  Array.map (fun f -> f board) phi_arr
+
+
+(** gives V(\phi(board)) *)
+let v_from_phis phis =
+  Auxfct.dot phis weights
+
+(** gives V(board) *)
+(** useful ? not sure  *)
+let v_from_board board =
+  let s = phi board Phis.phi_arr in
+  v_from_phis s
+
+(** compute delta for a given transition t *)
+let delta t gamma =
+  t.r_t +. gamma *. (v_from_phis t.s_t1) -. (v_from_phis t.s_t)
+
+(** compute loss function L for a mini-batch B *)
+(** useful ? not sure  *)
+let loss_f batch gamma =
+  1. /. (2. *. float(Array.length batch)) *.
+  Array.fold_left (fun accu elt -> accu +. (delta elt gamma)**2.) 0. batch
+
+(** compute \nabla L with respect to w for a given batch*)
+let grad_L batch gamma weights =
+  let card_b = float (Array.length batch) in
+  Array.mapi (fun index _ ->
+      1. /. card_b *. (Array.fold_left (fun accu elt ->
+          (delta elt gamma) *.
+          (gamma *. v_from_phis elt.s_t1 -. v_from_phis elt.s_t)
+        )) 0. batch
+    ) weights
+
+(** updates weights according to the gradient gard *)
+let update_weights grad eta =
+  Array.iteri (fun i elt -> weights.(i) <- weights.(i) -. eta *. elt) grad
+
+(*  ===============================  *)
+(*  ===============================  *)
 
 (** Reward function *)
+(* TODO: in aux function ? *)
 let r x = if x >= 2 then -200.
   else if x = 1 then -100.
   else if x = 0 then 1.
   else 100. *. (float (abs x))
 
-(** Outputs state from board repr and a tetromino *)
-let get_state board tetromino =
-  let board_repr = get_board_top board
-  and intetr = Game.Tetromino.to_int tetromino in
-  let board_one = Array.fold_left Array.append [| |] board_repr in
-  let dig_board = Auxfct.arr2dig board_one in
-  intetr lsl (Game.Board.width * 2) + dig_board
 
-(** chose an action for the current state
-    @return [(action, action_mo)] with action an Action.t and action_no the
-            id of the action *)
-let choose_action = fun q epsilon state action_set ->
-  let tirage = Random.float 1. in
-  let actionid = if tirage > epsilon then Auxfct.argmax_r q.(state)
-    else let rind = Random.int (List.length action_set - 1) in
-      List.nth action_set rind
-  in
-  (Game.Action.from_int actionid, actionid)
+(** how to chosse the next action *)
+(* TODO *)
+(* besoin d'une fonction de signature:
+   val simulation : Board -> Tetromino -> Rotation -> transition
+qui ne modifie pas en place le plateau*)
+let choose_action epsilon gamma idactions =
+  Game.Action
 
-(** Puts zeros on usable actions in a Q matrix *)
-let init_qmat qmat =
-  let tetr_per_state = Game.Board.width * line_per_state in
-  let state_per_tetr = truncate (2. ** (float tetr_per_state)) in
-  let tetr_range_st = ref 0 in
-  (* Writes the zeros in the Q matrix for only one tetromino *)
-  let init_qmat_aux tetr =
-    let actids = Game.Tetromino.get_actids tetr in
-    begin
-      tetr_range_st := Game.Tetromino.to_int tetr * state_per_tetr ;
-      List.iter (fun id ->
-          (* Each tetromino has 4096 associated stated possible *)
-          for j = !tetr_range_st to !tetr_range_st + state_per_tetr - 1 do
-            qmat.(j).(id) <- 0.
-          done ;
-        ) actids
-    end
-  in
-  (* Loops over tetrominos and writes zeros *)
-  List.iter init_qmat_aux Game.Tetromino.set
+let update weights epsilon gamma eta ntetro batch_size =
+  let board = Game.Board.make (2 * ntetro) in
+  let memory = Array.make batch_size empty_trans in
 
-(** Function updating Q matrix, plays one game *)
-let update_qmat bheight qmat eps gam alpha ntetr =
-  (* Initialise state *)
-  let board = Game.Board.make bheight
-  and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let state = ref (get_state board !tetromino)
-  and height = ref (Game.Board.height board) in
+  for i = 0 to 100000 do
 
-  for i = 0 to ntetr - 1 do
-    (* Compute action *)
-    let idactions = Game.Tetromino.get_actids !tetromino in
-    let action, act_ind = choose_action qmat eps !state idactions in
-    (* Update board accordingly to action *)
-    Game.play board !tetromino action ;
-    tetromino := Game.Tetromino.make_rand () ;
-    let nheight = Game.Board.height board in
-    let reward = r (nheight - !height)
-    and nstate = get_state board !tetromino in
-    (* Update Q matrix *)
-    qmat.(!state).(act_ind) <- qmat.(!state).(act_ind) +.
-                               (alpha i) *.  (reward +.
-                                gam *. (Auxfct.flarray_max qmat.(nstate)) -.
-                                qmat.(!state).(act_ind));
-    state := nstate ;
-    height := nheight
-  done ;
-  board
 
-(** Train the Q matrix with ngames of nturns each *)
-let train qmat eps gam alpha ngames ntetr =
-  (* Should ideally be updated during process, limiting height *)
-  let bh = 2 * ntetr + 1 in
-  for i = 0 to ngames do
-    let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
-    let fheight = Game.Board.height fboard in
-    Printf.printf "%d\n" fheight
+    (* fill the memory with some transitions *)
+    for i = 0 to batch_size - 1 do
+      let tetromino = Game.Tetromino.make_rand () in
+      let idactions = Game.Tetromino.get_actids tetromino in
+      let action, act_ind = choose_action epsilon gamma idactions in
+      let old_height = Game.Board.height board in
+      let old_features = phi board Phis.phi_arr in
+      Game.play board tetromino action;
+      let new_height = Game.Board.height board in
+      let new_features = phi board Phis.phi_arr in
+      memory.(i) <- { s_t = old_features;
+                      a_t = act_ind;
+                      r_t = r (new_height - old_height);
+                      s_t1= new_features}
+    done; (* memory is full *)
+    let grad = grad_L memory gamma weights in
+    update_weights grad eta
   done
-
-(** Plays a game of ntetr with qmat *)
-let play qmat ntetr =
-  let board = Game.Board.make (2 * ntetr + 1)
-  and tetromino = ref (Game.Tetromino.make_rand ()) in
-  let  state = ref (get_state board !tetromino) in
-  for i = 0 to ntetr - 1 do
-    let actids = Game.Tetromino.get_actids !tetromino in
-    let action, _ = choose_action qmat 0. !state actids in
-    Game.play board !tetromino action ;
-    tetromino := Game.Tetromino.make_rand () ;
-    state := get_state board !tetromino;
-    (* graphic part *)
-    Display.draw_board
-      (Game.Board.to_arr
-         (max 0 (Game.Board.height board - 10))
-         (Game.Board.height board + 5) board)
-      i ((Game.Board.height board) +1)  (* gives real height *)
-  done ;
-  Printf.printf "%d Tetrominos: final height of %d\n" ntetr
-    (Game.Board.height board) ;
-  board
