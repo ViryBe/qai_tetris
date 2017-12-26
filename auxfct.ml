@@ -1,8 +1,6 @@
-
 (** Auxiliary functions *)
 
-
-(** Simple fuction giving the max of an array *)
+(** Simple function giving the max of an array *)
 let flarray_max arr = Array.fold_left max arr.(0) arr
 
 (** Argmax with random choice if two same max *)
