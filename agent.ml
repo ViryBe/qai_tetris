@@ -1,6 +1,7 @@
 (* TODO
    * finir les phis
    * fonction choose action
+   * decide how to deal with the 'playspec' thing
 *)
 
 (* ================================ *)
@@ -28,23 +29,26 @@ let nb_full_top  row_0 row_1 =
   done;
   !ret
 
-module Phis = struct
-  (* convinient way to compute the dot production in L *)
-  let zero _ = 1.
+module Features = struct
+  (* The type of a feature *)
+  type t = Game.Board.t -> Game.Action.ps -> float
 
-  let one b = 18.
+  (* convenient way to compute the dot production in L *)
+  let zero _ _ = 1.
 
-  let two b = 18.
+  let one b ps = 18.
+
+  let two b ps = 18.
 
   (** max nb of 'neighbors' for all empty cells  in b*)
-  let three b =
+  let three b ps =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     float (Array.fold_left (fun accu elt ->
         max accu (nb_adjacent_empty_cell elt)
       ) 0 tab)
 
   (* Same as #4 but with columns *)
-  let four b =
+  let four b ps =
     let ret = ref 0 in
     let h = Game.Board.height b in
     let tab = Game.Board.to_arr 0 h b in
@@ -59,7 +63,7 @@ module Phis = struct
 
 
   (** the number of filled cells above holes  *)
-  let five b =
+  let five b ps =
     let accu = ref 0 in
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     for i = 0 to Array.length tab -2 do
@@ -67,14 +71,14 @@ module Phis = struct
     done;
     float !accu
 
-  let six b = 18.
+  let six b ps = 18.
 
   (** TODO find the diff between f5 and f7  *)
-  let seven b =
-    five b
+  let seven b ps =
+    five b ps
 
   (** nb of rox with, at least, 1 hole *)
-  let eight b =
+  let eight b ps =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     let accu = ref 0 in
     for i = 0 to Array.length tab -2 do
@@ -82,9 +86,14 @@ module Phis = struct
     done;
     float !accu
 
-
   (** Array of all phis functions *)
-  let phi_arr = [|zero; one; two; three; four; five; six; seven; eight|]
+  let arr = [|zero; one; two; three; four; five; six; seven; eight|]
+
+  (** Number of features considered *)
+  let card = Array.length arr
+
+  (* Compute all features *)
+  let compute b ps = Array.map (fun f -> f b ps) arr
 end
 
 
@@ -105,45 +114,36 @@ let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
 (* ================================ *)
 
 (** weights initialization between -1 and 1 *)
-let init_weights () =
-  Array.iteri (fun i _ -> weights.(i) <- Random.float 2. -.1.) weights
-
-
-let phi board phi_arr =
-  Array.map (fun f -> f board) phi_arr
+let make () =
+  let w = Array.make Features.card 0. in
+  Array.iteri (fun i _ -> w.(i) <- Random.float 2. -.1.) w ;
+  w
 
 
 (** gives V(\phi(board)) *)
-let v_from_phis phis =
-  Auxfct.dot phis weights
-
-(** gives V(board) *)
-(** useful ? not sure  *)
-let v_from_board board =
-  let s = phi board Phis.phi_arr in
-  v_from_phis s
+let v_from_feat w feat = Auxfct.dot feat w
 
 (** compute delta for a given transition t *)
-let delta t gamma =
-  t.r_t +. gamma *. (v_from_phis t.s_t1) -. (v_from_phis t.s_t)
+let delta w t gamma =
+  t.r_t +. gamma *. (v_from_feat w t.s_t1) -. (v_from_feat w t.s_t)
 
 (** compute loss function L for a mini-batch B *)
 (** useful ? not sure  *)
-let loss_f batch gamma =
+let loss_f w batch gamma =
   1. /. (2. *. float(Array.length batch)) *.
-  Array.fold_left (fun accu elt -> accu +. (delta elt gamma)**2.) 0. batch
+  Array.fold_left (fun accu elt -> accu +. (w delta elt gamma)**2.) 0. batch
 
 (** compute \nabla L with respect to w for a given batch*)
-let grad_L batch gamma weights =
+let grad_L w batch gamma =
   let card_b = float (Array.length batch) in
   Array.mapi (fun index _ ->
       1. /. card_b *. (Array.fold_left (fun accu elt ->
-          (delta elt gamma) *.
-          (gamma *. v_from_phis elt.s_t1 -. v_from_phis elt.s_t)
+          (delta w elt gamma) *.
+          (gamma *. v_from_feat w elt.s_t1 -. v_from_feat w elt.s_t)
         )) 0. batch
-    ) weights
+    ) w
 
-(** updates weights according to the gradient gard *)
+(** updates weights according to the gradient grad *)
 let update_weights weights grad eta =
   Array.iteri (fun i elt -> weights.(i) <- weights.(i) -. eta *. elt) grad
 
@@ -165,8 +165,7 @@ let r backboard board =
 (* besoin d'une fonction de signature:
    val simulation : Board -> Tetromino -> Rotation -> transition
 qui ne modifie pas en place le plateau*)
-let choose_action epsilon gamma idactions =
-  Game.Action
+let choose_action epsilon gamma idactions = Game.Action.from_int 0, 0
 
 let update weights epsilon gamma eta ntetr batch_size =
   let memory = Array.make batch_size empty_trans
@@ -179,10 +178,10 @@ let update weights epsilon gamma eta ntetr batch_size =
       let tetromino = Game.Tetromino.make_rand () in
       let idactions = Game.Tetromino.get_actids tetromino in
       let action, act_ind = choose_action epsilon gamma idactions in
-      let prevfeatures = phi board Phis.phi_arr in
+      let prevfeatures = Features.compute board ps in
       (* From here, prev for previous is for var not impacted by Game.play *)
       Game.play board tetromino action;
-      let features = phi board Phis.phi_arr in
+      let features = Features.compute board ps in
       memory.(i) <- { s_t = prevfeatures;
                       a_t = act_ind;
                       r_t = r prevboard board;
@@ -190,6 +189,6 @@ let update weights epsilon gamma eta ntetr batch_size =
       (* Update everything *)
       Game.play prevboard tetromino action ;
     done; (* memory is full *)
-    let grad = grad_L memory gamma weights in
+    let grad = grad_L weights memory gamma in
     update_weights weights grad eta
   done
