@@ -29,26 +29,34 @@ let nb_full_top  row_0 row_1 =
   done;
   !ret
 
+(* Module computing features. The objective here is to avoid parsing all board
+ * seven times each turn. Incremental updates are thereford advised, using data
+ * passed through calls *)
 module Features = struct
+  (* Data used by the features *)
+  type data = {
+    wells: (int * int) list; (* coordinates of wells *)
+  }
+
   (* The type of a feature *)
-  type t = Game.Board.t -> Game.Action.ps -> float
+  type feat_sig = float -> data -> Game.Board.t -> Game.Action.ps -> int
 
-  (* convenient way to compute the dot production in L *)
-  let zero _ _ = 1.
+  (* convenient way to compute the dot product in L *)
+  let zero _ _ _ _ = 1.
 
-  let one b ps = 18.
+  let one prev d b ps = 18.
 
-  let two b ps = 18.
+  let two prev d b ps = 18.
 
   (** max nb of 'neighbors' for all empty cells  in b*)
-  let three b ps =
+  let three prev d b ps =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     float (Array.fold_left (fun accu elt ->
         max accu (nb_adjacent_empty_cell elt)
       ) 0 tab)
 
   (* Same as #4 but with columns *)
-  let four b ps =
+  let four prev d b ps =
     let ret = ref 0 in
     let h = Game.Board.height b in
     let tab = Game.Board.to_arr 0 h b in
@@ -63,7 +71,7 @@ module Features = struct
 
 
   (** the number of filled cells above holes  *)
-  let five b ps =
+  let five prev d b ps =
     let accu = ref 0 in
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     for i = 0 to Array.length tab -2 do
@@ -71,14 +79,16 @@ module Features = struct
     done;
     float !accu
 
-  let six b ps = 18.
+  let six prev d b ps = 18.
 
   (** TODO find the diff between f5 and f7  *)
-  let seven b ps =
-    five b ps
+  let seven prev d b ps =
+    if List.mem (ps.x, ps.y) d.wells || List.mem (ps.x, ps.y + 1) d.wells
+    then prev +. 1.
+    else prev
 
   (** nb of rox with, at least, 1 hole *)
-  let eight b ps =
+  let eight prev d b ps =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     let accu = ref 0 in
     for i = 0 to Array.length tab -2 do
