@@ -181,8 +181,8 @@ module Tetromino = struct
   (** Ids associated to tetrominos *)
   let ids = [(Square, 0) ; (Lshaped, 1) ; (Line, 2) ; (Diag, 3) ; (Dot, 4)]
 
-  (** Array representation of tetrominos *)
-  let to_arr tetr = List.assoc tetr arr_repr
+  (** 1D array representation of tetrominos *)
+  let to_onedarr tetr = List.assoc tetr arr_repr
 
   (** Associative list mapping tetromino to its available orientations *)
   let available_rots =
@@ -226,7 +226,7 @@ let collide table x y tetromino rotation =
   let n = ref(false) in
   for i = 0 to 1 do
     for j = 0 to 1 do
-      let tetrarr = Tetromino.to_arr tetromino
+      let tetrarr = Tetromino.to_onedarr tetromino
       and ind_afterot = Action.make_rotation rotation i j in
       n := !n ||
            tetrarr.(ind_afterot) > 0 &&
@@ -240,7 +240,7 @@ let place_tetromino table tetromino rotation x y =
   let board = Board.get_board table in (* Still modifies table.board *)
   for i = 0 to 1 do
     for j = 0 to 1 do
-      let tetrarr = Tetromino.to_arr tetromino in
+      let tetrarr = Tetromino.to_onedarr tetromino in
       let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
       if tetrquarter > 0 then
         board.(x - i).(y + j) <- tetrquarter
