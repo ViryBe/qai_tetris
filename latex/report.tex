@@ -29,11 +29,11 @@
 \maketitle
 \tableofcontents
 
-\section*{Introduction}
-\addcontentsline{toc}{section}{Introduction}
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
 
-\section*{Notations}
-\addcontentsline{toc}{section}{Notations}
+\chapter*{Notations}
+\addcontentsline{toc}{chapter}{Notations}
 Seront notées dans la suite du rapport:
 \begin{itemize}
   \item \(n_t\) le nombre de tetrominos par jeu,
@@ -47,9 +47,9 @@ théorique maximale atteignable quand la deuxieme concerne la hauteur
 effectivement atteinte à un instant de jeu, i.e.\ le nombre de lignes non vides
 sur le plateau.
 
-\section{Tetris}
+\chapter{Tetris}
 
-\subsection{Le jeu et sa simplification}
+\section{Le jeu et sa simplification}
 Tetris met le joueur au défi de réaliser des lignes complètes en déplaçant des
 pièces de formes différentes, les tétrominos, qui défilent depuis le haut
 jusqu'au bas de l'écran. Les lignes complétées disparaissent tout en rapportant
@@ -107,9 +107,9 @@ inférieure à 2).
 
 Un tetromino est placé par le choix d'une colonne et d'une orientation.
 
-\subsection{L'implémentation}
+\section{L'implémentation}
 
-\subsubsection{Représentation}
+\subsection{Représentation}
 
 \paragraph{Tetrominos}
 Les tetrominos sont tableaux de longueur 4. L'unidimensionnalité permet
@@ -160,7 +160,7 @@ consequent la quantite d'information que l'agent doit apprendre. Pour pallier
 cette redondance, chaque tetromino dispose de son propre ensemble de rotations
 applicables.
 
-\subsection{Déroulement d'une partie}
+\section{Déroulement d'une partie}
 Un tetromino choisi aleatoirement parmi les cinq disponibles est donne au
 joueur. Ce dernier doit alors choisir ou et comment le placer. Une fois ce
 choix effectue, le tetromino est place en respectant les contraintes du jeu. Le
@@ -180,26 +180,26 @@ pièce.
 Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais
 la taille totale du plateau reste la même.
 
-\subsection{Drawbacks}
-\subsubsection{Fonction collide}
+\section{Drawbacks}
+\subsection{Fonction collide}
 L'implémentation actuelle oblige l'accessibilité de la position finale depuis
 le haut du plateau car la pièce ne peut pas être glissée au dernier moment
 sous une autre.
-\subsubsection{Tetromino}
+\subsection{Tetromino}
 Les tetrominos sont tous de même dimension par souci d'homogénéite et cela
 peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
 un choix d'action spécifique à chaque pièce (cf partie x).
 
 
-\section{Q learning}
+\chapter{Q learning}
 
-\subsection{principe de l'apprentissage par renforcement et Q-learning}
+\section{principe de l'apprentissage par renforcement et Q-learning}
 
 
 
-\subsection{Représentation des états}
+\section{Représentation des états}
 
-\subsubsection{Composition}
+\subsection{Composition}
 Intuitivement, un état correspond à la pièce donnée à jouer et la disposition
 des pièces sur le plateau, ce qui correspond aux informations nécessaires pour
 le placement d'une pièce par l'agent. En notant \(n_t\) le nombre de tetrominos
@@ -210,7 +210,7 @@ Pour réduire le nombre d'états, on ne considère que les deux plus hautes lign
 contenant au moins un tetromino. On obtient \(5\cdot 2^{2 \cdot w}\) états
 possibles, soit \(20,480\) pour une largeur \( w = 6 \).
 
-\subsubsection{Codage}
+\subsection{Codage}
 Comme chaque état correspond \textit{in fine} à une ligne de la matrice Q, il est
 nécessaire d'avoir une bijection entre l'ensemble des états et les entiers. La
 bijection genère deux représentations entières, une pour les deux lignes de
@@ -220,7 +220,7 @@ l'état et l'autre pour la pièce, et les combine en un état entier final,
 \]
 
 
-\subsection{Algorithmes}
+\section{Algorithmes}
 
 L'algorithme~\ref{alg:action} concerne la maniere dont l'agent choisit les
 actions parmi l'ensemble des actions possibles \(\mathcal{A}\), etant donne un
@@ -274,7 +274,7 @@ evaluant evaluant l'impact du coup choisi sur l'environnement. L'agent utilise
 cette recompense et sa connaissance des etats resultants pour affiner
 l'esperance de recompense associee au coup qu'il vient de realiser.
 
-\subsubsection{Paramètres}
+\subsection{Paramètres}
 L'apprentissage est paramétré par les trois variables,
 \begin{itemize}
   \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
@@ -324,9 +324,9 @@ stabiliser les resultats obtenus.
 \end{figure}
 
 
-\section{Difficultés rencontrées}
+\chapter{Difficultés rencontrées}
 
-\subsection{Le fl\'eau de la mutabilité}
+\section{Le fl\'eau de la mutabilité}
 L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
 considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
 actuelle du plateau, le principe est de copier la section de tableau incluant
@@ -341,7 +341,7 @@ tetrominos, faisant augmenter la hauteur.
 Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
 recréée à chaque blit.
 
-\subsection{Le hollandais volant}
+\section{Le hollandais volant}
 La fonction collide permet de tester la collision du tetromino avec les autres
 pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
 on testait donc toutes les positions possibles pour déposer les pièces de
@@ -355,14 +355,14 @@ accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
 initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
 rotations \texttt{South} et \texttt{West}.
 
-\section{Minimisation d'une fonction objectif \( V \)}
+\chapter{Minimisation d'une fonction objectif \( V \)}
 
-\subsection{Représentation des états et transitions}
+\section{Représentation des états et transitions}
 
 Dans cette partie l'ensemble des états \( \mathcal{S} \) est égal à l'ensemble
 des plateaux possibles. \( s \in \mathcal{S} \) est un plateau particulier.
 
-\subsection{Nouvelle méthode d'apprentissage}
+\section{Nouvelle méthode d'apprentissage}
 
 Pour s'affranchir de la limite de memoire due au nombre d'etats possibles, la
 matrice est remplacee par une fonction objectif \( V \) tel que:
@@ -394,7 +394,7 @@ On appelle transition un tuple \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 \end{itemize}
 
 
-\subsection{Algorithme}
+\section{Algorithme}
 
 L'algorithme d'apprentissage utilisé dans cette partie repose sur une variante
 sochastique de l'algorithme par descente de gradient.
@@ -469,10 +469,10 @@ La procédure est synthétisé dans l'algorithme suivant:
 \end{algorithm}
 
 
-\section{Réesultats du projet}
+\chapter{Réesultats du projet}
 
-\section*{Conclusion}
-\addcontentsline{toc}{section}{Conclusion}
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
