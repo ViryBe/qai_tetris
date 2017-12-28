@@ -355,23 +355,96 @@ accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
 initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
 rotations \texttt{South} et \texttt{West}.
 
-\section{Pas du Deep Q learning}
+\section{Minimisation d'une fonction objectif \( V \)}
 
-% TODO: des trucs a modifier ...
+\subsection{Représentation des états et transitions}
+
+Dans cette partie l'ensemble des états \( \mathcal{S} \) est égal à l'ensemble
+des plateaux possibles. \( s \in \mathcal{S} \) est un plateau particulier.
+
+\subsection{Nouvelle méthode d'apprentissage}
 
 Pour s'affranchir de la limite de memoire due au nombre d'etats possibles, la
-matrice est remplacee par une fonction lineaire \(V
-\colon \R^n \to \R\). En notant \(w = (w_0\, w_1\, \dots\, w_n)^\top\) des poids
-propre à la fonction \(V\) et \(x = (x_1\, \dots\, x_n)\), \(V\) s'exprime
+matrice est remplacee par une fonction objectif \( V \) tel que:
 \[
-  V \colon x \mapsto w_0 + \sum_{i=1}^n w_i \phi_i x.
+\forall s \in \mathcal{S}, \qquad V(s) =
+\mathbb{E}(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t)
+\]
+qui estime l'espérance de gain à partir d'un plateau donné.
+L'apprentissage est donc consiste donc maintenant à la maximisation de la
+fonction \( V \).
+On suppose \( V \) linéaire \(V \colon \R^n \to \R\). Cette fonction est alors
+déterminée par un ensemble de poids \(w = (w_0\, w_1\, \dots\, w_n)^\top\)
+qu'il va falloir 'entrainer'.
+
+En notant \( s_t \) un plateau de jeu à un instant \( t \), et
+\(\phi_i\colon \mathcal{S} \to \R\) des caracteristiques du plateau
+(voir~\cite{boumaza13}), la fonction \(V\)
+est définie par:
+\[
+  V \colon s_t \mapsto w_0 + \sum_{i=1}^n w_i \cdot \phi_i (s_t)
 \]
 
-La fonction \(V\) sera appliquee aux caracteristiques du plateau de jeu
-(\textit{features} en anglais). Elles seront obtenues par le biais d'une
-fonction \(\phi\colon \mathcal{S} \to \R^n\). Les caracteristiques utilisees
-sont decrites dans~\cite{boumaza13}.
-\begin{algorithm}
+On appelle transition un tuple \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
+\begin{itemize}
+    \item \( s_t \) le plateau à l'étape \( t \)
+    \item \( a_t \) l'action joué à l'étape \( t \)
+    \item \( r_t \) la récompense joué à l'étape \( t \)
+    \item \( s_{t+1} \) le plateau résultant de l'action \( a_t \)
+\end{itemize}
+
+
+\subsection{Algorithme}
+
+L'algorithme d'apprentissage utilisé dans cette partie repose sur une variante
+sochastique de l'algorithme par descente de gradient.
+
+L'idée est de jouer \( B \) coup et enregistrer dans une mémoire les différentes
+transitions. Les coups sont choisi selon l'algorithme~\ref{alg:choseactionv2}.
+
+\begin{algorithm}[h]
+  \caption{Choix de l'action}\label{alg:choseactionv2}
+  \begin{algorithmic}
+    [1]
+    \Procedure{ChooseAction2}{$V$, $s_t$, $\mathcal{A}$}
+    \State{} tirage \(\gets \uniform([0, 1])\)
+    \If{tirage \(> \epsilon\)}
+    \State{}\Return{\(\argmax_{{a_t}\in\mathcal{A}} [r_t + \gamma V(s_{t+1})] \)}
+    \\ \Comment{Choix de l'action maximisant l'esperance de recompense}
+    \Else{}
+    \State{}\Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aleatoire}
+    \EndIf{}
+    \EndProcedure{}
+  \end{algorithmic}
+\end{algorithm}
+
+Pour ne pas sauvegarder plusieurs fois le plateau de jeu \(s_t\), on ne met en
+mémoire que les features intéressantes \( (\phi_1 (s_t), \hdots, \phi_7(s_t)) \).
+
+Une fois la mémoire \( \mathcal{M} \) remplie avec \( B \) transitions, on calcule \( \delta_t \):
+\[
+\forall t_t = (s_t, a_t, r_t, s_{t+1}) \ in \mathcal{M},\quad
+\delta(t_t) = \underbrace{r_t + \gamma \cdot V(s_{t+1})}_{target} -
+\underbrace{V(s_{t})}_{prédiction}
+\]
+Comme \( V \) estime l'espérance de gain, un agent bien entrainé doit annuler
+les différents \(delta_t\) (l'espérance prédite à l'instant t = la récompense
+à l'instant t + l'espérance prédite à l'instant t + 1).
+
+On définie alors une fonction de coup (loss function):
+\[
+\mathcal{L} = \frac{1}{2B} \sum _{t_t \in \mathcal{M}} \delta(t_t)^2
+\]
+
+On applique alors l'algorithme de descente de gradient pour minimiser la fonction
+\( \mathcal{L} \) en actualisant les poids \( w \) suivant:
+\[
+w = w - \eta \nabla \mathcal{L}
+\]
+
+La procédure est synthétisé dans l'algorithme suivant:
+
+\begin{algorithm}[H]
   \caption{Algorithme d'apprentissage d'une fonction lineaire}\label{alg:linfct}
   \begin{algorithmic}
     [1]
@@ -380,7 +453,7 @@ sont decrites dans~\cite{boumaza13}.
     \State{} initialisation de \(s\)
     \Repeat{}
     \For{1 to $B$}
-    \State{} \(a \gets \mathup{ChooseAction}(V, s, \mathcal{A}, \epsilon)\)
+    \State{} \(a \gets \mathup{ChooseAction2}(V, s, \mathcal{A}, \epsilon)\)
     \State{} joue \(a\), observer \(r\) et le nouvel \'etat \(s'\)
     \State{} ajouter a la memoire \( \left(\phi(s), a, r, \phi(s')\right) \)
     \EndFor{}
@@ -394,6 +467,12 @@ sont decrites dans~\cite{boumaza13}.
     \EndProcedure{}
   \end{algorithmic}
 \end{algorithm}
+
+
+\section{Réesultats du projet}
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
@@ -409,11 +488,5 @@ sont decrites dans~\cite{boumaza13}.
     \textit{How to design good Tetris players}
     2013.
 \end{thebibliography}
-
-\section{Réesultats du projet}
-
-\section*{Conclusion}
-\addcontentsline{toc}{section}{Conclusion}
-
 
 \end{document}
