@@ -188,7 +188,7 @@ sous une autre.
 \subsection{Tetromino}
 Les tetrominos sont tous de même dimension par souci d'homogénéite et cela
 peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
-un choix d'action spécifique à chaque pièce (cf partie x).
+un choix d'action spécifique à chaque pièce (cf ~\ref{sec:volant}).
 
 
 \chapter{Q learning}
@@ -324,36 +324,6 @@ stabiliser les resultats obtenus.
 \end{figure}
 
 
-\chapter{Difficultés rencontrées}
-
-\section{Le fl\'eau de la mutabilité}
-L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
-considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
-actuelle du plateau, le principe est de copier la section de tableau incluant
-les lignes \(l+1\) jusqu'à \(h+1\) une ligne en dessous, i.e.\ translater le
-bloc d'une ligne vers le bas.
-
-Cette démarche engendre des comportements anormaux car la ligne \(h+1\) n'est
-pas copiée sur la ligne \(h\), elles partagent la même adresse mémoire. Ainsi,
-il etait observé quelques coups après un blit un dédoublement de carrés de
-tetrominos, faisant augmenter la hauteur.
-
-Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
-recréée à chaque blit.
-
-\section{Le hollandais volant}
-La fonction collide permet de tester la collision du tetromino avec les autres
-pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
-on testait donc toutes les positions possibles pour déposer les pièces de
-dimension 2 \(\times \) 2 sur le fond du plateau s'il n'y avait pas eu de
-collision. Malheureusement, certaines pièces comme le point ou la ligne
-pouvaient avoir une ``ligne vide'' en bas sous certaines rotations. Pour
-résoudre ce problème qui est devenu évident après la résolution du problème de
-\texttt{Array.blit}, nous avons décidé de restreindre les états possibles dans
-la Q-matrice. En effet lors de l'initialisation de la Q-matrice, tous les états
-accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
-initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
-rotations \texttt{South} et \texttt{West}.
 
 \chapter{Minimisation d'une fonction objectif \( V \)}
 
@@ -468,6 +438,36 @@ La procédure est synthétisé dans l'algorithme suivant:
   \end{algorithmic}
 \end{algorithm}
 
+\chapter{Difficultés rencontrées}
+
+\section{Le fl\'eau de la mutabilité}
+L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
+considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
+actuelle du plateau, le principe est de copier la section de tableau incluant
+les lignes \(l+1\) jusqu'à \(h+1\) une ligne en dessous, i.e.\ translater le
+bloc d'une ligne vers le bas.
+
+Cette démarche engendre des comportements anormaux car la ligne \(h+1\) n'est
+pas copiée sur la ligne \(h\), elles partagent la même adresse mémoire. Ainsi,
+il etait observé quelques coups après un blit un dédoublement de carrés de
+tetrominos, faisant augmenter la hauteur.
+
+Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
+recréée à chaque blit.
+
+\section{Le hollandais volant}\label{volant}
+La fonction collide permet de tester la collision du tetromino avec les autres
+pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
+on testait donc toutes les positions possibles pour déposer les pièces de
+dimension 2 \(\times \) 2 sur le fond du plateau s'il n'y avait pas eu de
+collision. Malheureusement, certaines pièces comme le point ou la ligne
+pouvaient avoir une ``ligne vide'' en bas sous certaines rotations. Pour
+résoudre ce problème qui est devenu évident après la résolution du problème de
+\texttt{Array.blit}, nous avons décidé de restreindre les états possibles dans
+la Q-matrice. En effet lors de l'initialisation de la Q-matrice, tous les états
+accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
+initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
+rotations \texttt{South} et \texttt{West}.
 
 \chapter{Réesultats du projet}
 
