@@ -50,6 +50,9 @@ module Tetromino : sig
   (** Tetromino type *)
   type t
 
+  (** The dimension of a tetromino (n \times n square) *)
+  val dim : int
+
   (** Set of tetrominos *)
   val set : t list
 
@@ -60,11 +63,23 @@ module Tetromino : sig
   (** Generates a random tetromino *)
   val make_rand : unit -> t
 
-  (** Outputs an array representation of a tetromino *)
-  val to_arr : t -> int array
-
   (** Outputs the list of available actions ids for the tetromino *)
   val get_actids : t -> int list
+end
+
+(** Specifications of last coup on a board *)
+module Playspec : sig
+  (** Details of a coup *)
+  type t
+
+  (** Coordinates of last positioned tetromino *)
+  val pos : Board.t -> int * int
+
+  (** Number of blits and position of blits *)
+  val blits : Board.t -> int * int list
+
+  (** Last tetromino played *)
+  val tetromino : Board.t -> Tetromino.t
 end
 
 (** Plays a turn and gives updated board *)

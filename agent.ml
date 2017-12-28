@@ -41,34 +41,35 @@ let nb_full_top  row_0 row_1 =
 module Features = struct
   (* Data used by the features *)
   type data = {
-    wells: (int * int) list; (* coordinates of wells *)
+    wells: int * int list; (* y coordinate and depth of wells *)
+    holes: int list (* y coordinate of holes *)
   }
 
   (* The type of a feature *)
-  type feat_sig = float -> data -> Game.Board.t -> Game.Action.ps -> int
+  type feat_sig = float -> data -> Game.Board.t -> int
   (* with [feat p d b ps] returns the feature with [p] the previous feature
      (often needed to speed up computation), [d] miscellaneous data needed to
      compute features, [b] the board and [ps] the play specifications *)
 
   (* Updates data *)
-  let data_update d b ps = d
+  let data_update d b = d
 
   (* convenient way to compute the dot product in L *)
-  let zero _ _ _ _ = 1.
+  let zero _ _ _ = 1.
 
-  let one prev d b ps = 18.
+  let one prev d b = 18.
 
-  let two prev d b ps = 18.
+  let two prev d b = 18.
 
   (** max nb of 'neighbors' for all empty cells  in b*)
-  let three prev d b ps =
+  let three prev d b =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     float (Array.fold_left (fun accu elt ->
         max accu (nb_adjacent_empty_cell elt)
       ) 0 tab)
 
   (* Same as #4 but with columns *)
-  let four prev d b ps =
+  let four prev d b =
     let ret = ref 0 in
     let h = Game.Board.height b in
     let tab = Game.Board.to_arr 0 h b in
@@ -83,7 +84,7 @@ module Features = struct
 
 
   (** the number of filled cells above holes  *)
-  let five prev d b ps =
+  let five prev d b =
     let accu = ref 0 in
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     for i = 0 to Array.length tab -2 do
@@ -91,16 +92,34 @@ module Features = struct
     done;
     float !accu
 
-  let six prev d b ps = 18.
+  let six prev d b = 18.
 
-  (** TODO find the diff between f5 and f7  *)
-  let seven prev d b ps =
-    if List.mem (ps.x, ps.y) d.wells || List.mem (ps.x, ps.y + 1) d.wells
-    then prev +. 1.
-    else prev
+  (* Number of filled cells above holes *)
+  let seven prev d b =
+    let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
+    match Game.Playspec.pos b with (x, y) ->
+      (* To process board places *)
+      let t2f i = if i > 0 then 1. else 0. in
+      (* Counts occupied places in a column *)
+      let rec loop_x c k =
+        if k <= 0 then 0.
+        else t2f tab.(x - k - 1).(c) +. loop_x c (k - 1)
+      in
+      (* Runs through the columns to count filled cells if there is a hole *)
+      let rec loop_y k acc =
+        if k <= 0 then acc
+        else let nacc =
+               let col = y + k - 1 in
+               if List.mem col d.holes
+               then acc +. loop_x col Game.Tetromino.dim
+               else acc
+          in
+          loop_y (k - 1) nacc
+      in
+      loop_y Game.Tetromino.dim prev
 
   (** nb of rox with, at least, 1 hole *)
-  let eight prev d b ps =
+  let eight prev d b =
     let tab = Game.Board.to_arr 0 (Game.Board.height b) b in
     let accu = ref 0 in
     for i = 0 to Array.length tab -2 do
@@ -115,9 +134,9 @@ module Features = struct
   let card = Array.length arr
 
   (* Compute all features and returns updated data *)
-  let compute pf d b ps =
-    let newdata = data_update d b ps in
-    (Array.mapi (fun i f -> f pf.(i) newdata b ps) arr, newdata)
+  let compute pf d b =
+    let newdata = data_update d b in
+    (Array.mapi (fun i f -> f pf.(i) newdata b) arr, newdata)
 end
 
 (** transition between 2 states *)
