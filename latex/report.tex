@@ -61,6 +61,48 @@ tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
 tetrominos différents (seulement 5) et des tetrominos plus petits (taille
 inférieure à 2).
 
+\begin{figure}[h]
+  \centering
+  \subfloat[Diagonale] {%
+    \begin{tikzpicture}
+      \fill[color=magenta] (0,0) rectangle (1,1);
+      \fill[color=magenta] (0,0) rectangle (-1,-1);
+      \draw (-1,1) rectangle (1,-1);
+    \end{tikzpicture}
+  }\qquad
+  \subfloat[L] {%
+    \begin{tikzpicture}
+      \fill[color=cyan] (0,0) rectangle (1,1);
+      \fill[color=cyan] (0,0) rectangle (-1,-1);
+      \fill[color=cyan] (0,0) rectangle (-1,1);
+      \draw (-1,1) rectangle (1,-1);
+    \end{tikzpicture}
+  }\qquad
+  \subfloat[Carré] {%
+    \begin{tikzpicture}
+      \fill[color=yellow] (0,0) rectangle (1,1);
+      \fill[color=yellow] (0,0) rectangle (-1,-1);
+      \fill[color=yellow] (0,0) rectangle (-1,1);
+      \fill[color=yellow] (0,0) rectangle (1,-1);
+      \draw (-1,1) rectangle (1,-1);
+    \end{tikzpicture}
+  }\\
+  \subfloat[Barre] {%
+    \begin{tikzpicture}
+      \fill[color=green] (0,0) rectangle (-1,-1);
+      \fill[color=green] (0,0) rectangle (-1,1);
+      \draw (-1,1) rectangle (1,-1);
+    \end{tikzpicture}
+  }\qquad
+  \subfloat[Point] {%
+    \begin{tikzpicture}
+      \fill[color=red] (0,0) rectangle (-1,1);
+      \draw (-1,1) rectangle (1,-1);
+    \end{tikzpicture}
+  }
+  \caption{Liste des tertrominos}\label{fig:tetrolist}
+\end{figure}
+
 Un tetromino est plac\'e par le choix d'une colonne et d'une orientation.
 
 \subsection{L'impl\'ementation}
@@ -87,7 +129,7 @@ tetrominos. Les rotations sont representées par les points cardinaux
 \(w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino
 (voir fig\ref{fig:tetref}).
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \subfloat[Diagonale] {%
     \begin{tikzpicture}
