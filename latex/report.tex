@@ -1,3 +1,10 @@
+%
+%  TODO:
+%  - RELIRE POUR LES FOTTES ET ACCENTS
+%  - le Q learning
+%  - 
+%
+
 \documentclass{report}
 \usepackage{fontspec}
 \usepackage{polyglossia}
@@ -64,7 +71,7 @@ Seront notées dans la suite du rapport:
   \item \(\mathcal{S}\) l'ensemble des états,
   \item \(b_w, b_h\) la largeur et la hauteur totale du plateau.
 \end{itemize}
-Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10,000,
+Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10000,
 b_w = 6\). Seront distingu\'ees la hauteur totale \(b_h\) et la hauteur relative
 à un instant de jeu \(h\) du plateau, la première correspond à la hauteur
 théorique maximale atteignable quand la deuxieme concerne la hauteur
@@ -82,7 +89,7 @@ n'a pas de fin: le joueur perd la partie lorsqu'un tétrimino reste bloqué en
 haut.
 
 Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
-termine apres avoir fourni 10,000 tetrominos à placer. De plus notre
+termine apres avoir fourni 10000 tetrominos à placer. De plus notre
 tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
 tetrominos différents (seulement 5) et des tetrominos plus petits (taille
 inférieure à 2).
@@ -152,7 +159,7 @@ manipulations du plateau se font en place.
 Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
 tetrominos. Les rotations sont representées par les points cardinaux
 (North, South, East, West) et les translations par un entier compris entre 0 et
-\(w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino
+\(b_w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino
 (voir fig\ref{fig:tetref}).
 
 \begin{figure}[h]
@@ -174,7 +181,7 @@ tetrominos. Les rotations sont representées par les points cardinaux
       \draw (0,0) rectangle (1,-1);
     \end{tikzpicture}
   }
-  \caption{Point de reference de tetromini, ici hachure}\label{fig:tetref}
+  \caption{Point de reference de tetromino, ici hachure}\label{fig:tetref}
 \end{figure}
 
 La geometrie de certains tetrominos rend certaines orientations redondantes. Par
@@ -279,11 +286,11 @@ Intuitivement, un état correspond à la pièce donnée à jouer et la dispositi
 des pièces sur le plateau, ce qui correspond aux informations nécessaires pour
 le placement d'une pièce par l'agent. En notant \(n_t\) le nombre de tetrominos
 différents, \( h \) la hauteur du plateau a un instant considèré  et \(w\) la
-largeur du plateau, on obtient \(n_t \cdot 2^{h \cdot w}\) états possibles.
+largeur du plateau, on obtient \(n_t \cdot 2^{h \cdot b_w}\) états possibles.
 
 Pour réduire le nombre d'états, on ne considère que les deux plus hautes lignes
-contenant au moins un tetromino. On obtient \(5\cdot 2^{2 \cdot w}\) états
-possibles, soit \(20,480\) pour une largeur \( w = 6 \).
+contenant au moins un tetromino. On obtient \(5\cdot 2^{2 b_w}\) états
+possibles, soit \(20480\) pour une largeur \( b_w = 6 \).
 
 \subsection{Codage}
 Comme chaque état correspond \textit{in fine} à une ligne de la matrice Q, il est
@@ -416,7 +423,7 @@ matrice est remplacee par une fonction objectif \( V \) tel que:
 \mathbb{E}(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t)
 \]
 qui estime l'espérance de gain à partir d'un plateau donné.
-L'apprentissage est donc consiste donc maintenant à la maximisation de la
+L'apprentissage consiste donc maintenant à la maximisation de la
 fonction \( V \).
 On suppose \( V \) linéaire \(V \colon \R^n \to \R\). Cette fonction est alors
 déterminée par un ensemble de poids \(w = (w_0\, w_1\, \dots\, w_n)^\top\)
@@ -444,8 +451,8 @@ On appelle transition un tuple \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 L'algorithme d'apprentissage utilisé dans cette partie repose sur une variante
 sochastique de l'algorithme par descente de gradient.
 
-L'idée est de jouer \( B \) coup et enregistrer dans une mémoire les différentes
-transitions. Les coups sont choisi selon l'algorithme~\ref{alg:choseactionv2}.
+L'idée est de jouer \( B \) coups et enregistrer dans une mémoire les différentes
+transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
 
 \begin{algorithm}[h]
   \caption{Choix de l'action}\label{alg:choseactionv2}
@@ -468,15 +475,15 @@ mémoire que les features intéressantes \( (\phi_1 (s_t), \hdots, \phi_7(s_t)) 
 
 Une fois la mémoire \( \mathcal{M} \) remplie avec \( B \) transitions, on calcule \( \delta_t \):
 \[
-\forall t_t = (s_t, a_t, r_t, s_{t+1}) \ in \mathcal{M},\quad
+\forall t_t = (s_t, a_t, r_t, s_{t+1}) \in \mathcal{M},\quad
 \delta(t_t) = \underbrace{r_t + \gamma \cdot V(s_{t+1})}_{target} -
-\underbrace{V(s_{t})}_{prédiction}
+\underbrace{V(s_{t})}_{prediction}
 \]
 Comme \( V \) estime l'espérance de gain, un agent bien entrainé doit annuler
 les différents \(delta_t\) (l'espérance prédite à l'instant t = la récompense
 à l'instant t + l'espérance prédite à l'instant t + 1).
 
-On définie alors une fonction de coup (loss function):
+On définit alors une fonction de coup (loss function):
 \[
 \mathcal{L} = \frac{1}{2B} \sum _{t_t \in \mathcal{M}} \delta(t_t)^2
 \]
