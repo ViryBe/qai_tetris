@@ -30,12 +30,14 @@
 \tableofcontents
 
 \section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
 
 \section*{Notations}
+\addcontentsline{toc}{section}{Notations}
 Seront not\'es dans tout l'ouvrage:
 \begin{itemize}
   \item \(n_t\) le nombre de tetrominos par jeu,
-  \item \(\mathcal{S}\) l'ensemble des \'etats,
+  \item \(\mathcal{S}\) l'ensemble des états,
   \item \(b_w, b_h\) la largeur et la hauteur totale du plateau.
 \end{itemize}
 Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10,000,
@@ -103,21 +105,21 @@ inférieure à 2).
   \caption{Liste des tertrominos}\label{fig:tetrolist}
 \end{figure}
 
-Un tetromino est plac\'e par le choix d'une colonne et d'une orientation.
+Un tetromino est placé par le choix d'une colonne et d'une orientation.
 
-\subsection{L'impl\'ementation}
+\subsection{L'implémentation}
 
 \subsubsection{Représentation}
 
 \paragraph{Tetrominos}
-Les tetrominos sont tableaux de longueur 4. L'unidimensionnalit\'e permet
-d'impl\'ementer les rotations comme des transformations d'indices, \'evitant la
-cr\'eation ou la modification de structures.
+Les tetrominos sont tableaux de longueur 4. L'unidimensionnalité permet
+d'implémenter les rotations comme des transformations d'indices, évitant la
+création ou la modification de structures.
 
 Les tetrominos sont tous de même dimension par souci d'homogénéite.
 
 \paragraph{Plateau \texttt{Board}}
-Le plateau est repr\'esent\'e par une matrice de dimension
+Le plateau est représenté par une matrice de dimension
 \(2\cdot n_t \times 6\) d'entiers dans laquelle on inscrit les tetrominos. Les
 manipulations du plateau se font en place.
 
@@ -158,7 +160,7 @@ consequent la quantite d'information que l'agent doit apprendre. Pour pallier
 cette redondance, chaque tetromino dispose de son propre ensemble de rotations
 applicables.
 
-\subsection{D\'eroulement d'une partie}
+\subsection{Déroulement d'une partie}
 Un tetromino choisi aleatoirement parmi les cinq disponibles est donne au
 joueur. Ce dernier doit alors choisir ou et comment le placer. Une fois ce
 choix effectue, le tetromino est place en respectant les contraintes du jeu. Le
@@ -180,8 +182,8 @@ la taille totale du plateau reste la même.
 
 \subsection{Drawbacks}
 \subsubsection{Fonction collide}
-L'implémentation actuelle oblige l'accessibilit\'e de la position finale depuis
-le haut du plateau car la pi\`ece ne peut pas \^etre gliss\'ee au dernier moment
+L'implémentation actuelle oblige l'accessibilité de la position finale depuis
+le haut du plateau car la pièce ne peut pas être glissée au dernier moment
 sous une autre.
 \subsubsection{Tetromino}
 Les tetrominos sont tous de même dimension par souci d'homogénéite et cela
@@ -272,7 +274,7 @@ evaluant evaluant l'impact du coup choisi sur l'environnement. L'agent utilise
 cette recompense et sa connaissance des etats resultants pour affiner
 l'esperance de recompense associee au coup qu'il vient de realiser.
 
-\subsubsection{Param\`etres}
+\subsubsection{Paramètres}
 L'apprentissage est paramétré par les trois variables,
 \begin{itemize}
   \item \(\alpha \in [0, 1]\) le taux d'apprentissage,
@@ -324,7 +326,7 @@ stabiliser les resultats obtenus.
 
 \section{Difficultés rencontrées}
 
-\subsection{Le fl\'eau de la mutabilit\'e}
+\subsection{Le fl\'eau de la mutabilité}
 L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
 considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
 actuelle du plateau, le principe est de copier la section de tableau incluant
@@ -408,8 +410,10 @@ sont decrites dans~\cite{boumaza13}.
     2013.
 \end{thebibliography}
 
-\section{R\'esultats du projet}
+\section{Réesultats du projet}
 
 \section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+
 
 \end{document}
