@@ -10,7 +10,7 @@
 \usepackage{algpseudocode}
 \usepackage{subfig}
 
-\usetikzlibrary{patterns}
+\usetikzlibrary{patterns,arrows,positioning}
 
 \setmainlanguage{french}
 
@@ -23,6 +23,30 @@
 \title{Ocaml---IA\\Tetris par Qlearning}
 \author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
 \date{\today}
+
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    punkt/.style={
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           text width=6.5em,
+           minimum height=2em,
+           text centered},
+    % Define arrow style
+    pildwn/.style={
+           <-,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    pilup/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+}
 
 
 \begin{document}
@@ -194,6 +218,57 @@ un choix d'action spécifique à chaque pièce (cf ~\ref{sec:volant}).
 \chapter{Q learning}
 
 \section{principe de l'apprentissage par renforcement et Q-learning}
+\subsection{L'apprentissage par renforcement, késako ?}
+
+L'apprentisage par renforcement est une méthode d'apprentisage automatique
+inspirée de la biologie. L'idée est un apprentisage à partir d'actions et
+de récompenses, à l'image d'un enfant qui met les doigts dans une prise, il
+risque d'apprendre et ne plus recommencer.
+
+Un agent est plongé dans un environnement (ici le jeu de Tetris) et effectue une
+action (pour nous un mouvement). L'agent reçoit alors une récompense (ou alors
+une punition) qui lui permet d'adapter son comportement et ainsi apprendre à
+évoluer dans l'environnement.
+
+\begin{figure}[h]
+    \begin{center}
+        \begin{tikzpicture}[node distance=1cm, auto,]
+         %nodes
+         \node[punkt] (env) {Environnement};
+         \node[punkt, inner sep=5pt,below=2cm of env]
+         (agent) {Agent}
+            edge[pilup,bend right=60] (env.east)
+            edge[pildwn,bend left=70] (env.west)
+            edge[pildwn,bend left=50] (env.west);
+        \node[left=of env,below=of env] (rew) {Récompense};
+        \node[left=of rew] {Nouvel état};
+        \node[right=of rew] {Action};
+        \end{tikzpicture}
+    \end{center}
+
+    \caption{Principe d'apprentissage par renforcement}
+    \label{}
+\end{figure}
+
+Le but de l'apprentissage va être de maximiser la somme des récompense sur une
+période donnée.
+
+Plus formellement, notons:
+\begin{itemize}
+    \item \( s_i \) un état à l'étape \( i \)
+    \item \( a_i \) une action jouée à l'étape \( i \)
+    \item \( r(s_i, a_i) \) la récompense immédiate après l'action \( a_i \)
+    \item \( \gamma \): cf sections suivantes % TODO: faire une reference
+\end{itemize}
+
+La récompense à long terme pour un ensemble
+\( s = (s_0, a_0, s_1, a_1, \hdots) \) est donc:
+\[
+R(s) = \sum_{i=0}^{+\infty}\gamma^i \cdot r(s_i, a_i)
+\]
+
+
+\subsection{Le Q-learning}
 
 
 
