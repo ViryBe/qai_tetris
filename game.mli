@@ -37,12 +37,8 @@ module Action : sig
   (** Number of actions *)
   val card : int
 
-  (** One to one, onto mapping from action to int *)
-  val to_int : t -> int
-
-  (** One to one, onto mapping from int to actions *)
-  val from_int : int -> t
-
+  (** Default action *)
+  val none : t
 end
 
 (** Manipulates tetrominos in the board *)
@@ -56,15 +52,11 @@ module Tetromino : sig
   (** Set of tetrominos *)
   val set : t list
 
-  (** Gives a one to one mapping from tetrominos to int *)
-  val to_int : t -> int
-  (** @return integer in \[0, 4\] *)
-
   (** Generates a random tetromino *)
   val make_rand : unit -> t
 
-  (** Outputs the list of available actions ids for the tetromino *)
-  val get_actids : t -> int list
+  (** Outputs the list of available actions for the tetromino *)
+  val get_actions : t -> Action.t list
 end
 
 (** Specifications of last coup on a board *)
@@ -81,6 +73,9 @@ module Playspec : sig
   (** Last tetromino played *)
   val tetromino : Board.t -> Tetromino.t
 end
+
+(** Reverts the board to its state before the last action *)
+val revert : Board.t -> unit
 
 (** Plays a turn and gives updated board *)
 val play : Board.t -> Tetromino.t -> Action.t -> unit

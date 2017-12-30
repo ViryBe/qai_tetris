@@ -3,7 +3,8 @@ module Board = struct
   type t = {
       board : int array array;
       mutable stacked_height : int ;
-      tot_height : int
+      mutable last_drop : int * int ;
+      tot_height : int ;
   }
 
   (** Width of the board *)
@@ -14,7 +15,8 @@ module Board = struct
     {
       board = Array.make_matrix h width 0 ;
       stacked_height = 0 ;
-      tot_height = h
+      last_drop = 0, 0 ;
+      tot_height = h ;
     }
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
@@ -76,8 +78,10 @@ module Board = struct
         end
     done
 
-  (** Update height (in place) *)
-  let update_height board new_height = board.stacked_height <- new_height
+  (** Update height and last drop(in place) *)
+  let update_metadata board new_height x y =
+    board.stacked_height <- new_height ;
+    board.last_drop <- x, y
 
   (** Writes board to a file *)
   let to_file fname b =
@@ -102,6 +106,9 @@ module Action = struct
 
   (** The type of an action *)
   type t = {rot : rotation; trans : int}
+
+  (** An default exported action *)
+  let none = { rot = North ; trans = 0 }
 
   (** Number of actions *)
   let card = 20
@@ -166,6 +173,9 @@ module Tetromino = struct
   (** Number of tetrominos *)
   let card = 5
 
+  (* Dimension of tetrominos *)
+  let dim = 2
+
   (** A list of all tetrominos *)
   let set = [ Square ; Lshaped ; Line ; Diag ; Dot ]
 
@@ -198,23 +208,20 @@ module Tetromino = struct
   let act_set_from_rot rot =
     let rec loop k =
       if k < 0 then []
-      else Action.to_int {Action.rot = rot ; Action.trans = k} :: loop (k-1)
+      else {Action.rot = rot ; Action.trans = k} :: loop (k-1)
     in
     loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
 
   (** Outputs actions ids of a tetromino *)
-  let compute_actids tetr =
+  let compute_actions tetr =
     let rots = List.assoc tetr available_rots in
     (tetr, List.fold_left (fun acc elt -> act_set_from_rot elt @ acc) [] rots)
 
-  (** Associative list mapping tetrominos to their actions ids *)
-  let t_to_actids = List.map compute_actids set
+  (** Associative list mapping tetromino to available actions *)
+  let t_to_actions = List.map compute_actions set
 
-  (** @return actions ids associated to tetromino *)
-  let get_actids tetr = List.assoc tetr t_to_actids
-
-  (** Converts tetromino to int *)
-  let to_int tetr = List.assoc tetr ids
+  (** @returns actions available for rot *)
+  let get_actions t = List.assoc t t_to_actions
 
   (** Generates a random tetromino *)
   let make_rand () =
@@ -246,8 +253,25 @@ let place_tetromino table tetromino rotation x y =
         board.(x - i).(y + j) <- tetrquarter
     done;
   done;
-  Board.update_height table (max (Board.assess_height board x y)
-                               (Board.height table))
+  Board.update_metadata table (max (Board.assess_height board x y)
+                               (Board.height table)) x y
+
+(* Undo last action with tetromino (only works if tetromino and action matces
+ * the last action *)
+let revert board tetromino action =
+  let table = Board.get_board board
+  and x, y = board.last_drop
+  and rotation = Action.get_rotation action in
+  for i = 0 to Tetromino.dim - 1 do
+    for j = 0 to Tetromino.dim - 1 do
+      let tetrarr = Tetromino.to_onedarr tetromino in
+      let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
+      if tetrquarter > 0
+      then table.(x - i).(y + j) <- 0
+    done ;
+  done ;
+  Board.update_metadata board (min (Board.assess_height table x y)
+                                 (Board.height board)) (-1) (-1)
 
 let play board tetromino action =
   let x = ref (Board.height board + 2) in (* +1 to add the new tetromino *)

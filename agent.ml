@@ -39,6 +39,9 @@ let nb_full_top  row_0 row_1 =
  * seven times each turn. Incremental updates are thereford advised, using data
  * passed through calls *)
 module Features = struct
+  (* Type of a feature *)
+  type t = float array
+
   (* Data used by the features *)
   type data = {
     wells: int * int list; (* y coordinate and depth of wells *)
@@ -134,9 +137,7 @@ module Features = struct
   let card = Array.length arr
 
   (* Compute all features and returns updated data *)
-  let compute pf d b =
-    let newdata = data_update d b in
-    (Array.mapi (fun i f -> f pf.(i) newdata b) arr, newdata)
+  let compute (board : Game.Board.t) = [| 0. |]
 end
 
 (** transition between 2 states *)
@@ -161,9 +162,11 @@ let make () =
   Array.iteri (fun i _ -> w.(i) <- Random.float 2. -.1.) w ;
   w
 
-
 (** gives V(\phi(board)) *)
 let v_from_feat w feat = Auxfct.dot feat w
+
+(* V x, here the linear form <w|x> *)
+let valuation w x = Auxfct.dot w x
 
 (** compute delta for a given transition t *)
 let delta w t gamma =
@@ -207,7 +210,28 @@ let r backboard board =
 (* besoin d'une fonction de signature:
    val simulation : Board -> Tetromino -> Rotation -> transition
 qui ne modifie pas en place le plateau*)
-let choose_action epsilon gamma idactions = Game.Action.from_int 0, 0
+let choose_action weight epsilon board tetr actions =
+  let rec loop acts (bestrans : Game.Action.t * float * Features.t) =
+    match acts with
+    | [] -> bestrans
+    | hd :: tl ->
+        Game.play board tetr hd ;
+        let feat_t1 = Features.compute board in
+        let _, prevbest, _ = bestrans in
+        let rewexp = valuation weight feat_t1 in
+        let trans =
+          if rewexp > prevbest
+          then hd, rewexp, feat_t1
+          else bestrans
+        in
+        Game.revert board ;
+        loop tl trans
+  in
+  if Random.float 1. > epsilon
+  then List.nth actions (Random.int (List.length actions))
+  else
+    let act, _, _ = loop actions (Game.Action.none, 0., [| 0. |]) in
+    act
 
 (* Has to be verified, regarding new data, old data et caetera *)
 let update weights epsilon gamma eta ntetr batch_size =
@@ -219,8 +243,8 @@ let update weights epsilon gamma eta ntetr batch_size =
     (* fill the memory with some transitions *)
     for i = 0 to batch_size - 1 do
       let tetromino = Game.Tetromino.make_rand () in
-      let idactions = Game.Tetromino.get_actids tetromino in
-      let action, act_ind = choose_action epsilon gamma idactions in
+      let actions = Game.Tetromino.get_actions tetromino in
+      let action = choose_action weights epsilon board tetromino actions in
       let prevfeatures, feat_data =
         Features.compute prevfeatures feat_data board ps in
       (* From here, prev for previous is for var not impacted by Game.play *)
