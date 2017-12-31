@@ -244,7 +244,7 @@ module Board = struct
       Printf.fprintf fd "\n"
     done ;
     close_out fd
-      
+
   (* Checks whether the tetromino collides with environment at x y with
    * action *)
   let collide board x y tetromino rotation =
