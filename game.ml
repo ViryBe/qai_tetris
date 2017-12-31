@@ -23,6 +23,8 @@ module Action = struct
 
   let get_rotation action = action.rot
 
+  let get_translation action = action.trans
+
   let rot_from_int k =
     if k = 0 then North else if k = 1 then South else if k = 2 then East else
     if k = 3 then West else failwith "invalid rotation integer"
@@ -140,11 +142,11 @@ module Board = struct
     blits : int list ; (** Positions of blits if any *)
     tetromino : Tetromino.t ; (** The tetromino dropped *)
     action : Action.t ; (** The position of the tetromino *)
-    drop : int * int ; (** Coordinates of the dropped tetromino *)
+    drop : int ; (** Height of dropped tetromino *)
   }
 
   let empty_turn = { blits = [] ; tetromino = Tetromino.Square ;
-                     action = Action.none ; drop = (-1), (-1) }
+                     action = Action.none ; drop = (-1) }
 
   (** The tetris board *)
   type t = {
@@ -249,8 +251,8 @@ module Board = struct
    * action *)
   let collide board x y tetromino rotation =
     let n = ref false in
-    for i = 0 to 1 do
-      for j = 0 to 1 do
+    for i = 0 to Tetromino.dim - 1 do
+      for j = 0 to Tetromino.dim - 1 do
         let tetrarr = Tetromino.to_onedarr tetromino
         and ind_afterot = Action.make_rotation rotation i j in
         n := !n ||
@@ -263,8 +265,8 @@ module Board = struct
   (** Places tetromino rotated at x y on board table *)
   let place_tetromino board tetromino action x y =
     let rotation = Action.get_rotation action in
-    for i = 0 to 1 do
-      for j = 0 to 1 do
+    for i = 0 to Tetromino.dim - 1 do
+      for j = 0 to Tetromino.dim - 1 do
         let tetrarr = Tetromino.to_onedarr tetromino in
         let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
         if tetrquarter > 0 then
@@ -273,7 +275,7 @@ module Board = struct
     done;
     (* Update metadata *)
     let lastplay = List.hd board.game_mem in
-    board.game_mem <- { lastplay with drop = x, y ;
+    board.game_mem <- { lastplay with drop = x ;
                                       tetromino = tetromino ;
                                       action = action ;
                       } :: (List.tl board.game_mem) ;
@@ -284,7 +286,8 @@ module Board = struct
    * the last action *)
   let revert board =
     let lastplay = List.hd board.game_mem in
-    let x, y = lastplay.drop
+    let x = lastplay.drop
+    and y = Action.get_translation lastplay.action
     and rotation = Action.get_rotation lastplay.action in
     for i = 0 to Tetromino.dim - 1 do
       for j = 0 to Tetromino.dim - 1 do
