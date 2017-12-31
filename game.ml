@@ -143,6 +143,9 @@ module Board = struct
     drop : int * int ; (** Coordinates of the dropped tetromino *)
   }
 
+  let empty_turn = { blits = [] ; tetromino = Tetromino.Square ;
+                     action = Action.none ; drop = (-1), (-1) }
+
   (** The tetris board *)
   type t = {
       table : int array array; (** The table on which are placed the tetro *)
@@ -162,6 +165,9 @@ module Board = struct
       game_mem = [] ;
       tot_height = h ;
     }
+
+  (** Creates an entry to be filled for a new turn *)
+  let init_turn b = b.game_mem <- empty_turn :: b.game_mem
 
   (** Gives the height of the given board, i.e. number of stages stacked *)
   let height b = b.stacked_height
@@ -215,7 +221,12 @@ module Board = struct
           Array.blit b.table (line+1) b.table line len;
           (* Reset upper copied line to avoid dependencies *)
           b.table.(line + len) <- Array.make width 0 ;
-          b.stacked_height <- b.stacked_height - 1
+          b.stacked_height <- b.stacked_height - 1 ;
+          (* Complete metadata *)
+          let lastplay = List.hd b.game_mem in
+          b.game_mem <-
+            { lastplay with blits = line :: lastplay.blits } ::
+            (List.tl b.game_mem)
         end
     done
 
@@ -234,7 +245,8 @@ module Board = struct
     done ;
     close_out fd
       
-  (* Try to place the tetromino at the lowest position *)
+  (* Checks whether the tetromino collides with environment at x y with
+   * action *)
   let collide board x y tetromino rotation =
     let n = ref false in
     for i = 0 to 1 do
@@ -249,7 +261,8 @@ module Board = struct
     !n
 
   (** Places tetromino rotated at x y on board table *)
-  let place_tetromino board tetromino rotation x y =
+  let place_tetromino board tetromino action x y =
+    let rotation = Action.get_rotation action in
     for i = 0 to 1 do
       for j = 0 to 1 do
         let tetrarr = Tetromino.to_onedarr tetromino in
@@ -258,6 +271,12 @@ module Board = struct
           board.table.(x - i).(y + j) <- tetrquarter
       done;
     done;
+    (* Update metadata *)
+    let lastplay = List.hd board.game_mem in
+    board.game_mem <- { lastplay with drop = x, y ;
+                                      tetromino = tetromino ;
+                                      action = action ;
+                      } :: (List.tl board.game_mem) ;
     update_metadata board (max (assess_height board.table x y)
                                    (board.stacked_height)) x y
 
@@ -280,6 +299,8 @@ module Board = struct
 end
 
 let play board tetromino action =
+  (* Create new turn spec entry *)
+  Board.init_turn board ;
   let x = ref (Board.height board + 2) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
   while !x > 0 && not (Board.collide board !x y tetromino
@@ -287,5 +308,5 @@ let play board tetromino action =
     x := !x - 1;
   done;
   x := !x + 1 ;
-  Board.place_tetromino board tetromino (Action.get_rotation action) !x y ;
+  Board.place_tetromino board tetromino action !x y ;
   Board.update_board board !x
