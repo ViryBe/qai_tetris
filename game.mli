@@ -1,33 +1,5 @@
 (** Implements a tetris game *)
 
-(** Module using the overall board *)
-module Board : sig
-  (** The tetris board *)
-  type t
-
-  (** Creates an empty board of a given height *)
-  val make : int -> t
-
-  (** Gives the height of the given board, i.e. number of stages stacked *)
-  val height : t -> int
-
-  (** Width of the considered board *)
-  val width : int
-
-  (** Creates a representation of the board *)
-  val to_arr : int -> int -> t -> int array array
-  (** [to_arr l u b] outputs a matrix representing the board
-      [b] from line [l] to line [u] (included) where each element is
-      one if the square is occupied by a tetromino else zero *)
-
-  (** Prints board to stdout from [low] to [up] if precised *)
-  val print : ?low:int -> ?up:int -> t -> unit
-
-  (** Saves representation of board to a file *)
-  val to_file : string -> t -> unit
-  (** [to_file fname b] saves board [b] to file [fname] *)
-end
-
 (** An action executed by the player *)
 module Action : sig
 
@@ -59,23 +31,36 @@ module Tetromino : sig
   val get_actions : t -> Action.t list
 end
 
-(** Specifications of last coup on a board *)
-module Playspec : sig
-  (** Details of a coup *)
+(** Module using the overall board *)
+module Board : sig
+  (** The tetris board *)
   type t
 
-  (** Coordinates of last positioned tetromino *)
-  val pos : Board.t -> int * int
+  (** Creates an empty board of a given height *)
+  val make : int -> t
 
-  (** Number of blits and position of blits *)
-  val blits : Board.t -> int * int list
+  (** Gives the height of the given board, i.e. number of stages stacked *)
+  val height : t -> int
 
-  (** Last tetromino played *)
-  val tetromino : Board.t -> Tetromino.t
+  (** Width of the considered board *)
+  val width : int
+
+  (** Creates a representation of the board *)
+  val to_arr : int -> int -> t -> int array array
+  (** [to_arr l u b] outputs a matrix representing the board
+      [b] from line [l] to line [u] (included) where each element is
+      one if the square is occupied by a tetromino else zero *)
+
+  (** Prints board to stdout from [low] to [up] if precised *)
+  val print : ?low:int -> ?up:int -> t -> unit
+
+  (** Saves representation of board to a file *)
+  val to_file : string -> t -> unit
+  (** [to_file fname b] saves board [b] to file [fname] *)
+
+  (** Reverts the board to its state before the last action *)
+  val revert : t -> unit
 end
-
-(** Reverts the board to its state before the last action *)
-val revert : Board.t -> unit
 
 (** Plays a turn and gives updated board *)
 val play : Board.t -> Tetromino.t -> Action.t -> unit

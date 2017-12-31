@@ -1,99 +1,4 @@
-module Board = struct
-  (** The tetris board *)
-  type t = {
-      board : int array array;
-      mutable stacked_height : int ;
-      mutable last_drop : int * int ;
-      tot_height : int ;
-  }
-
-  (** Width of the board *)
-  let width = 6
-
-  (** Creates an empty board *)
-  let make h =
-    {
-      board = Array.make_matrix h width 0 ;
-      stacked_height = 0 ;
-      last_drop = 0, 0 ;
-      tot_height = h ;
-    }
-
-  (** Gives the height of the given board, i.e. number of stages stacked *)
-  let height b = b.stacked_height
-
-  (** Creates a representation of the board *)
-  let to_arr low high board =
-    let rec loop k =
-      if k > high then [| [| |] |] else
-        Array.append [| board.board.(k) |] (loop (k+1))
-    in
-    loop low
-
-  (** Get the board, should be consistent with mutable policy *)
-  let get_board b = b.board
-
-  (** Checks whether line is full *)
-  let is_full board x =
-    Array.fold_left ( && ) true (Array.map (fun elt -> elt <> 0) board.(x))
-
-  (** Returns height of board after placing a tetromino at (x, y) *)
-  let assess_height board x y =
-    if board.(x).(y) <> 0 || board.(x).(y+1) <> 0 then x else x-1
-
-  (** Prints board to stdout *)
-  let print ?low ?up board =
-    Printf.printf "  ------\n" ;
-    let lb =
-      match low with
-      | None -> 0
-      | Some k -> k
-    and ub =
-      match up with
-      | None -> board.stacked_height
-      | Some k -> k
-    in
-    for i = ub downto max 0 lb do
-      Printf.printf "%d:" i ;
-      for j = 0 to width - 1 do
-        Printf.printf "%s" (if board.board.(i).(j) <> 0 then "*" else " ")
-      done ;
-      print_newline ()
-    done ;
-    Printf.printf "  ------" ;
-    print_newline ()
-
-  (** Removes full lines *)
-  let update_board b x =
-    for i = 0 to 1 do
-      let line = max 0 (x - i) in
-      if is_full b.board line then
-        (* We must be sure to have a line of false in the blitted area *)
-        let len = height b - line + 1 in
-        begin
-          Array.blit b.board (line+1) b.board line len;
-          (* Reset upper copied line to avoid dependencies *)
-          b.board.(line + len) <- Array.make width 0 ;
-          b.stacked_height <- b.stacked_height - 1
-        end
-    done
-
-  (** Update height and last drop(in place) *)
-  let update_metadata board new_height x y =
-    board.stacked_height <- new_height ;
-    board.last_drop <- x, y
-
-  (** Writes board to a file *)
-  let to_file fname b =
-    let fd = open_out fname in
-    for i = b.stacked_height downto 0 do
-      for j = 0 to width - 1 do
-        Printf.fprintf fd "%s" (if b.board.(i).(j) <> 0 then "*" else " ")
-      done ;
-      Printf.fprintf fd "\n"
-    done ;
-    close_out fd
-end
+let board_width = 6
 
 module Action = struct
 
@@ -210,7 +115,7 @@ module Tetromino = struct
       if k < 0 then []
       else {Action.rot = rot ; Action.trans = k} :: loop (k-1)
     in
-    loop (Board.width - 2) (* 2 because a tetromino has a width of 2 *)
+    loop (board_width - 2) (* 2 because a tetromino has a width of 2 *)
 
   (** Outputs actions ids of a tetromino *)
   let compute_actions tetr =
@@ -229,57 +134,158 @@ module Tetromino = struct
     List.nth set n
 end
 
-let collide table x y tetromino rotation =
-  let n = ref(false) in
-  for i = 0 to 1 do
-    for j = 0 to 1 do
-      let tetrarr = Tetromino.to_onedarr tetromino
-      and ind_afterot = Action.make_rotation rotation i j in
-      n := !n ||
-           tetrarr.(ind_afterot) > 0 &&
-           (Board.get_board table).(x-i).(y+j) <> 0;
-    done;
-  done;
-  !n
+module Board = struct
+  (** Details of turn *)
+  type ts = {
+    blits : int list ; (** Positions of blits if any *)
+    tetromino : Tetromino.t ; (** The tetromino dropped *)
+    action : Action.t ; (** The position of the tetromino *)
+    drop : int * int ; (** Coordinates of the dropped tetromino *)
+  }
 
-(** Places tetromino rotated at x y on board table *)
-let place_tetromino table tetromino rotation x y =
-  let board = Board.get_board table in (* Still modifies table.board *)
-  for i = 0 to 1 do
-    for j = 0 to 1 do
-      let tetrarr = Tetromino.to_onedarr tetromino in
-      let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
-      if tetrquarter > 0 then
-        board.(x - i).(y + j) <- tetrquarter
-    done;
-  done;
-  Board.update_metadata table (max (Board.assess_height board x y)
-                               (Board.height table)) x y
+  (** The tetris board *)
+  type t = {
+      table : int array array; (** The table on which are placed the tetro *)
+      mutable stacked_height : int ; (** The current height of the table *)
+      mutable game_mem : ts list ; (** Memory of what happened so far *)
+      tot_height : int ; (** The available height of the board *)
+  }
 
-(* Undo last action with tetromino (only works if tetromino and action matces
- * the last action *)
-let revert board tetromino action =
-  let table = Board.get_board board
-  and x, y = board.last_drop
-  and rotation = Action.get_rotation action in
-  for i = 0 to Tetromino.dim - 1 do
-    for j = 0 to Tetromino.dim - 1 do
-      let tetrarr = Tetromino.to_onedarr tetromino in
-      let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
-      if tetrquarter > 0
-      then table.(x - i).(y + j) <- 0
+  (** Width of the board *)
+  let width = board_width
+
+  (** Creates an empty board *)
+  let make h =
+    {
+      table = Array.make_matrix h width 0 ;
+      stacked_height = 0 ;
+      game_mem = [] ;
+      tot_height = h ;
+    }
+
+  (** Gives the height of the given board, i.e. number of stages stacked *)
+  let height b = b.stacked_height
+
+  (** Creates a representation of the board *)
+  let to_arr low high board =
+    let rec loop k =
+      if k > high then [| [| |] |] else
+        Array.append [| board.table.(k) |] (loop (k+1))
+    in
+    loop low
+
+  (** Checks whether line is full *)
+  let is_full board x =
+    Array.fold_left ( && ) true (Array.map (fun elt -> elt <> 0) board.(x))
+
+  (** Returns height of board after placing a tetromino at (x, y) *)
+  let assess_height board x y =
+    if board.(x).(y) <> 0 || board.(x).(y+1) <> 0 then x else x-1
+
+  (** Prints board to stdout *)
+  let print ?low ?up board =
+    Printf.printf "  ------\n" ;
+    let lb =
+      match low with
+      | None -> 0
+      | Some k -> k
+    and ub =
+      match up with
+      | None -> board.stacked_height
+      | Some k -> k
+    in
+    for i = ub downto max 0 lb do
+      Printf.printf "%d:" i ;
+      for j = 0 to width - 1 do
+        Printf.printf "%s" (if board.table.(i).(j) <> 0 then "*" else " ")
+      done ;
+      print_newline ()
     done ;
-  done ;
-  Board.update_metadata board (min (Board.assess_height table x y)
-                                 (Board.height board)) (-1) (-1)
+    Printf.printf "  ------" ;
+    print_newline ()
+
+  (** Removes full lines *)
+  let update_board b x =
+    for i = 0 to 1 do
+      let line = max 0 (x - i) in
+      if is_full b.table line then
+        (* We must be sure to have a line of false in the blitted area *)
+        let len = height b - line + 1 in
+        begin
+          Array.blit b.table (line+1) b.table line len;
+          (* Reset upper copied line to avoid dependencies *)
+          b.table.(line + len) <- Array.make width 0 ;
+          b.stacked_height <- b.stacked_height - 1
+        end
+    done
+
+  (** Update height and last drop(in place) *)
+  let update_metadata board new_height x y =
+    board.stacked_height <- new_height
+
+  (** Writes board to a file *)
+  let to_file fname b =
+    let fd = open_out fname in
+    for i = b.stacked_height downto 0 do
+      for j = 0 to width - 1 do
+        Printf.fprintf fd "%s" (if b.table.(i).(j) <> 0 then "*" else " ")
+      done ;
+      Printf.fprintf fd "\n"
+    done ;
+    close_out fd
+      
+  (* Try to place the tetromino at the lowest position *)
+  let collide board x y tetromino rotation =
+    let n = ref false in
+    for i = 0 to 1 do
+      for j = 0 to 1 do
+        let tetrarr = Tetromino.to_onedarr tetromino
+        and ind_afterot = Action.make_rotation rotation i j in
+        n := !n ||
+             tetrarr.(ind_afterot) > 0 &&
+             board.table.(x-i).(y+j) <> 0;
+      done;
+    done;
+    !n
+
+  (** Places tetromino rotated at x y on board table *)
+  let place_tetromino board tetromino rotation x y =
+    for i = 0 to 1 do
+      for j = 0 to 1 do
+        let tetrarr = Tetromino.to_onedarr tetromino in
+        let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
+        if tetrquarter > 0 then
+          board.table.(x - i).(y + j) <- tetrquarter
+      done;
+    done;
+    update_metadata board (max (assess_height board.table x y)
+                                   (board.stacked_height)) x y
+
+  (* Undo last action with tetromino (only works if tetromino and action matces
+   * the last action *)
+  let revert board =
+    let lastplay = List.hd board.game_mem in
+    let x, y = lastplay.drop
+    and rotation = Action.get_rotation lastplay.action in
+    for i = 0 to Tetromino.dim - 1 do
+      for j = 0 to Tetromino.dim - 1 do
+        let tetrarr = Tetromino.to_onedarr lastplay.tetromino in
+        let tetrquarter = tetrarr.(Action.make_rotation rotation i j) in
+        if tetrquarter > 0
+        then board.table.(x - i).(y + j) <- 0
+      done ;
+    done ;
+    update_metadata board (min (assess_height board.table x y)
+                                   (height board)) (-1) (-1)
+end
 
 let play board tetromino action =
   let x = ref (Board.height board + 2) in (* +1 to add the new tetromino *)
   let y = Action.int_from_translation action in
-  while !x > 0 && not (collide board !x y tetromino
+  while !x > 0 && not (Board.collide board !x y tetromino
                          (Action.get_rotation action)) do
     x := !x - 1;
   done;
   x := !x + 1 ;
-  place_tetromino board tetromino (Action.get_rotation action) !x y ;
+  Board.place_tetromino board tetromino (Action.get_rotation action) !x y ;
   Board.update_board board !x
