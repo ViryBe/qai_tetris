@@ -244,12 +244,9 @@ une punition) qui lui permet d'adapter son comportement et ainsi apprendre à
          \node[punkt] (env) {Environnement};
          \node[punkt, inner sep=5pt,below=2cm of env]
          (agent) {Agent}
-            edge[pilup,bend right=60] (env.east)
-            edge[pildwn,bend left=70] (env.west)
-            edge[pildwn,bend left=50] (env.west);
-        \node[left=of env,below=of env] (rew) {Récompense};
-        \node[left=of rew] {Nouvel état};
-        \node[right=of rew] {Action};
+         edge[pilup,bend right=60] node[right] {Action} (env.east)
+         edge[pildwn,bend left=70] node[left] {Nouvel état} (env.west)
+         edge[pildwn,bend left=50] node[right] {Récompense} (env.west);
         \end{tikzpicture}
     \end{center}
 
