@@ -1,6 +1,6 @@
 %
 %  TODO:
-%  - RELIRE POUR LES FOTTES ET ACCENTS
+%  - RELIRE POUR LES FOTTES ET ACCENTS accents faits, fottes a peu préfet
 %  - le Q learning
 %  -
 %
@@ -224,13 +224,13 @@ un choix d'action spécifique à chaque pièce (cf~\ref{sec:hollandais_volant}).
 
 \chapter{Q learning}
 
-\section{principe de l'apprentissage par renforcement et Q-learning}
+\section{Principe de l'apprentissage par renforcement et Q-learning}
 \subsection{L'apprentissage par renforcement}
 
 L'apprentissage par renforcement est une méthode d'apprentissage automatique
 inspirée de la biologie. L'idée est un apprentissage à partir d'actions et
-de récompenses, à l'image d'un enfant qui met les doigts dans une prise, il
-risque d'apprendre et ne plus recommencer.
+de récompenses, permettant \'a l'entité évoluant d'adapter son comportement aux
+conséquences de ses actions.
 
 Un agent est plongé dans un environnement (ici le jeu de Tetris) et effectue une
 action (pour nous un mouvement). L'agent reçoit alors une récompense (ou alors
@@ -482,14 +482,15 @@ transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
 Pour ne pas sauvegarder plusieurs fois le plateau de jeu \(s_t\), on ne met en
 mémoire que les features intéressantes \( (\phi_1 (s_t), \hdots, \phi_7(s_t)) \).
 
-Une fois la mémoire \( \mathcal{M} \) remplie avec \( B \) transitions, on calcule \( \delta_t \):
+Une fois la mémoire \( \mathcal{M} \) remplie avec \( B \) transitions, on
+calcule \(\delta_t\):
 \[
 \forall t_t = (s_t, a_t, r_t, s_{t+1}) \in \mathcal{M},\quad
 \delta(t_t) = \underbrace{r_t + \gamma \cdot V(s_{t+1})}_{target} -
 \underbrace{V(s_{t})}_{prediction}
 \]
 Comme \( V \) estime l'espérance de gain, un agent bien entrainé doit annuler
-les différents \(delta_t\) (l'espérance prédite à l'instant t = la récompense
+les différents \(\delta_t\) (l'espérance prédite à l'instant t = la récompense
 à l'instant t + l'espérance prédite à l'instant t + 1).
 
 On définit alors une fonction de coût (loss function):
