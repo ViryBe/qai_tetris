@@ -136,20 +136,21 @@ module Features = struct
   (** Number of features considered *)
   let card = Array.length arr
 
-  (* Compute all features and returns updated data *)
-  let compute (board : Game.Board.t) = [| 0. |]
+  (* Compute all features in place *)
+  let update (curfeat : t) (board : Game.Board.t) = ()
 end
 
 (** transition between 2 states *)
 type transition = {
-  s_t : float array;
-  a_t : int;
-  r_t : float;
+  s_t : float array ;
+  a_t : Game.Action.t ;
+  r_t : float ;
   s_t1: float array
 }
 
 (* TODO: find a more elegent solution *)
-let empty_trans = { s_t = [||]; a_t =0; r_t =0.; s_t1=[||]}
+let empty_trans = { s_t = [| |] ; a_t = Game.Action.none ;
+                    r_t = 0. ; s_t1= [| |] }
 
 
 (* ================================ *)
@@ -196,7 +197,7 @@ let update_weights weights grad eta =
 (*  ===============================  *)
 
 (** Reward function *)
-(* TODO: in aux function ? *)
+(* TODO in aux function ? *)
 let r backboard board =
   let x = Game.Board.height board - Game.Board.height backboard in
   if x >= 2 then -200.
@@ -205,18 +206,15 @@ let r backboard board =
   else 100. *. (float (abs x))
 
 
-(** how to chosse the next action *)
-(* TODO *)
-(* besoin d'une fonction de signature:
-   val simulation : Board -> Tetromino -> Rotation -> transition
-qui ne modifie pas en place le plateau*)
-let choose_action weight epsilon board tetr actions =
+(** how to choose the next action *)
+let choose_action weight curfeat epsilon board tetr actions =
   let rec loop acts (bestrans : Game.Action.t * float * Features.t) =
     match acts with
     | [] -> bestrans
     | hd :: tl ->
         Game.play board tetr hd ;
-        let feat_t1 = Features.compute board in
+        let feat_t1 = Array.copy curfeat in
+        Features.update feat_t1 board ;
         let _, prevbest, _ = bestrans in
         let rewexp = valuation weight feat_t1 in
         let trans =
@@ -224,7 +222,7 @@ let choose_action weight epsilon board tetr actions =
           then hd, rewexp, feat_t1
           else bestrans
         in
-        Game.revert board ;
+        Game.Board.revert board ;
         loop tl trans
   in
   if Random.float 1. > epsilon
@@ -238,24 +236,25 @@ let update weights epsilon gamma eta ntetr batch_size =
   let memory = Array.make batch_size empty_trans
   and board = Game.Board.make (2 * ntetr)
   and prevboard = Game.Board.make (2 * ntetr)
+  and features = Array.make Features.card 0.
+  and prevfeatures = Array.make Features.card 0.
   in
   for i = 0 to ntetr - 1 do
     (* fill the memory with some transitions *)
     for i = 0 to batch_size - 1 do
       let tetromino = Game.Tetromino.make_rand () in
       let actions = Game.Tetromino.get_actions tetromino in
-      let action = choose_action weights epsilon board tetromino actions in
-      let prevfeatures, feat_data =
-        Features.compute prevfeatures feat_data board ps in
+      let action = choose_action weights features epsilon board tetromino
+          actions in
       (* From here, prev for previous is for var not impacted by Game.play *)
       Game.play board tetromino action;
-      let features, feat_data =
-        Features.compute prevfeatures feat_data board ps in
+      Features.update features board ;
       memory.(i) <- { s_t = prevfeatures;
-                      a_t = act_ind;
+                      a_t = action;
                       r_t = r prevboard board;
                       s_t1= features} ;
       (* Update everything *)
+      Array.iteri (fun i elt -> prevfeatures.(i) <- elt) features ;
       Game.play prevboard tetromino action ;
     done; (* memory is full *)
     let grad = grad_L weights memory gamma in
