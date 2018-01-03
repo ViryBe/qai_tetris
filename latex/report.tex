@@ -551,6 +551,28 @@ accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
 initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
 rotations \texttt{South} et \texttt{West}.
 
+\section{Le foncteur n'est pas pass\'e}
+Ayant deux moyens pour r\'esoudre le tetris, il semble pertinent de
+g\'en\'eraliser le code afin de faire en sorte que toute impl\'ementation
+d'agent soit facilement d\'eveloppable et int\'egrable au reste du projet. Pour
+cela un foncteur est indiqu\'e: ce foncteur \texttt{Agent.Make} prendrait en
+param\`etre un module d'impl\'ementation d'agent, contenant une fonction
+permettant de choisir une action, un fonction de mise \`a jour de l'agent, un
+type d\'esignant la donn\'ee avec laquelle travaille l'agent (e.g.\ matrice de
+flottants pour le Q learning et tableau de poids flottants pour la fonction de
+valuation). Le r\'esultat de l'application de ce foncteur est un module ayant
+une fonction \texttt{train} entra\^inant en place l'agent, une fonction
+\texttt{play} pour jouer un jeu de tetris et une fonction make pour cr\'eer un
+agent inital.
+
+La g\'en\'eralisation du code s'est malheureusement r\'ev\'el\'ee plus
+d\'elicate que pr\'evu. D'une part les deux m\'ethodes impl\'ement\'ees
+contenaient des diff\'erences, notamment sur le nombre de param\`etres, ou
+l'utilisation d'une m\'emoire, d'autre part adapter le code \`a ces deux
+impl\'ementations finissait plus \`a resembler \`a du bricolage plut\^ot qu'\`a
+de la g\'en\'eralisation. Et de plus cela avait tendance \'a pervertir le code
+d\'evelopp\'e pour la fonction de valuation, le poussant \`a coller \'a la
+signature d'un argument de foncteur qui est peut-\^etre mal designed.
 \chapter{Réesultats du projet}
 
 \chapter*{Conclusion}
