@@ -391,7 +391,7 @@ stabiliser les resultats obtenus.
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \begin{axis}[only marks, mark size = 0.1,
+    \begin{axis}[line width=0.05, mark size = 0.1,
         legend entries={0,.0003,.0006,.0009}
       ]
       \foreach \i in {0,1,...,3}{%
@@ -402,13 +402,11 @@ stabiliser les resultats obtenus.
   \caption{Exploitation ou exploration?}
 \end{figure}
 
-% TODO: faire un graphe avec epsilon qui varie (ex: 0.5 puis 0.01) ?
-
 \paragraph{Valeurs}
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \begin{axis}[only marks, mark size = 0.1,
+    \begin{axis}[line width=0.05, mark size = 0.1,
         legend entries={0.80,0.84,0.88,0.92,0.96,1.00}
       ]
       \foreach \i in {0,1,...,5}{%
