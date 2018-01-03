@@ -219,7 +219,7 @@ sous une autre.
 \subsection{Tetromino}
 Les tetrominos sont tous de même dimension par souci d'homogénéité et cela
 peut entrainer un problème de ``tetromino flottant''. Ce problème est traité par
-un choix d'action spécifique à chaque pièce (cf ~\ref{sec:volant}).
+un choix d'action spécifique à chaque pièce (cf~\ref{sec:hollandais_volant}).
 
 
 \chapter{Q learning}
@@ -431,15 +431,15 @@ des plateaux possibles. \( s \in \mathcal{S} \) est un plateau particulier.
 Pour s'affranchir de la limite de mémoire due au nombre d'états possibles, la
 matrice est remplacée par une fonction objectif \( V \) tel que:
 \[
-\forall s \in \mathcal{S}, \qquad V(s) =
-\mathbb{E}(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t)
+  \forall s \in \mathcal{S}, \qquad V(s) =
+  \mathbb{E}\left(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t\right)
 \]
 qui estime l'espérance de gain à partir d'un plateau donné.
 L'apprentissage consiste donc maintenant à la maximisation de la
 fonction \( V \).
 On suppose \( V \) linéaire \(V \colon \R^n \to \R\). Cette fonction est alors
 déterminée par un ensemble de poids \(w = (w_0\, w_1\, \dots\, w_n)^\top\)
-qu'il va falloir 'entrainer'.
+qu'il va falloir ``entrainer''.
 
 En notant \( s_t \) un plateau de jeu à un instant \( t \), et
 \(\phi_i\colon \mathcal{S} \to \R\) des caractéristiques du plateau
@@ -549,7 +549,7 @@ tetrominos, faisant augmenter la hauteur.
 Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
 recréée à chaque blit.
 
-\section{Le hollandais volant}\label{volant}
+\section{Hollandais volant}\label{sec:hollandais_volant}
 La fonction collide permet de tester la collision du tetromino avec les autres
 pièces et le fond du plateau. Lors de l'exécution de la fonction \texttt{play}
 on testait donc toutes les positions possibles pour déposer les pièces de
