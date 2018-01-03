@@ -72,9 +72,9 @@ Seront notées dans la suite du rapport:
   \item \(b_w, b_h\) la largeur et la hauteur totale du plateau.
 \end{itemize}
 Sauf mention explicite, les applications utiliseront les valeurs \(n_t=10000,
-b_w = 6\). Seront distingu\'ees la hauteur totale \(b_h\) et la hauteur relative
+b_w = 6\). Seront distinguées la hauteur totale \(b_h\) et la hauteur relative
 à un instant de jeu \(h\) du plateau, la première correspond à la hauteur
-théorique maximale atteignable quand la deuxieme concerne la hauteur
+théorique maximale atteignable quand la deuxième concerne la hauteur
 effectivement atteinte à un instant de jeu, i.e.\ le nombre de lignes non vides
 sur le plateau.
 
@@ -85,11 +85,11 @@ Tetris met le joueur au défi de réaliser des lignes complètes en déplaçant 
 pièces de formes différentes, les tétrominos, qui défilent depuis le haut
 jusqu'au bas de l'écran. Les lignes complétées disparaissent tout en rapportant
 des points et le joueur peut de nouveau remplir les cases libérées. Le jeu
-n'a pas de fin: le joueur perd la partie lorsqu'un tétrimino reste bloqué en
+n'a pas de fin: le joueur perd la partie lorsqu'un tétromino reste bloqué en
 haut.
 
 Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
-termine apres avoir fourni 10000 tetrominos à placer. De plus notre
+termine après avoir fourni 10000 tetrominos à placer. De plus notre
 tetris diffère par une grille plus étroite (6 colonnes disponibles), moins de
 tetrominos différents (seulement 5) et des tetrominos plus petits (taille
 inférieure à 2).
@@ -147,7 +147,7 @@ Les tetrominos sont tableaux de longueur 4. L'unidimensionnalité permet
 d'implémenter les rotations comme des transformations d'indices, évitant la
 création ou la modification de structures.
 
-Les tetrominos sont tous de même dimension par souci d'homogénéite.
+Les tetrominos sont tous de même dimension par souci d'homogénéité.
 
 \paragraph{Plateau \texttt{Board}}
 Le plateau est représenté par une matrice de dimension
@@ -157,7 +157,7 @@ manipulations du plateau se font en place.
 
 \paragraph{Actions}
 Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
-tetrominos. Les rotations sont representées par les points cardinaux
+tetrominos. Les rotations sont représentées par les points cardinaux
 (North, South, East, West) et les translations par un entier compris entre 0 et
 \(b_w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino
 (voir fig\ref{fig:tetref}).
@@ -181,22 +181,22 @@ tetrominos. Les rotations sont representées par les points cardinaux
       \draw (0,0) rectangle (1,-1);
     \end{tikzpicture}
   }
-  \caption{Point de reference de tetromino, ici hachure}\label{fig:tetref}
+  \caption{Point de référence de tetromino, ici hachure}\label{fig:tetref}
 \end{figure}
 
-La geometrie de certains tetrominos rend certaines orientations redondantes. Par
+La géométrie de certains tetrominos rend certaines orientations redondantes. Par
 exemple le carre est invariant par rotation, et utiliser les quatre rotations
 ne fait qu'augmenter inutilement le nombre d'actions possibles, et augmente par
-consequent la quantite d'information que l'agent doit apprendre. Pour pallier
+conséquent la quantité d'information que l'agent doit apprendre. Pour pallier
 cette redondance, chaque tetromino dispose de son propre ensemble de rotations
 applicables.
 
 \section{Déroulement d'une partie}
-Un tetromino choisi aleatoirement parmi les cinq disponibles est donne au
+Un tetromino choisi aléatoirement parmi les cinq disponibles est donne au
 joueur. Ce dernier doit alors choisir ou et comment le placer. Une fois ce
 choix effectue, le tetromino est place en respectant les contraintes du jeu. Le
-plateau est ensuite mis a jour: les lignes completes sont supprimees et la
-hauteur est reevaluee. Un nouveau tetromino est donne et le jeu continue.
+plateau est ensuite mis a jour: les lignes complètes sont supprimées et la
+hauteur est réévaluée. Un nouveau tetromino est donne et le jeu continue.
 
 
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
@@ -217,18 +217,18 @@ L'implémentation actuelle oblige l'accessibilité de la position finale depuis
 le haut du plateau car la pièce ne peut pas être glissée au dernier moment
 sous une autre.
 \subsection{Tetromino}
-Les tetrominos sont tous de même dimension par souci d'homogénéite et cela
-peut entrainer un probleme de ``tetromino flottant''. Ce problème est traité par
+Les tetrominos sont tous de même dimension par souci d'homogénéité et cela
+peut entrainer un problème de ``tetromino flottant''. Ce problème est traité par
 un choix d'action spécifique à chaque pièce (cf ~\ref{sec:volant}).
 
 
 \chapter{Q learning}
 
 \section{principe de l'apprentissage par renforcement et Q-learning}
-\subsection{L'apprentissage par renforcement, késako ?}
+\subsection{L'apprentissage par renforcement}
 
-L'apprentisage par renforcement est une méthode d'apprentisage automatique
-inspirée de la biologie. L'idée est un apprentisage à partir d'actions et
+L'apprentissage par renforcement est une méthode d'apprentissage automatique
+inspirée de la biologie. L'idée est un apprentissage à partir d'actions et
 de récompenses, à l'image d'un enfant qui met les doigts dans une prise, il
 risque d'apprendre et ne plus recommencer.
 
@@ -285,7 +285,7 @@ La récompense à long terme pour un ensemble
 Intuitivement, un état correspond à la pièce donnée à jouer et la disposition
 des pièces sur le plateau, ce qui correspond aux informations nécessaires pour
 le placement d'une pièce par l'agent. En notant \(n_t\) le nombre de tetrominos
-différents, \( h \) la hauteur du plateau a un instant considèré  et \(w\) la
+différents, \( h \) la hauteur du plateau a un instant considéré  et \(w\) la
 largeur du plateau, on obtient \(n_t \cdot 2^{h \cdot b_w}\) états possibles.
 
 Pour réduire le nombre d'états, on ne considère que les deux plus hautes lignes
@@ -295,7 +295,7 @@ possibles, soit \(20480\) pour une largeur \( b_w = 6 \).
 \subsection{Codage}
 Comme chaque état correspond \textit{in fine} à une ligne de la matrice Q, il est
 nécessaire d'avoir une bijection entre l'ensemble des états et les entiers. La
-bijection genère deux représentations entières, une pour les deux lignes de
+bijection génère deux représentations entières, une pour les deux lignes de
 l'état et l'autre pour la pièce, et les combine en un état entier final,
 \[
   \texttt{get\_state}\colon [0,4]\times [0, 2^{12} - 1] \to [0, 5\cdot 2^{12}].
@@ -304,9 +304,9 @@ l'état et l'autre pour la pièce, et les combine en un état entier final,
 
 \section{Algorithmes}\label{sec:algorithmes}
 
-L'algorithme~\ref{alg:action} concerne la maniere dont l'agent choisit les
-actions parmi l'ensemble des actions possibles \(\mathcal{A}\), etant donne un
-etat \(s\). Le parametre \(\epsilon\) definit la frequence de choix aleatoire.
+L'algorithme~\ref{alg:action} concerne la manière dont l'agent choisit les
+actions parmi l'ensemble des actions possibles \(\mathcal{A}\), étant donne un
+état \(s\). Le paramètre \(\epsilon\) définit la fréquence de choix aléatoire.
 \begin{algorithm}
   \caption{Choix de l'action}\label{alg:action}
   \begin{algorithmic}
@@ -315,22 +315,22 @@ etat \(s\). Le parametre \(\epsilon\) definit la frequence de choix aleatoire.
     \State{} tirage \(\gets \uniform([0, 1])\)
     \If{tirage \(> \epsilon\)}
     \Return{\(\argmax_{a\in\mathcal{A}} Q(s, a)\)}\Comment{Choix de l'action
-    maximisant l'esperance de recompense}
+    maximisant l'espérance de récompense}
     \Else{}
-    \Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aleatoire}
+    \Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aléatoire}
     \EndIf{}
     \EndProcedure{}
   \end{algorithmic}
 \end{algorithm}
 
 
-L'algorithme~\ref{alg:qlearning} definit la maniere dont l'agent se met a jour
-afin de maximiser l'esperance de gain. Est notee \(\gamma\) la vision de
-l'agent correspondant a l'importance que l'agent attribue aux recompenses
-futures par rapport a la recompense immediate. Un \(\gamma\) de zero cree un
-agent myope ne choisissant son action que par rapport a la recompense immediate
+L'algorithme~\ref{alg:qlearning} définit la manière dont l'agent se met a jour
+afin de maximiser l'espérance de gain. Est notée \(\gamma\) la vision de
+l'agent correspondant a l'importance que l'agent attribue aux récompenses
+futures par rapport a la récompense immédiate. Un \(\gamma\) de zéro crée un
+agent myope ne choisissant son action que par rapport a la récompense immédiate
 tandis qu'un \(\gamma\) tendant vers un associe autant d'importance aux
-recompenses des coups suivants qu'a la recompense immediate.
+récompenses des coups suivants qu'a la récompense immédiate.
 \begin{algorithm}
   \caption{Algorithme de \textit{Q-learning}}\label{alg:qlearning}
   \begin{algorithmic}
@@ -349,12 +349,12 @@ recompenses des coups suivants qu'a la recompense immediate.
   \end{algorithmic}
 \end{algorithm}
 
-Pour realiser une mise a jour, l'agent commence par choisir l'action qui, a un
-etat donne fournit l'esperance de recompense maximale, selon les connaissances
-actuelles de l'agent. Une fois le coup joue, l'agent recoit une recompense
-evaluant evaluant l'impact du coup choisi sur l'environnement. L'agent utilise
-cette recompense et sa connaissance des etats resultants pour affiner
-l'esperance de recompense associee au coup qu'il vient de realiser.
+Pour réaliser une mise a jour, l'agent commence par choisir l'action qui, a un
+état donne fournit l'espérance de récompense maximale, selon les connaissances
+actuelles de l'agent. Une fois le coup joue, l'agent reçoit une récompense
+évaluant évaluant l'impact du coup choisi sur l'environnement. L'agent utilise
+cette récompense et sa connaissance des états résultants pour affiner
+l'espérance de récompense associée au coup qu'il vient de réaliser.
 
 \subsection{Paramètres}
 L'apprentissage est paramétré par les trois variables,
@@ -376,7 +376,7 @@ suivante, pour tout \( k \in \mathbb{N} \) et
 Le taux d'apprentissage reste manipulable via le paramètre \( C \).
 
 
-% Le paramètre \(\epsilon\) pourra \'egalement varier au cours des jeux effectués.
+% Le paramètre \(\epsilon\) pourra également varier au cours des jeux effectués.
 % En effet, intuitivement, un \(\epsilon\) grand permet une exploration rapide de
 % l'ensemble des états possibles mais devient nuisible lorsque la matrice est bien
 % entrainée.
@@ -386,7 +386,7 @@ effet, un \(\epsilon\) important permet une exploration rapide de l'ensemble
 des états possibles en jouant des actions aléatoires. À l'inverse un \(\epsilon\)
 petit correspond à l'exploitation de la politique apprise par l'agent. Ainsi,
 une diminution d'\(\epsilon\) au cours de la phase d'apprentissage permet de
-stabiliser les resultats obtenus.
+stabiliser les résultats obtenus.
 
 \begin{figure}
   \centering
@@ -414,7 +414,7 @@ stabiliser les resultats obtenus.
       }
     \end{axis}
   \end{tikzpicture}
-  \caption{Influence du parametre \(\gamma\)}
+  \caption{Influence du paramètre \(\gamma\)}
 \end{figure}
 
 
@@ -428,8 +428,8 @@ des plateaux possibles. \( s \in \mathcal{S} \) est un plateau particulier.
 
 \section{Nouvelle méthode d'apprentissage}
 
-Pour s'affranchir de la limite de memoire due au nombre d'etats possibles, la
-matrice est remplacee par une fonction objectif \( V \) tel que:
+Pour s'affranchir de la limite de mémoire due au nombre d'états possibles, la
+matrice est remplacée par une fonction objectif \( V \) tel que:
 \[
 \forall s \in \mathcal{S}, \qquad V(s) =
 \mathbb{E}(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t)
@@ -442,14 +442,14 @@ déterminée par un ensemble de poids \(w = (w_0\, w_1\, \dots\, w_n)^\top\)
 qu'il va falloir 'entrainer'.
 
 En notant \( s_t \) un plateau de jeu à un instant \( t \), et
-\(\phi_i\colon \mathcal{S} \to \R\) des caracteristiques du plateau
+\(\phi_i\colon \mathcal{S} \to \R\) des caractéristiques du plateau
 (voir~\cite{boumaza13}), la fonction \(V\)
 est définie par:
 \[
   V \colon s_t \mapsto w_0 + \sum_{i=1}^n w_i \cdot \phi_i (s_t)
 \]
 
-On appelle transition un tuple \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
+On appelle transition un 4-uplet \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 \begin{itemize}
     \item \( s_t \) le plateau à l'étape \( t \)
     \item \( a_t \) l'action joué à l'étape \( t \)
@@ -461,7 +461,7 @@ On appelle transition un tuple \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 \section{Algorithme}
 
 L'algorithme d'apprentissage utilisé dans cette partie repose sur une variante
-sochastique de l'algorithme par descente de gradient.
+stochastique de l'algorithme par descente de gradient.
 
 L'idée est de jouer \( B \) coups et enregistrer dans une mémoire les différentes
 transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
@@ -474,9 +474,9 @@ transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
     \State{} tirage \(\gets \uniform([0, 1])\)
     \If{tirage \(> \epsilon\)}
     \State{}\Return{\(\argmax_{{a_t}\in\mathcal{A}} [r_t + \gamma V(s_{t+1})] \)}
-    \\ \Comment{Choix de l'action maximisant l'esperance de recompense}
+    \\ \Comment{Choix de l'action maximisant l'espérance de récompense}
     \Else{}
-    \State{}\Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aleatoire}
+    \State{}\Return{\(\uniform(\mathcal{A})\)}\Comment{Choix aléatoire}
     \EndIf{}
     \EndProcedure{}
   \end{algorithmic}
@@ -495,7 +495,7 @@ Comme \( V \) estime l'espérance de gain, un agent bien entrainé doit annuler
 les différents \(delta_t\) (l'espérance prédite à l'instant t = la récompense
 à l'instant t + l'espérance prédite à l'instant t + 1).
 
-On définit alors une fonction de coup (loss function):
+On définit alors une fonction de coût (loss function):
 \[
 \mathcal{L} = \frac{1}{2B} \sum _{t_t \in \mathcal{M}} \delta(t_t)^2
 \]
@@ -509,7 +509,7 @@ w = w - \eta \nabla \mathcal{L}
 La procédure est synthétisé dans l'algorithme suivant:
 
 \begin{algorithm}[H]
-  \caption{Algorithme d'apprentissage d'une fonction lineaire}\label{alg:linfct}
+  \caption{Algorithme d'apprentissage d'une fonction linéaire}\label{alg:linfct}
   \begin{algorithmic}
     [1]
     \Procedure{Update}{$V$, $\epsilon$, $\gamma$, $\eta$, $\eta$}
@@ -519,9 +519,9 @@ La procédure est synthétisé dans l'algorithme suivant:
     \For{1 to $B$}
     \State{} \(a \gets \mathup{ChooseAction2}(V, s, \mathcal{A}, \epsilon)\)
     \State{} joue \(a\), observer \(r\) et le nouvel \'etat \(s'\)
-    \State{} ajouter a la memoire \( \left(\phi(s), a, r, \phi(s')\right) \)
+    \State{} ajouter a la mémoire \( \left(\phi(s), a, r, \phi(s')\right) \)
     \EndFor{}
-    \State{} Chosir aleatoirement \(B\) quadruplets depuis la memoire
+    \State{} Choisir aléatoirement \(B\) quadruplets depuis la mémoire
     \State{} \(y_t \gets r_t + \gamma V\left(\phi(s_t')\right)\)
     \State{} \(\delta_t \gets y_t - V \left(\phi(s_t)\right)\)
     \State{} \(\mathcal{L} \gets \frac{1}{2B}\sum_{k=1}^B \delta_t^2\)
@@ -534,16 +534,16 @@ La procédure est synthétisé dans l'algorithme suivant:
 
 \chapter{Difficultés rencontrées}
 
-\section{Le fl\'eau de la mutabilité}
-L'usage du \texttt{Array.blit} s'est revélé plus delicat que prévu. En
-considerant que la ligne \(l\) doit etre supprimée et en notant \(h\) la hauteur
+\section{Le fléau de la mutabilité}
+L'usage du \texttt{Array.blit} s'est révélé plus délicat que prévu. En
+considerant que la ligne \(l\) doit être supprimée et en notant \(h\) la hauteur
 actuelle du plateau, le principe est de copier la section de tableau incluant
 les lignes \(l+1\) jusqu'à \(h+1\) une ligne en dessous, i.e.\ translater le
 bloc d'une ligne vers le bas.
 
 Cette démarche engendre des comportements anormaux car la ligne \(h+1\) n'est
 pas copiée sur la ligne \(h\), elles partagent la même adresse mémoire. Ainsi,
-il etait observé quelques coups après un blit un dédoublement de carrés de
+il était observé quelques coups après un blit un dédoublement de carrés de
 tetrominos, faisant augmenter la hauteur.
 
 Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
@@ -551,7 +551,7 @@ recréée à chaque blit.
 
 \section{Le hollandais volant}\label{volant}
 La fonction collide permet de tester la collision du tetromino avec les autres
-pièces et le fond du plateau. Lors de l'éxécution de la fonction \texttt{play}
+pièces et le fond du plateau. Lors de l'exécution de la fonction \texttt{play}
 on testait donc toutes les positions possibles pour déposer les pièces de
 dimension 2 \(\times \) 2 sur le fond du plateau s'il n'y avait pas eu de
 collision. Malheureusement, certaines pièces comme le point ou la ligne
@@ -563,33 +563,33 @@ accessibles sont mis à 0 (flottant) et tous les états non utilisés sont
 initialisés à \(-\infty \). Ainsi, pour le point, on ne gardera que les
 rotations \texttt{South} et \texttt{West}.
 
-\section{Le foncteur n'est pas pass\'e}
-Ayant deux moyens pour r\'esoudre le tetris, il semble pertinent de
-g\'en\'eraliser le code afin de faire en sorte que toute impl\'ementation
-d'agent soit facilement d\'eveloppable et int\'egrable au reste du projet. Pour
-cela un foncteur est indiqu\'e: ce foncteur \texttt{Agent.Make} prendrait en
-param\`etre un module d'impl\'ementation d'agent, contenant une fonction
+\section{Le foncteur n'est pas passé}
+Ayant deux moyens pour résoudre le tetris, il semble pertinent de
+généraliser le code afin de faire en sorte que toute implémentation
+d'agent soit facilement développable et intégrable au reste du projet. Pour
+cela un foncteur semble pertinent: le foncteur \texttt{Agent.Make} prendrait en
+paramètre un module d'implémentation d'agent, contenant une fonction
 permettant de choisir une action, un fonction de mise \`a jour de l'agent, un
-type d\'esignant la donn\'ee avec laquelle travaille l'agent (e.g.\ matrice de
+type d\'esignant la donnée avec laquelle travaille l'agent (e.g.\ matrice de
 flottants pour le Q learning et tableau de poids flottants pour la fonction de
 valuation). Le r\'esultat de l'application de ce foncteur est un module ayant
 une fonction \texttt{train} entra\^inant en place l'agent, une fonction
 \texttt{play} pour jouer un jeu de tetris et une fonction make pour cr\'eer un
-agent inital.
+agent initial.
 
-La g\'en\'eralisation du code s'est malheureusement r\'ev\'el\'ee plus
-d\'elicate que pr\'evu. D'une part les deux m\'ethodes impl\'ement\'ees
-contenaient des diff\'erences, notamment sur le nombre de param\`etres, ou
-l'utilisation d'une m\'emoire, d'autre part adapter le code \`a ces deux
-impl\'ementations finissait plus \`a resembler \`a du bricolage plut\^ot qu'\`a
-de la g\'en\'eralisation. Et de plus cela avait tendance \'a pervertir le code
-d\'evelopp\'e pour la fonction de valuation, le poussant \`a coller \'a la
-signature d'un argument de foncteur qui est peut-\^etre mal designed.
+La généralisation du code s'est malheureusement révélée plus
+délicate que prévu. D'une part les deux méthodes implémentées
+différaient trop, notamment sur le nombre de paramètres, ou
+l'utilisation d'une mémoire, d'autre part adapter le code \'a ces deux
+implémentations finissait plus \'a ressembler \'a du bricolage plutôt qu'\'a
+de la généralisation. Et de plus cela avait tendance \'a pervertir le code
+développé pour la fonction de valuation, le poussant \'a coller \'a la
+signature d'un argument de foncteur qui est peut-être, avouons le, mal conçu.
 
-En cons\'equence, l'agent utilisant la fonction d'\'evaluation est cod\'e sur
-une branche d\'edi\'ee du git, la branche \texttt{valuation}. Le code du
+En conséquence, l'agent utilisant la fonction d'évaluation est codé sur
+une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
-\chapter{Réesultats du projet}
+\chapter{Résultats du projet}
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
