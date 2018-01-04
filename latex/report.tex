@@ -377,10 +377,12 @@ stabiliser les résultats obtenus.
 
 \begin{figure}
   \centering
-  \subfloat[Premiers jeux, un \(\epsilon\) non nul favorise la prise de
-  d\'ecisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
-  (\(\epsilon = 0\)) est plus haute que les autres. De plus la courbe noire
-  ayant le taux d'apprentissage le plus \'elev\'e est la plus basse.] {%
+  \subfloat[
+    Premiers jeux, un \(\epsilon\) non nul favorise la prise de
+    d\'ecisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
+    (\(\epsilon = 0\)) est plus haute que les autres. De plus la courbe noire
+    ayant le taux d'apprentissage le plus \'elev\'e est la plus basse.
+  ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
           legend entries={0,.0003,.0006,.0009}
@@ -392,7 +394,7 @@ stabiliser les résultats obtenus.
           ] {data/epsilon.dat};
         }
       \end{axis}
-    \end{tikzpicture}
+    \end{tikzpicture}\label{sfig:exex_first_steps}
   }
   \quad
   \subfloat[
@@ -431,6 +433,11 @@ stabiliser les résultats obtenus.
   \end{tikzpicture}
   \caption{Influence du paramètre \(\gamma\)}
 \end{figure}
+
+\subparagraph{Taux d'apprentissage} Les courbes~\ref{sfig:exex_first_steps}
+montrent qu'un \(\epsilon\) nul n'est pas optimal. Le
+graphe~\ref{fig:learnrate_high} montre qu'un \(\epsilon\) plus grand que 0.02
+tend a ralentir la convergence du système.
 
 
 
@@ -547,6 +554,34 @@ La procédure est synthétisé dans l'algorithme suivant:
     \EndProcedure{}
   \end{algorithmic}
 \end{algorithm}
+
+\chapter{Programmes auxiliaires}
+\section{Creation de faisceaux}
+La création de faisceaux de courbes est automatisée via le script bash
+\texttt{tetris\_parameval.bash}. Tout le paramétrage se fait en ligne de commande
+par les arguments passés au script. Le langage bash a été choisi car semble le
+plus propice a l'utilisation en ligne de commande.
+
+Le parsing se fait avec le GNU \texttt{getopt}, les calculs en virgule flottante
+avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
+les données sont enregistrées dans un fichier.
+
+\section{Compilation}
+La compilation du code source se fait via un \textit{makefile}. Il permet de
+créer trois binaires,
+\begin{itemize}
+  \item le bytecode avec les options de debugging (\texttt{-g});
+  \item le binaire optimisé pour bénéficier d'un temps d'exécution réduit;
+  \item un toplevel avec tous les modules importés.
+\end{itemize}
+
+Les dépendances entre les modules sont gérées par \texttt{ocamldep}. La cible
+\texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
+La cible \texttt{doc} génère la documentation a l'aide de l'outil
+\texttt{ocamldoc} et d'un code source documenté.
+
+
+
 
 \chapter{Difficultés rencontrées}
 
