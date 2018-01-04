@@ -149,7 +149,7 @@ création ou la modification de structures.
 
 Les tetrominos sont tous de même dimension par souci d'homogénéité.
 
-\paragraph{Plateau \texttt{Board}}
+\paragraph{Plateau}
 Le plateau est représenté par une matrice de dimension
 \(2\cdot n_t \times 6\) d'entiers dans laquelle on inscrit les tetrominos. Les
 manipulations du plateau se font en place.
@@ -211,16 +211,6 @@ pièce.
 Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais
 la taille totale du plateau reste la même.
 
-\section{Drawbacks}
-\subsection{Fonction collide}
-L'implémentation actuelle oblige l'accessibilité de la position finale depuis
-le haut du plateau car la pièce ne peut pas être glissée au dernier moment
-sous une autre.
-\subsection{Tetromino}
-Les tetrominos sont tous de même dimension par souci d'homogénéité et cela
-peut entrainer un problème de ``tetromino flottant''. Ce problème est traité par
-un choix d'action spécifique à chaque pièce (cf~\ref{sec:hollandais_volant}).
-
 
 \chapter{Q learning}
 
@@ -254,7 +244,7 @@ une punition) qui lui permet d'adapter son comportement et ainsi apprendre à
     \label{}
 \end{figure}
 
-Le but de l'apprentissage va être de maximiser la somme des récompense sur une
+Le but de l'apprentissage va être de maximiser la somme des récompenses sur une
 période donnée.
 
 Plus formellement, notons:
@@ -531,6 +521,18 @@ La procédure est synthétisé dans l'algorithme suivant:
 \end{algorithm}
 
 \chapter{Difficultés rencontrées}
+
+\section{Limites intrinsèques de conception}
+\subsection{Résolution de collisions}
+La gestion actuelle des collisions oblige l'accessibilité de la position finale
+depuis le haut du plateau. L'agent ne peut placer de tetrominos qu'\'a des
+positions o\'u ils peuvent ``tomber'', c'est-\'a-dire que les tetrominos ne
+peuvent être glissés au dernier moment sous d'autres. Plus formellement, tout
+tetromino placé ne peut avoir de cellule occupée en amont des siennes. Autrement
+dit, en considérant un tetromino de largeur \(l\) (avec dans notre
+implémentation \(l = 1\) ou \(2\)), chacun des tétraèdres composant le tetromino
+ne peut avoir de tétraèdre d'un tetromino pose précédemment sur la même colonne
+a une hauteur supérieure.
 
 \section{Le fléau de la mutabilité}
 L'usage du \texttt{Array.blit} s'est révélé plus délicat que prévu. En
