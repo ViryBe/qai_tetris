@@ -377,15 +377,43 @@ stabiliser les résultats obtenus.
 
 \begin{figure}
   \centering
-  \begin{tikzpicture}
-    \begin{axis}[line width=0.05, mark size = 0.1,
-        legend entries={0,.0003,.0006,.0009}
-      ]
-      \foreach \i in {0,1,...,3}{%
-        \addplot+ table [x expr = {\lineno}, y index = \i] {data/epsilon.dat};
-      }
-    \end{axis}
-  \end{tikzpicture}
+  \subfloat[Premiers jeux, un \(\epsilon\) non nul favorise la prise de
+  d\'ecisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
+  (\(\epsilon = 0\)) est plus haute que les autres. De plus la courbe noire
+  ayant le taux d'apprentissage le plus \'elev\'e est la plus basse.] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={0,.0003,.0006,.0009}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [
+            skip coords between index={100}{512},
+            x expr = {\lineno}, y index = \i
+          ] {data/epsilon.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }
+  \quad
+  \subfloat[
+    Stabilisation, un \(\epsilon\) nul favorise l'utilisation des
+    connaissances acquises et limite les mauvais jeux en \'evitant les actions
+    inefficaces. La courbe ayant un taux d'apprentissage nul a une variance
+    moindre.
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={0,.0003,.0006,.0009}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [
+            skip coords between index={0}{350},
+            x expr = {\lineno}, y index = \i
+          ] {data/epsilon.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }
   \caption{Exploitation ou exploration?}
 \end{figure}
 
