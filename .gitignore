@@ -36,12 +36,14 @@ setup.log
 *.fls
 *.toc
 *.fdb_latexmk
+latex/*.out
 
 # doc
 doc/
 
 # vim specific files
 *.swp
+*.un~
 
 # logging facilities
 log/
