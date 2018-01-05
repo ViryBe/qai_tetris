@@ -22,7 +22,10 @@ $(GRAPHDIR)/epsilon.dat:
 	$(PARAMEVAL) -p epsilon -l 0 -u 0.001 -n 4 -q -o $@
 	sed -i '1s/^/%/' $@
 
-.PHONY: clean
+.PHONY: clean tags
+
+tags:
+	ctags *.tex Makefile
 
 clean:
 	rm -rf *.log *.toc *.aux
