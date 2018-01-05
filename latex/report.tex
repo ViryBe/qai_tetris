@@ -562,7 +562,7 @@ La procédure est synthétisé dans l'algorithme suivant:
 
 
 \chapter{Programmes auxiliaires}
-\section{Creation de faisceaux}
+\section{Creation de faisceaux}\label{sec:faisceaux}
 La création de faisceaux de courbes est automatisée via le script bash
 \texttt{tetris\_parameval.bash}. Tout le paramétrage se fait en ligne de commande
 par les arguments passés au script. Le langage bash a été choisi car semble le
@@ -592,11 +592,11 @@ La cible \texttt{doc} génère la documentation a l'aide de l'outil
 
 
 \section{Rapport}
-Le rapport est rédigé en \LaTeX{}, les figures sont faites grâce a
-\texttt{tikz} et les graphes avec \texttt{pgfplot}. Le rapport est compilé via
-un \textit{makefile} dédié
-automatisant la génération des fichiers de données pour créer les courbes. Le
-programme \texttt{latexmk} est également utilise pour faciliter la compilation.
+Le rapport est rédigé en \LaTeX{}, les figures et graphes sont faits grâce a
+\texttt{PGF/tikz}. Le rapport est compilé via un \textit{makefile} dédié
+automatisant la génération des fichiers de données pour créer les courbes en
+appelant le script bash susmentionne en~\ref{sec:faisceaux}. Le
+programme \texttt{latexmk} est également utilisé pour faciliter la compilation.
 
 
 
