@@ -555,6 +555,11 @@ La procédure est synthétisé dans l'algorithme suivant:
   \end{algorithmic}
 \end{algorithm}
 
+
+
+
+
+
 \chapter{Programmes auxiliaires}
 \section{Creation de faisceaux}
 La création de faisceaux de courbes est automatisée via le script bash
@@ -565,6 +570,8 @@ plus propice a l'utilisation en ligne de commande.
 Le parsing se fait avec le GNU \texttt{getopt}, les calculs en virgule flottante
 avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
 les données sont enregistrées dans un fichier.
+
+
 
 \section{Compilation}
 La compilation du code source se fait via un \textit{makefile}. Il permet de
@@ -579,6 +586,16 @@ Les dépendances entre les modules sont gérées par \texttt{ocamldep}. La cible
 \texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
 La cible \texttt{doc} génère la documentation a l'aide de l'outil
 \texttt{ocamldoc} et d'un code source documenté.
+
+
+
+
+\section{Rapport}
+Le rapport est rédigé en \LaTeX{}, les figures sont faites grace a \texttt{tikz}
+et les graphes avec \texttt{pgfplot}. Le rapport est compilé via un
+\textit{makefile} dédié
+automatisant la génération des fichiers de données pour créer les courbes. Le
+programme \texttt{latexmk} est également utilise pour faciliter la compilation.
 
 
 
