@@ -48,7 +48,7 @@ clean:
 	rm -f *.cm[xio] *.o *~
 
 tags:
-	otags -vi *.ml *.mli
+	ctags *.ml *.mli *.bash Makefile
 
 .depend: $(SOURCES) $(INTERFACES)
 	$(DEPGEN) $^ > .depend
