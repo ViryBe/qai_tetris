@@ -32,4 +32,4 @@ tags:
 	ctags *.tex Makefile
 
 clean:
-	rm -rf *.log *.toc *.aux
+	rm -rf *.log *.toc *.aux *.out *.fdb_latexmk *.fls
