@@ -7,7 +7,7 @@
 * build tags ([ctags](http://ctags.sourceforge.net/)) : ```$ make tags```
 * clean : ```$ make clean```
 
-### Executables résultants
+### Exécutables résultants
 
 
 * ```tetris_player``` (compilé avec ```ocamlc```)
@@ -38,16 +38,22 @@ A partir d'une matrice 'qmat.save':
 
 ## Script ```tetris_parameval.bash```
 
-Permet l'affichage de graphes donnant la hauteur de chaque partie en fonction du nombre de jeux, en faisant varier un paramètre donné (ex gamma, epsilon ou alpha).
+Permet l'affichage de graphes donnant la hauteur de chaque partie en fonction
+du nombre de jeux, en faisant varier un paramètre donné (ex gamma, epsilon ou
+alpha).
 
 Exemple pour une variation 10 valeurs de gamma dans 0, 1:
 
-```./tetris_parameval.bash --param gamma --low 0 --up 1 --nval 10```
+```$ ./tetris_parameval.bash --param gamma --low 0 --up 1 --nval 10```
 
 * ```--param``` : paramètre à faire varier
 * ```--low``` : borne inférieure de variation
 * ```--up``` : borne superieure de variation
 * ```--nval```  : nombre de valeurs à prendre dans l'interval [low, up]
+
+
+Calcule également les parametres optimaux avec l'option ```--panacea```:
+```./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
 
 
 ## Dépendances
@@ -56,7 +62,7 @@ Exemple pour une variation 10 valeurs de gamma dans 0, 1:
 * Modules OCaml : ```Marshal```, ```Graphics``` et ```Unix```
 
 
-## Documentation additionelle
+## Documentation additionnelle
 
 ```$ ./tetris_player --help```
 
