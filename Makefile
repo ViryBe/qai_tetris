@@ -1,5 +1,6 @@
 TARGET = tetris_player
 DOC_DIR = doc
+BINDIR = bin
 OCAMLCOPT = ocamlopt
 OCAMLC = ocamlc -g
 DOCGEN = ocamldoc -d $(DOC_DIR) -html
@@ -15,19 +16,19 @@ LIB = graphics unix
 
 all: .depend byte opt top
 
-byte: $(TARGET)
+byte: $(BINDIR)/$(TARGET)
 
-opt: $(TARGET).opt
+opt: $(BINDIR)/$(TARGET).opt
 
-top: $(TARGET).top
+top: $(BINDIR)/$(TARGET).top
 
-$(TARGET): $(CINT) $(OBJS) main.ml
+$(BINDIR)/$(TARGET): $(CINT) $(OBJS) main.ml
 	$(OCAMLC) $(LIB:=.cma) $(OBJS) main.ml -o $@
 
-$(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
+$(BINDIR)/$(TARGET).opt: $(CINT) $(OBJSOPT) main.ml
 	$(OCAMLCOPT) $(LIB:=.cmxa) $(OBJSOPT) main.ml -o $@
 
-$(TARGET).top: $(OBJS)
+$(BINDIR)/$(TARGET).top: $(OBJS)
 	$(TOPGEN) $(LIB:=.cma) $^ -o $@
 
 %.cmi: %.mli
