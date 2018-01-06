@@ -1,5 +1,6 @@
 from sys import argv
 from math import sqrt
+import re
 
 def average(l):
     return sum(l)/len(l)
@@ -62,13 +63,22 @@ def best_params(dict_stat, feature="th"):
     return param_max, min_mean, min_threashold, min_var
 
 
-# def com_parser(filename):
-#     with open(filename, "r") as f:
-#         current_vals = []
-#         current_param = ""
-#         for line in f:
-#             pass
-#     return 10000
+def com_parser(filename):
+    with open(filename, "r") as f:
+        ngames = 0
+        ntetro = 0
+        for line in f:
+            if line[0] == "#":
+                try:
+                    ntetro = int(re.search(r"ntetro:(\d+)", line).group(1))
+                except:
+                    pass
+                try:
+                    ngames = int(re.search(r"ngames:(\d+)", line).group(1))
+                except:
+                    pass
+
+    return ngames, ntetro
 
 def content_parser(filename):
     """
@@ -102,8 +112,7 @@ def content_parser(filename):
 if __name__ == '__main__':
     filename = argv[1]
     # ntetro = com_parser(filename)
-    ntetro = 10000
-    ngames = 500
+    ngames, ntetro = com_parser(filename)
     dic_parsed = content_parser(filename)
     dict_stat = compute_stats(dic_parsed, ntetro, ngames)
     print("mean\tthreshold\tstandard deviation")
