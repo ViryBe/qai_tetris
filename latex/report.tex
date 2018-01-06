@@ -715,10 +715,18 @@ signature d'un argument de foncteur qui est peut-être, avouons le, mal conçu.
 En conséquence, l'agent utilisant la fonction d'évaluation est codé sur
 une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
-\chapter{Résultats du projet}
-
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
+Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
+learning applique au jeu de Tetris. L'algorithme développé obtient des résultats
+du même ordre que ce que l'on trouve dans la littérature, avec des évolutions
+visibles. Le paramétrage permet de modifier les caractéristiques du programme,
+le permettant de répondre à plusieurs contraintes, rappelons principalement la
+vitesse de convergence et la stabilité.
+
+L'utilisation d'OCaml a permis d'aborder les différences entre la programmation
+fonctionnelle et impérative, notamment l'opposition sécurité contre performance
+incarnée par le problème de mutabilité des données.
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
