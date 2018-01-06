@@ -5,9 +5,10 @@ NAME=$0
 # Short options, add a column for required arg, two for optional
 OPTIONS=hqp:l:u:s:n:o:
 # Long options, names separated with commas
-LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:,quiet
+LONGOPTIONS=help,param:,low:,up:,step:,nval:,ngames:,ntetr:,out:,quiet,panacea
 # Usage string
 USAGE="Usage: $0 PARAM BOUNDS BOUNDSP -o <out> [OPTIONS]
+or $0 --panacea [--ngames <ngames>] [--ntetr <ntetr>] [-o <out> ]
 Param:
 \t-p|--param\t<epsilon|gamma|alphap>\tthe parameter tested
 Bounds:
@@ -20,7 +21,11 @@ Options:
 \t--ngames\t<int>\tnumber of games done in one training
 \t--ntetr\t\t<int>\tnumber of tetrominos in a game
 \t-o|--out\t\tfile to output
-\t-q|--quiet\t\tdo not print to stdout"
+\t-q|--quiet\t\tdo not print to stdout
+Panacea: finds the 3 optimal values"
+
+# silver script name
+SILVERSCRIPT='tetris_paramfind.bash'
 
 # Tetris player related options
 TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
@@ -39,7 +44,8 @@ NGAMES=512		# number of games per training
 PVAL=( )		# param values, array
 FILES=( )		# name of files
 OUTFILE=''      # name of output file
-QUIET=false
+QUIET=false		# whether to plot graph at the end
+PANACEA=false	# find the 3 optimum parameters
 
 TEMP=$(getopt -o $OPTIONS --long $LONGOPTIONS -n $NAME -- "$@")
 
@@ -109,6 +115,11 @@ while true; do
 			shift 2
 			continue
 			;;
+		'--panacea')
+			PANACEA=true
+			shift 1
+			continue
+			;;
           '-q'|'--quiet')
             QUIET=true
             shift 1
@@ -171,24 +182,33 @@ function run_tetris () {
 	return 0
 }
 
-# Set name if not provided
-if [[ $OUTFILE = '' ]] ; then
-  OUTFILE="$BASEFNAME_$PARAM.dat"
-fi
+# operating mode
+if [[ $PANACEA = true ]] ; then
+	if [[ $OUTFILE = '' ]] ; then
+		OUTFILE="$BASEFNAME_opt.dat"
+	fi
+	$SILVERSCRIPT -o $OUTFILE
+else
 
-make_values
-run_tetris
-for i in $(seq 0 $((${#PVAL[@]} - 1))); do
-	sed -i "s/^#.*$/${PVAL[$i]}/" "${FILES[$i]}"
-done ;
-paste "${FILES[@]}" > "$OUTFILE"
-for file in ${FILES[@]} ; do
-  rm $file
-done;
+	# Set name if not provided
+	if [[ $OUTFILE = '' ]] ; then
+		OUTFILE="$BASEFNAME_$PARAM.dat"
+	fi
 
-# plot
-if [[ "$QUIET" = false ]] ; then
-  gnuplot -p -e "set key autotitle columnheader;\
-    set title '$PARAM' ;\
-	plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
+	make_values
+	run_tetris
+	for i in $(seq 0 $((${#PVAL[@]} - 1))); do
+		sed -i "s/^#.*$/${PVAL[$i]}/" "${FILES[$i]}"
+	done ;
+	paste "${FILES[@]}" > "$OUTFILE"
+	for file in ${FILES[@]} ; do
+		rm $file
+	done;
+
+	# plot
+	if [[ "$QUIET" = false ]] ; then
+		gnuplot -p -e "set key autotitle columnheader;\
+			set title '$PARAM' ;\
+			plot for [col=1:${#PVAL[@]}] '$OUTFILE' using 0:col"
+	fi
 fi
