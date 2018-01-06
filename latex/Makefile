@@ -15,7 +15,7 @@ $(GRAPHDIR)/gamma.dat:
 	sed -i '1s/^/%/' $@	# Comment first line containing param values
 
 $(GRAPHDIR)/alphap.dat:
-	$(PARAMEVAL) -p alphap -l 0.001 -u 0.005 -n 6 -q -o $@
+	$(PARAMEVAL) -p alphap -l 0.001 -u 0.01 -n 6 -q -o $@
 	sed -i '1s/^/%/' $@
 
 $(GRAPHDIR)/epsilon.dat:

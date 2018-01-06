@@ -465,6 +465,28 @@ que 0.02 tend a ralentir la convergence du système.
 \end{figure}
 
 
+\subparagraph{Taux d'apprentissage}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[line width=0.05, mark size = 0.1,
+        legend entries={.001,.0028,.0046,.0064,.0082,.01}
+      ]
+      \foreach \i in {0,1,...,5}{%
+        \addplot+ table [
+          x expr = {\lineno},
+          y index = \i,
+          skip coords between index={300}{513},
+        ] {data/alphap.dat};
+      }
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Le taux d'apprentissage influence principalement la vitesse de
+  convergence.}\label{fig:alphap}
+\end{figure}
+
+
+
 \chapter{Minimisation d'une fonction objectif \( V \)}
 
 \section{Représentation des états et transitions}
