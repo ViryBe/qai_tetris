@@ -16,12 +16,12 @@
 
 
 ## Entrainement Agent
-```
-./tetris_player -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+```bash
+$ ./tetris_player -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
 ```
 ou
-```
-./tetris_player.opt -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+```bash
+$ ./tetris_player.opt -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
 ```
 
 #### Performances
@@ -34,7 +34,7 @@ Pour un entrainement de 500 parties de 10k tetrominos:
 
 A partir d'une matrice 'qmat.save':
 
-```./tetris_player -demo -qload qmat.save```
+```$ ./tetris_player -demo -qload qmat.save```
 
 ## Script ```tetris_parameval.bash```
 
@@ -58,6 +58,6 @@ Exemple pour une variation 10 valeurs de gamma dans 0, 1:
 
 ## Documentation additionelle
 
-```./tetris_player --help```
+```$ ./tetris_player --help```
 
-```./tetris_parameval.bash --help```
+```$ ./tetris_parameval.bash --help```
