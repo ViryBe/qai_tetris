@@ -25,7 +25,7 @@ Options:
 Panacea: finds the 3 optimal values"
 
 # silver script name
-SILVERSCRIPT='tetris_paramfind.bash'
+SILVERSCRIPT='scripts/tetris_paramfind.bash'
 
 # Tetris player related options
 TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
@@ -188,6 +188,7 @@ if [[ $PANACEA = true ]] ; then
 		OUTFILE="$BASEFNAME_opt.dat"
 	fi
 	$SILVERSCRIPT -o $OUTFILE
+    python3 scripts/data_analysis.py $OUTFILE
 else
 
 	# Set name if not provided
