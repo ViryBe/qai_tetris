@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set getopt options
-NAME='tetris_argeval.bash'
+NAME=$0
 # Short options, add a column for required arg, two for optional
 OPTIONS=hqp:l:u:s:n:o:
 # Long options, names separated with commas
