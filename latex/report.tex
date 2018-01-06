@@ -381,8 +381,8 @@ stabiliser les résultats obtenus.
   \subfloat[
     Premiers jeux, un \(\epsilon\) non nul favorise la prise de
     d\'ecisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
-    (\(\epsilon = 0\)) est plus haute que les autres. De plus la courbe noire
-    ayant le taux d'apprentissage le plus \'elev\'e est la plus basse.
+    (\(\epsilon = 0\)) est plus haute que les autres. La courbe
+    ayant l'\(\epsilon\) le plus \'elev\'e est la plus basse.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
@@ -401,8 +401,7 @@ stabiliser les résultats obtenus.
   \subfloat[
     Stabilisation, un \(\epsilon\) nul favorise l'utilisation des
     connaissances acquises et limite les mauvais jeux en \'evitant les actions
-    inefficaces. La courbe ayant un taux d'apprentissage nul a une variance
-    moindre.
+    inefficaces. Plus l'\(\epsilon\) est faible moins les pics ont d'amplitude.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
@@ -421,6 +420,17 @@ stabiliser les résultats obtenus.
 \end{figure}
 
 \paragraph{Valeurs}
+\subparagraph{Optimalité des paramètres}
+Pour évaluer les paramètres, plusieurs critères sont utilisables,
+\begin{itemize}
+  \item la stabilité,
+  \item la vitesse de convergence vers une hauteur stable,
+  \item la valeur de la hauteur stabilisée.
+\end{itemize}
+Les hauteurs finales variant peu, seule la vitesse de convergence et la
+stabilité finale discrimineront la qualité des paramètres.
+
+
 \begin{figure}
   \centering
   \begin{tikzpicture}
@@ -435,11 +445,24 @@ stabiliser les résultats obtenus.
   \caption{Influence du paramètre \(\gamma\)}
 \end{figure}
 
-\subparagraph{Taux d'apprentissage} Les courbes~\ref{sfig:exex_first_steps}
-montrent qu'un \(\epsilon\) nul n'est pas optimal. Le
-graphe~\ref{fig:learnrate_high} montre qu'un \(\epsilon\) plus grand que 0.02
-tend a ralentir la convergence du système.
-
+\subparagraph{Fréquence de coups aléatoires} Les
+courbes~\ref{sfig:exex_first_steps} montrent qu'un \(\epsilon\) nul n'est pas
+optimal. Le graphe~\ref{fig:eps_high} montre qu'un \(\epsilon\) plus grand
+que 0.02 tend a ralentir la convergence du système.
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[line width=0.05, mark size = 0.1,
+        legend entries={.002,.068,.134,.2}
+      ]
+      \foreach \i in {0,1,...,3}{%
+        \addplot+ table [x expr = {\lineno}, y index = \i] {data/eps_high.dat};
+      }
+    \end{axis}
+  \end{tikzpicture}
+  \caption{L'élévation de la fréquence de coups aléatoires réduit fortement la
+  vitesse de convergence.}\label{fig:eps_high}
+\end{figure}
 
 
 \chapter{Minimisation d'une fonction objectif \( V \)}

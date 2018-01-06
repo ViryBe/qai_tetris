@@ -3,7 +3,7 @@ PARAMEVAL = ../tetris_parameval.bash
 CC = latexmk
 FLAGS = -lualatex -shell-escape -synctex=1
 GRAPHDIR = data
-GRAPHS = gamma alphap epsilon
+GRAPHS = gamma alphap epsilon eps_high
 GRAPHFILES = $(addsuffix .dat, $(addprefix $(GRAPHDIR)/, $(GRAPHS)))
 SRC = report.tex
 
@@ -20,6 +20,10 @@ $(GRAPHDIR)/alphap.dat:
 
 $(GRAPHDIR)/epsilon.dat:
 	$(PARAMEVAL) -p epsilon -l 0 -u 0.001 -n 4 -q -o $@
+	sed -i '1s/^/%/' $@
+
+$(GRAPHDIR)/eps_high.dat:
+	$(PARAMEVAL) -p epsilon -l 0.002 -u 0.2 -n 4 -q -o $@
 	sed -i '1s/^/%/' $@
 
 .PHONY: clean tags
