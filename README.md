@@ -53,7 +53,8 @@ Exemple pour une variation 10 valeurs de gamma dans 0, 1:
 
 
 Calcule également les parametres optimaux avec l'option ```--panacea```:
-```./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
+
+```$ ./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
 
 
 ## Dépendances
