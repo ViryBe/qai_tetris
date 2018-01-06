@@ -60,9 +60,9 @@ GAM=( 0.7 0.8 0.9 )
 for a in ${ALP[@]} ; do
 	for e in ${EPS[@]} ; do
 		for g in ${GAM[@]} ; do
-			echo "a=$a,e=$e,g=$g"
 			$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -alphap $a -epsilon $e \
 				-gamma $g > $OUT
+			echo "a=$a,e=$e,g=$g"
 		done ;
 	done ;
 done ;
