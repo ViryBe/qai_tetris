@@ -14,6 +14,7 @@ Param:
 NGAMES=512
 NTETR=10000
 OUT='/dev/stdout'
+TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
 
 TEMP=$( getopt -o $OPTIONS --long $LGOPTIONS -n $NAME -- "$@" )
 
@@ -61,8 +62,9 @@ for a in ${ALP[@]} ; do
 	for e in ${EPS[@]} ; do
 		for g in ${GAM[@]} ; do
 			$TETRIS_CMD -ngames $NGAMES -ntetr $NTETR -alphap $a -epsilon $e \
-				-gamma $g > $OUT
-			echo "a=$a,e=$e,g=$g"
+				-gamma $g >> $OUT
+			echo "a=$a e=$e g=$g" >> $OUT
+			echo "a=$a e=$e g=$g"
 		done ;
 	done ;
 done ;
