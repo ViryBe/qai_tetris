@@ -6,6 +6,9 @@ _build/
 *.native
 *.docdir
 
+# profiling
+gmon.out
+
 # ocamldep files
 .depend
 
