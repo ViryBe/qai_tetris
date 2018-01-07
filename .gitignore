@@ -1,25 +1,10 @@
-*.annot
-*.cmo
-*.cma
-*.cmi
-*.a
-*.o
-*.cmx
-*.cmxs
-*.cmxa
-
 # ocamlbuild working directory
 _build/
-
-# name of the executable file
-tetris_player.opt
-tetris_player
-tetris_player.top
-a.out
 
 # ocamlbuild targets
 *.byte
 *.native
+*.docdir
 
 # ocamldep files
 .depend
@@ -30,27 +15,21 @@ setup.log
 
 # latex files
 *.pdf
-*.aux
-*.log
 *.synctex.gz
-*.fls
-*.toc
 *.fdb_latexmk
 latex/*.out
-
-# doc
-doc/
+latex/*.aux
+latex/*.fls
+latex/*.toc
+latex/*.log
+latex/data
 
 # vim specific files
 *.swp
 *.un~
 
-# logging facilities
-log/
-
 # tag files
 tags
 
-# folder containing saved matrices
-data/
-*.dat
+# generated matrices
+*.qmat
