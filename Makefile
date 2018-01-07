@@ -5,7 +5,7 @@ DOCDIR = doc/qai_tetris.docdir
 OCB_FLAGS = -use-ocamlfind -tag bin_annot -I src
 OCB = ocamlbuild $(OCB_FLAGS)
 
-all: native byte profile
+all: native byte
 
 clean:
 	$(OCB) -clean
