@@ -1,0 +1,66 @@
+\documentclass[tikz, footheight=2em]{beamer}
+\usetheme[hideothersubsections]{Hannover}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{color,graphicx}
+\usepackage{ulem}
+\usepackage{gensymb}
+\usepackage[]{tikz}
+\usetikzlibrary{quotes,angles}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+
+\usecolortheme{dolphin}
+
+\title{QAI Tetris}
+\author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
+\date{}
+
+% ----------------------------------------------------------
+% nuremotation des pages -----------------------------------
+% ----------------------------------------------------------
+\def\swidth{1.6cm}
+\setbeamersize{sidebar width left=\swidth}
+\setbeamertemplate{sidebar left}
+{%
+  {\usebeamerfont{title in sidebar}
+    \vskip1.5em
+    \usebeamercolor[fg]{title in sidebar}
+    \insertshorttitle[width=\swidth,center,respectlinebreaks]\par
+    \vskip1.25em
+  }
+  {
+    \usebeamercolor[fg]{author in sidebar}
+    \usebeamerfont{author in sidebar}
+    \insertshortauthor[width=\swidth,center,respectlinebreaks]\par
+    \vskip1.25em
+  }
+  \hbox to2cm{\hss\insertlogo\hss}
+  \vskip1.25em
+  \insertverticalnavigation{\swidth}
+  \vfill
+  \hbox to2cm{\hskip0.6cm\usebeamerfont{subsection in
+      sidebar}\strut\usebeamercolor[fg]{subsection in
+      sidebar}\insertframenumber /\inserttotalframenumber\hfill}
+  \vskip3pt
+}
+% ----------------------------------------------------------
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\AtBeginSection[]
+{%
+  \begin{frame}
+    \frametitle{Plan}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+\end{document}
