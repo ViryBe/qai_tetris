@@ -620,19 +620,23 @@ les données sont enregistrées dans un fichier.
 
 
 \section{Compilation}
-La compilation du code source se fait via un \textit{makefile} qui appelle
-\texttt{ocamlbuild} par les commandes usuelles de \texttt{make}. Il permet de
-créer deux binaires,
+Le code source est compilable via un usuel \texttt{\$make}. Le
+\textit{makefile} utilise le programme \texttt{ocamlbuild}. L'utilisation
+d'\texttt{ocamlbuild} permet de séparer plus facilement les sources dans un
+dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
+également automatiquement gérées. Deux cibles sont générées,
 \begin{itemize}
-  \item le bytecode avec les options de débogage (\texttt{-g}),\texttt{main.byte};
+  \item le bytecode avec les options de débogage (\texttt{-g})
+    \texttt{main.byte};
   \item le binaire optimisé pour bénéficier d'un temps d'exécution réduit,
-  \texttt{main.native};
+    \texttt{main.native}.
 \end{itemize}
 
-Les dépendances entre les modules sont gérées par \texttt{ocamldep}. La cible
+La cible
 \texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
-La cible \texttt{doc} génère la documentation a l'aide de l'outil
-\texttt{ocamldoc} et d'un code source documenté.
+La cible \texttt{doc} génère la documentation aux formats html, tex, texinfo,
+manpage et dot graph via \texttt{ocamldoc} et un code source adéquatement
+commenté.
 
 
 
