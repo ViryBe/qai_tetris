@@ -56,6 +56,8 @@ Calcule également les parametres optimaux avec l'option ```--panacea```:
 
 ```$ ./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
 
+Ce script entraîne un agent pour ~80 triplets de paramètres différents.
+Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
 
 ## Dépendances
 
