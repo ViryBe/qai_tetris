@@ -620,12 +620,13 @@ les données sont enregistrées dans un fichier.
 
 
 \section{Compilation}
-La compilation du code source se fait via un \textit{makefile}. Il permet de
-créer trois binaires,
+La compilation du code source se fait via un \textit{makefile} qui appelle
+\texttt{ocamlbuild} par les commandes usuelles de \texttt{make}. Il permet de
+créer deux binaires,
 \begin{itemize}
-  \item le bytecode avec les options de debugging (\texttt{-g});
-  \item le binaire optimisé pour bénéficier d'un temps d'exécution réduit;
-  \item un toplevel avec tous les modules importés.
+  \item le bytecode avec les options de débogage (\texttt{-g}),\texttt{main.byte};
+  \item le binaire optimisé pour bénéficier d'un temps d'exécution réduit,
+  \texttt{main.native};
 \end{itemize}
 
 Les dépendances entre les modules sont gérées par \texttt{ocamldep}. La cible

@@ -10,31 +10,30 @@
 ### Exécutables résultants
 
 
-* ```tetris_player``` (compilé avec ```ocamlc```)
-* ```tetris_player.opt``` (compilé avec ```ocamlopt```)
-* ```tetris_player.top``` : top-level avec import de tout les modules
+* ```main.byte``` (compilé avec ```ocamlc```)
+* ```main.native``` (compilé avec ```ocamlopt```)
 
 
 ## Entrainement Agent
 ```bash
-$ ./tetris_player -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+$ ./main.byte -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
 ```
 ou
 ```bash
-$ ./tetris_player.opt -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+$ ./main.native -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
 ```
 
 #### Performances
 Pour un entrainement de 500 parties de 10k tetrominos:
 
-* ```./tetris_player``` ~ 2 minutes
-* ```./tetris_player.opt``` ~ 15 secondes
+* ```./main.byte``` ~ 2 minutes
+* ```./main.native``` ~ 15 secondes
 
 ## Visualisation d'un jeu
 
 A partir d'une matrice 'qmat.save':
 
-```$ ./tetris_player -demo -qload qmat.save```
+```$ ./main.native -demo -qload qmat.save```
 
 ## Script ```tetris_parameval.bash```
 
@@ -62,11 +61,11 @@ Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
 ## Dépendances
 
 * ```gnuplot```
-* Modules OCaml : ```Marshal```, ```Graphics``` et ```Unix```
+* Modules OCaml : ```ocamlbuild```, ```Marshal```, ```Graphics``` et ```Unix```
 
 
 ## Documentation additionnelle
 
-```$ ./tetris_player --help```
+```$ ./main.native --help```
 
 ```$ ./tetris_parameval.bash --help```

@@ -28,7 +28,7 @@ Panacea: finds the 3 optimal values"
 SILVERSCRIPT='scripts/tetris_paramfind.bash'
 
 # Tetris player related options
-TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
+TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/main.native"
 
 BASEFNAME='gplot'   # beginning of file names
 BCSCALE=4           # number of decimals after dot
