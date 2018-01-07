@@ -5,6 +5,7 @@ _build/
 *.byte
 *.native
 *.docdir
+*.out
 
 # profiling
 gmon.out

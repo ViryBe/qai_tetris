@@ -14,7 +14,7 @@ Param:
 NGAMES=512
 NTETR=10000
 OUT='/dev/stdout'
-TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/tetris_player.opt"
+TETRIS_CMD="$( dirname ${BASH_SOURCE[0]} )/main.native"
 
 TEMP=$( getopt -o $OPTIONS --long $LGOPTIONS -n $NAME -- "$@" )
 
