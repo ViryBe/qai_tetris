@@ -19,13 +19,15 @@ setup.log
 
 # latex files
 *.pdf
-*.synctex.gz
-*.fdb_latexmk
+latex/*.synctex.gz
+latex/*.fdb_latexmk
 latex/*.out
 latex/*.aux
 latex/*.fls
 latex/*.toc
 latex/*.log
+latex/*.nav
+latex/*.snm
 latex/data
 
 # vim specific files
