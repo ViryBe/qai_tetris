@@ -702,8 +702,8 @@ programme \texttt{latexmk} est également utilisé pour faciliter la compilation
 \section{Limites intrinsèques de conception}
 \subsection{Résolution de collisions}
 La gestion actuelle des collisions oblige l'accessibilité de la position finale
-depuis le haut du plateau. L'agent ne peut placer de tetrominos qu'\'a des
-positions o\'u ils peuvent ``tomber'', c'est-\'a-dire que les tetrominos ne
+depuis le haut du plateau. L'agent ne peut placer de tetrominos qu'\`a des
+positions o\`u ils peuvent ``tomber'', c'est-\`a-dire que les tetrominos ne
 peuvent pas être glissés au dernier moment sous d'autres.
 
 \section{Le fléau de la mutabilité}
@@ -752,10 +752,10 @@ agent initial.
 La généralisation du code s'est malheureusement révélée plus
 délicate que prévu. D'une part les deux méthodes implémentées
 différaient trop, notamment sur le nombre de paramètres, ou
-l'utilisation d'une mémoire, d'autre part adapter le code \'a ces deux
-implémentations finissait plus \'a ressembler \'a du bricolage plutôt qu'\'a
-de la généralisation. Et de plus cela avait tendance \'a pervertir le code
-développé pour la fonction de valuation, le poussant \'a coller \'a la
+l'utilisation d'une mémoire, d'autre part adapter le code \`a ces deux
+implémentations finissait plus \`a ressembler \`a du bricolage plutôt qu'\`a
+de la généralisation. Et de plus cela avait tendance \`a pervertir le code
+développé pour la fonction de valuation, le poussant \`a coller \`a la
 signature d'un argument de foncteur qui est peut-être, avouons le, mal conçu.
 
 En conséquence, l'agent utilisant la fonction d'évaluation est codé sur
@@ -775,11 +775,18 @@ L'utilisation d'OCaml a permis d'aborder les différences entre la programmation
 fonctionnelle et impérative, notamment l'opposition sécurité contre performance.
 
 \paragraph{Continuation}
+L'implémentation actuelle peut voir sa représentation des états allégée en
+tirant profit de la symétrie du plateau, chaque état dispose d'un état
+symétrique par rapport a un axe au milieu du plateau. On divise ainsi le nombre
+d'états par deux. On peut ainsi espérer une convergence plus rapide de la
+matrice Q vers la matrice optimale.
+
 L'implémentation de la fonction de valuation n'est pas encore en place,
 particulièrement au niveau des caractéristiques.
 
 D'autres méthodes d'apprentissages pourraient être explorées. On peut par
 exemple citer le deep Q learning\cite{deepmind}.
+
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
