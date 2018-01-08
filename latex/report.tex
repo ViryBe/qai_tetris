@@ -666,17 +666,11 @@ les données sont enregistrées dans un fichier.
 
 
 \section{Compilation}
-<<<<<<< HEAD
-La compilation du code source se fait via un \textit{makefile} qui appelle
-\texttt{ocamlbuild} par les commandes usuelles de \texttt{make}. Il permet de
-créer deux exécutables,
-=======
 Le code source est compilable via un usuel \texttt{\$make}. Le
 \textit{makefile} utilise le programme \texttt{ocamlbuild}. L'utilisation
 d'\texttt{ocamlbuild} permet de séparer plus facilement les sources dans un
 dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
 également automatiquement gérées. Deux cibles sont générées,
->>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 \begin{itemize}
   \item le bytecode avec les options de débogage (\texttt{-g})
     \texttt{main.byte};
@@ -686,14 +680,9 @@ dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
 
 La cible
 \texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
-<<<<<<< HEAD
-La cible \texttt{doc} génère la documentation à l'aide de l'outil
-\texttt{ocamldoc} et d'un code source documenté.
-=======
 La cible \texttt{doc} génère la documentation aux formats html, tex, texinfo,
 manpage et dot graph via \texttt{ocamldoc} et un code source adéquatement
 commenté.
->>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 
 
 
@@ -774,15 +763,10 @@ une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
-<<<<<<< HEAD
-Ce projet a permis d'aboutir à une implémentation viable de l'algorithme de Q
-learning applique au jeu de Tetris. L'algorithme développé obtient des résultats
-=======
 Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
-learning appliquée au jeu de Tetris. L'algorithme développé obtient des résultats
->>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
-du même ordre que ce que l'on trouve dans la littérature, avec des évolutions
-visibles.
+learning appliquée au jeu de Tetris. L'algorithme développé obtient des
+résultats du même ordre que ce que l'on trouve dans la littérature, avec une
+évolutions des performances de jeu visible.
 
 Le paramétrage permet d'adapter le comportement de l'agent en fonction des
 performances souhaitées.
