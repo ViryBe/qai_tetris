@@ -154,7 +154,7 @@ inférieure à 2).
       \draw (-1,1) rectangle (1,-1);
     \end{tikzpicture}
   }
-  \caption{Liste des tertrominos}\label{fig:tetrolist}
+  \caption{Liste des tetrominos}\label{fig:tetrolist}
 \end{figure}
 
 Un tetromino est placé par le choix d'une colonne et d'une orientation.
@@ -164,7 +164,7 @@ Un tetromino est placé par le choix d'une colonne et d'une orientation.
 \subsection{Représentation}
 
 \paragraph{Tetrominos}
-Les tetrominos sont tableaux de longueur 4. L'unidimensionnalité permet
+Les tetrominos sont des tableaux de longueur 4. L'unidimensionnalité permet
 d'implémenter les rotations comme des transformations d'indices, évitant la
 création ou la modification de structures.
 
@@ -177,7 +177,7 @@ manipulations du plateau se font en place.
 
 
 \paragraph{Actions}
-Composées d'une rotation et d'une translation. Elles permettent d'agir sur les
+Composées d'une rotation et d'une translation, elles permettent d'agir sur les
 tetrominos. Les rotations sont représentées par les points cardinaux
 (North, South, East, West) et les translations par un entier compris entre 0 et
 \(b_w - 2\) correspondant à l'indice du coin supérieur gauche du tetromino
@@ -206,17 +206,17 @@ tetrominos. Les rotations sont représentées par les points cardinaux
 \end{figure}
 
 La géométrie de certains tetrominos rend certaines orientations redondantes. Par
-exemple le carre est invariant par rotation, et utiliser les quatre rotations
+exemple le carré est invariant par rotation, et utiliser les quatre rotations
 ne fait qu'augmenter inutilement le nombre d'actions possibles, et augmente par
-conséquent la quantité d'information que l'agent doit apprendre. Pour pallier
+conséquent la quantité d'informations que l'agent doit apprendre. Pour pallier
 cette redondance, chaque tetromino dispose de son propre ensemble de rotations
 applicables.
 
 \section{Déroulement d'une partie}
-Un tetromino choisi aléatoirement parmi les cinq disponibles est donne au
-joueur. Ce dernier doit alors choisir ou et comment le placer. Une fois ce
-choix effectue, le tetromino est place en respectant les contraintes du jeu. Le
-plateau est ensuite mis a jour: les lignes complètes sont supprimées et la
+Un tetromino choisi aléatoirement parmi les cinq disponibles est donné au
+joueur. Ce dernier doit alors choisir où et comment le placer. Une fois ce
+choix effectué, le tetromino est placé en respectant les contraintes du jeu. Le
+plateau est ensuite mis à jour: les lignes complètes sont supprimées et la
 hauteur est réévaluée. Un nouveau tetromino est donne et le jeu continue.
 
 
@@ -240,12 +240,12 @@ la taille totale du plateau reste la même.
 
 L'apprentissage par renforcement est une méthode d'apprentissage automatique
 inspirée de la biologie. L'idée est un apprentissage à partir d'actions et
-de récompenses, permettant \'a l'entité évoluant d'adapter son comportement aux
+de récompenses, permettant à l'entité évoluant d'adapter son comportement aux
 conséquences de ses actions.
 
 Un agent est plongé dans un environnement (ici le jeu de Tetris) et effectue une
 action (pour nous un mouvement). L'agent reçoit alors une récompense (ou alors
-une punition) qui lui permet d'adapter son comportement et ainsi apprendre à
+une punition) qui lui permet d'adapter son comportement et ainsi d'apprendre à
 évoluer dans l'environnement.
 
 \begin{figure}[h]
@@ -306,10 +306,10 @@ Bellman\cite{mengin}
 \section{Représentation des états}
 
 \subsection{Composition}
-Intuitivement, un état correspond à la pièce donnée à jouer et la disposition
-des pièces sur le plateau, ce qui correspond aux informations nécessaires pour
-le placement d'une pièce par l'agent. En notant \(n_t\) le nombre de tetrominos
-différents, \( h \) la hauteur du plateau a un instant considéré  et \(w\) la
+Intuitivement, pour placer une nouvelle pièce, nous avons besoin de l'état du
+plateau ainsi que de la nouvelle pièce donnée. Ceci correspond aux informations
+nécessaires pour le placement d'une pièce par l'agent. En notant \(n_t\) le nombre de tetrominos
+différents, \( h \) la hauteur du plateau à un instant considéré  et \(w\) la
 largeur du plateau, on obtient \(n_t \cdot 2^{h \cdot b_w}\) états possibles.
 
 Pour réduire le nombre d'états, on ne considère que les deux plus hautes lignes
@@ -348,13 +348,13 @@ actions parmi l'ensemble des actions possibles \(\mathcal{A}\), étant donne un
 \end{algorithm}
 
 
-L'algorithme~\ref{alg:qlearning} définit la manière dont l'agent se met a jour
+L'algorithme~\ref{alg:qlearning} définit la manière dont l'agent se met à jour
 afin de maximiser l'espérance de gain. Est notée \(\gamma\) la vision de
-l'agent correspondant a l'importance que l'agent attribue aux récompenses
-futures par rapport a la récompense immédiate. Un \(\gamma\) de zéro crée un
+l'agent correspondant à l'importance que l'agent attribue aux récompenses
+futures par rapport à la récompense immédiate. Un \(\gamma\) de zéro crée un
 agent myope ne choisissant son action que par rapport a la récompense immédiate
 tandis qu'un \(\gamma\) tendant vers un associe autant d'importance aux
-récompenses des coups suivants qu'a la récompense immédiate.
+récompenses des coups suivants qu'à la récompense immédiate.
 \begin{algorithm}
   \caption{Algorithme de \textit{Q-learning}}\label{alg:qlearning}
   \begin{algorithmic}
@@ -373,10 +373,10 @@ récompenses des coups suivants qu'a la récompense immédiate.
   \end{algorithmic}
 \end{algorithm}
 
-Pour réaliser une mise a jour, l'agent commence par choisir l'action qui, a un
-état donne fournit l'espérance de récompense maximale, selon les connaissances
-actuelles de l'agent. Une fois le coup joue, l'agent reçoit une récompense
-évaluant évaluant l'impact du coup choisi sur l'environnement. L'agent utilise
+Pour réaliser une mise à jour, l'agent commence par choisir l'action qui, à un
+état donné fournit l'espérance de récompense maximale, selon les connaissances
+actuelles de l'agent. Une fois le coup joué, l'agent reçoit une récompense
+évaluant l'impact du coup choisi sur l'environnement. L'agent utilise
 cette récompense et sa connaissance des états résultants pour affiner
 l'espérance de récompense associée au coup qu'il vient de réaliser.
 
@@ -426,7 +426,7 @@ stabiliser les résultats obtenus.
   \centering
   \subfloat[
     Premiers jeux, un \(\epsilon\) non nul favorise la prise de
-    d\'ecisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
+    décisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
     (\(\epsilon = 0\)) est plus haute que les autres. La courbe
     ayant l'\(\epsilon\) le plus \'elev\'e est la plus basse.
   ] {%
@@ -494,7 +494,7 @@ stabilité finale discrimineront la qualité des paramètres.
 \subparagraph{Fréquence de coups aléatoires} Les
 courbes~\ref{sfig:exex_first_steps} montrent qu'un \(\epsilon\) nul n'est pas
 optimal. Le graphe~\ref{fig:eps_high} montre qu'un \(\epsilon\) plus grand
-que 0.02 tend a ralentir la convergence du système.
+que 0.02 tend à ralentir la convergence du système.
 \begin{figure}
   \centering
   \begin{tikzpicture}
@@ -537,13 +537,13 @@ que 0.02 tend a ralentir la convergence du système.
 
 \section{Représentation des états et transitions}
 
-Dans cette partie l'ensemble des états \( \mathcal{S} \) est égal à l'ensemble
+Dans cette partie l'ensemble des états \( \mathcal{S} \) correspond à l'ensemble
 des plateaux possibles. \( s \in \mathcal{S} \) est un plateau particulier.
 
 \section{Nouvelle méthode d'apprentissage}
 
 Pour s'affranchir de la limite de mémoire due au nombre d'états possibles, la
-matrice est remplacée par une fonction objectif \( V \) tel que:
+matrice est remplacée par une fonction objectif \( V \) telle que:
 \[
   \forall s \in \mathcal{S}, \qquad V(s) =
   \mathbb{E}\left(\sum_{t=0}^{+\infty} \gamma ^t \cdot r_t\right)
@@ -566,8 +566,8 @@ est définie par:
 On appelle transition un 4-uplet \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 \begin{itemize}
     \item \( s_t \) le plateau à l'étape \( t \)
-    \item \( a_t \) l'action joué à l'étape \( t \)
-    \item \( r_t \) la récompense joué à l'étape \( t \)
+    \item \( a_t \) l'action jouée à l'étape \( t \)
+    \item \( r_t \) la récompense jouée à l'étape \( t \)
     \item \( s_{t+1} \) le plateau résultant de l'action \( a_t \)
 \end{itemize}
 
@@ -597,7 +597,7 @@ transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
 \end{algorithm}
 
 Pour ne pas sauvegarder plusieurs fois le plateau de jeu \(s_t\), on ne met en
-mémoire que les features intéressantes \( (\phi_1 (s_t), \hdots, \phi_7(s_t)) \).
+mémoire que les caractéristiques (features) intéressantes \( (\phi_1 (s_t), \hdots, \phi_7(s_t)) \).
 
 Une fois la mémoire \( \mathcal{M} \) remplie avec \( B \) transitions, on
 calcule \(\delta_t\):
@@ -616,12 +616,12 @@ On définit alors une fonction de coût (loss function):
 \]
 
 On applique alors l'algorithme de descente de gradient pour minimiser la fonction
-\( \mathcal{L} \) en actualisant les poids \( w \) suivant:
+\( \mathcal{L} \) en actualisant les poids \( w \) suivants:
 \[
 w = w - \eta \nabla \mathcal{L}
 \]
 
-La procédure est synthétisé dans l'algorithme suivant:
+La procédure est synthétisée dans l'algorithme suivant:
 
 \begin{algorithm}[H]
   \caption{Algorithme d'apprentissage d'une fonction linéaire}\label{alg:linfct}
@@ -634,7 +634,7 @@ La procédure est synthétisé dans l'algorithme suivant:
     \For{1 to $B$}
     \State{} \(a \gets \mathup{ChooseAction2}(V, s, \mathcal{A}, \epsilon)\)
     \State{} joue \(a\), observer \(r\) et le nouvel \'etat \(s'\)
-    \State{} ajouter a la mémoire \( \left(\phi(s), a, r, \phi(s')\right) \)
+    \State{} ajouter à la mémoire \( \left(\phi(s), a, r, \phi(s')\right) \)
     \EndFor{}
     \State{} Choisir aléatoirement \(B\) quadruplets depuis la mémoire
     \State{} \(y_t \gets r_t + \gamma V\left(\phi(s_t')\right)\)
@@ -653,11 +653,11 @@ La procédure est synthétisé dans l'algorithme suivant:
 
 
 \chapter{Programmes auxiliaires}
-\section{Creation de faisceaux}\label{sec:faisceaux}
+\section{Création de faisceaux}\label{sec:faisceaux}
 La création de faisceaux de courbes est automatisée via le script bash
 \texttt{tetris\_parameval.bash}. Tout le paramétrage se fait en ligne de commande
 par les arguments passés au script. Le langage bash a été choisi car semble le
-plus propice a l'utilisation en ligne de commande.
+plus propice à l'utilisation en ligne de commande.
 
 Le parsing se fait avec le GNU \texttt{getopt}, les calculs en virgule flottante
 avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
@@ -666,11 +666,17 @@ les données sont enregistrées dans un fichier.
 
 
 \section{Compilation}
+<<<<<<< HEAD
+La compilation du code source se fait via un \textit{makefile} qui appelle
+\texttt{ocamlbuild} par les commandes usuelles de \texttt{make}. Il permet de
+créer deux exécutables,
+=======
 Le code source est compilable via un usuel \texttt{\$make}. Le
 \textit{makefile} utilise le programme \texttt{ocamlbuild}. L'utilisation
 d'\texttt{ocamlbuild} permet de séparer plus facilement les sources dans un
 dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
 également automatiquement gérées. Deux cibles sont générées,
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 \begin{itemize}
   \item le bytecode avec les options de débogage (\texttt{-g})
     \texttt{main.byte};
@@ -680,18 +686,23 @@ dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
 
 La cible
 \texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
+<<<<<<< HEAD
+La cible \texttt{doc} génère la documentation à l'aide de l'outil
+\texttt{ocamldoc} et d'un code source documenté.
+=======
 La cible \texttt{doc} génère la documentation aux formats html, tex, texinfo,
 manpage et dot graph via \texttt{ocamldoc} et un code source adéquatement
 commenté.
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 
 
 
 
 \section{Rapport}
-Le rapport est rédigé en \LaTeX{}, les figures et graphes sont faits grâce a
+Le rapport est rédigé en \LaTeX{}, les figures et graphes sont faits grâce à
 \texttt{PGF/tikz}. Le rapport est compilé via un \textit{makefile} dédié
 automatisant la génération des fichiers de données pour créer les courbes en
-appelant le script bash susmentionne en~\ref{sec:faisceaux}. Le
+appelant le script bash susmentionné en~\ref{sec:faisceaux}. Le
 programme \texttt{latexmk} est également utilisé pour faciliter la compilation.
 
 
@@ -704,12 +715,7 @@ programme \texttt{latexmk} est également utilisé pour faciliter la compilation
 La gestion actuelle des collisions oblige l'accessibilité de la position finale
 depuis le haut du plateau. L'agent ne peut placer de tetrominos qu'\'a des
 positions o\'u ils peuvent ``tomber'', c'est-\'a-dire que les tetrominos ne
-peuvent être glissés au dernier moment sous d'autres. Plus formellement, tout
-tetromino placé ne peut avoir de cellule occupée en amont des siennes. Autrement
-dit, en considérant un tetromino de largeur \(l\) (avec dans notre
-implémentation \(l = 1\) ou \(2\)), chacun des tétraèdres composant le tetromino
-ne peut avoir de tétraèdre d'un tetromino pose précédemment sur la même colonne
-a une hauteur supérieure.
+peuvent pas être glissés au dernier moment sous d'autres.
 
 \section{Le fléau de la mutabilité}
 L'usage du \texttt{Array.blit} s'est révélé plus délicat que prévu. En
@@ -726,7 +732,7 @@ tetrominos, faisant augmenter la hauteur.
 Pour pallier ce problème de partage d'adresse mémoire, la ligne \(h\) est
 recréée à chaque blit.
 
-\section{Hollandais volant}\label{sec:hollandais_volant}
+\section{Le lémurien volant - Tetromino flottant}\label{sec:hollandais_volant}
 La fonction collide permet de tester la collision du tetromino avec les autres
 pièces et le fond du plateau. Lors de l'exécution de la fonction \texttt{play}
 on testait donc toutes les positions possibles pour déposer les pièces de
@@ -768,8 +774,13 @@ une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
+<<<<<<< HEAD
+Ce projet a permis d'aboutir à une implémentation viable de l'algorithme de Q
+learning applique au jeu de Tetris. L'algorithme développé obtient des résultats
+=======
 Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
 learning appliquée au jeu de Tetris. L'algorithme développé obtient des résultats
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 du même ordre que ce que l'on trouve dans la littérature, avec des évolutions
 visibles.
 
