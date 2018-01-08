@@ -531,6 +531,14 @@ que 0.02 tend à ralentir la convergence du système.
   convergence.}\label{fig:alphap}
 \end{figure}
 
+\paragraph{Limite de la méthode}
+Pour augmenter les performances de l'agent, le modèle peut être affine, par
+exemple en considérant plus de cases.
+
+Le nombre d'états étant le nombre de lignes de la Q matrice, son ordre de
+grandeur doit rester limite (dans notre cas, environ 20000) pour des
+considérations de mémoire. En effet, le nombre d'état augmente de manière
+exponentielle en fonction du nombre de cases considérées.
 
 
 \chapter{Minimisation d'une fonction objectif \( V \)}
@@ -648,25 +656,40 @@ La procédure est synthétisée dans l'algorithme suivant:
 \end{algorithm}
 
 
+\paragraph{}
+Si cette méthode permet de s'affranchir des contraintes de mémoire liées au
+nombre d'états, il n'est pas sur qu'elle soit plus performante (apprentissage
+plus rapide, convergence plus rapide, hauteur finale plus faible, \dots).
+L'implémentation n'étant pas achevée, nous ne pouvons conclure sur ce point. Le
+code reste néanmoins accessible sur la branche \texttt{valuation} du dépôt
+github.
+
+
 
 
 
 
 \chapter{Programmes auxiliaires}
-\section{Création de faisceaux}\label{sec:faisceaux}
+\section{Scripts}\label{sec:faisceaux}
+\paragraph{Creation de faisceaux}
 La création de faisceaux de courbes est automatisée via le script bash
 \texttt{tetris\_parameval.bash}. Tout le paramétrage se fait en ligne de commande
-par les arguments passés au script. Le langage bash a été choisi car semble le
-plus propice à l'utilisation en ligne de commande.
+par les arguments passés au script. Le langage bash a été choisi car il semble
+le plus propice à l'utilisation en ligne de commande.
 
 Le parsing se fait avec le GNU \texttt{getopt}, les calculs en virgule flottante
 avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
 les données sont enregistrées dans un fichier.
 
+\paragraph{Parametres optimaux}
+Les parametres \(\alpha, \gamma, \epsilon\) optimisant au choix la hauteur
+finale, l'ecart type ou la vitesse de convergence sont determines par un script
+bash donnant des donnees a traiter a un script python.
+
 
 
 \section{Compilation}
-Le code source est compilable via un usuel \texttt{\$make}. Le
+Le code source est compilable via un usuel \texttt{\$ make}. Le
 \textit{makefile} utilise le programme \texttt{ocamlbuild}. L'utilisation
 d'\texttt{ocamlbuild} permet de séparer plus facilement les sources dans un
 dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
@@ -774,18 +797,14 @@ performances souhaitées.
 L'utilisation d'OCaml a permis d'aborder les différences entre la programmation
 fonctionnelle et impérative, notamment l'opposition sécurité contre performance.
 
-\paragraph{Continuation}
 L'implémentation actuelle peut voir sa représentation des états allégée en
 tirant profit de la symétrie du plateau, chaque état dispose d'un état
 symétrique par rapport a un axe au milieu du plateau. On divise ainsi le nombre
 d'états par deux. On peut ainsi espérer une convergence plus rapide de la
 matrice Q vers la matrice optimale.
 
-L'implémentation de la fonction de valuation n'est pas encore en place,
-particulièrement au niveau des caractéristiques.
-
-D'autres méthodes d'apprentissages pourraient être explorées. On peut par
-exemple citer le deep Q learning\cite{deepmind}.
+D'autres méthodes d'apprentissages pourraient également être explorées. On peut
+par exemple citer le deep Q learning\cite{deepmind}.
 
 
 \begin{thebibliography}{9}
