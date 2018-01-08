@@ -771,13 +771,20 @@ foncteur est disponible sur la branche \texttt{functorise}.
 Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
 learning appliquée au jeu de Tetris. L'algorithme développé obtient des résultats
 du même ordre que ce que l'on trouve dans la littérature, avec des évolutions
-visibles. Le paramétrage permet de modifier les caractéristiques du programme,
-le permettant de répondre à plusieurs contraintes, rappelons principalement la
-vitesse de convergence et la stabilité.
+visibles.
+
+Le paramétrage permet d'adapter le comportement de l'agent en fonction des
+performances souhaitées.
 
 L'utilisation d'OCaml a permis d'aborder les différences entre la programmation
-fonctionnelle et impérative, notamment l'opposition sécurité contre performance
-incarnée par le problème de mutabilité des données.
+fonctionnelle et impérative, notamment l'opposition sécurité contre performance.
+
+\paragraph{Continuation}
+L'implémentation de la fonction de valuation n'est pas encore en place,
+particulièrement au niveau des caractéristiques.
+
+D'autres méthodes d'apprentissages pourraient être explorées. On peut par
+exemple citer le deep Q learning\cite{deepmind}.
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
@@ -792,7 +799,14 @@ incarnée par le problème de mutabilité des données.
     Amine Boumaza,
     \textit{How to design good Tetris players}
     2013.
+    \bibitem{schiex_alliot92}
+    J.-M.~Alliot \& T.~Schiex,
+    \textit{Intelligence artificelle \& informatique theorique}
+    C\'epadu\`es \'editions, 1992
     \bibitem{mengin}
+    J\'er\^ome Mengin,
+    \textit{Apprentissage par renforcement},
+    Université Paul Sabatier, 2016
 \end{thebibliography}
 
 \end{document}
