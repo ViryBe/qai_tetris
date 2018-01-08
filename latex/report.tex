@@ -297,7 +297,7 @@ trouver une matrice optimale \(Q^*\).
 L'algorithme fonctionne selon un processus itératif qui fera converger sous
 certaines conditions, la matrice vers son homologue optimal.
 
-L'equation regissant les changements de coefficients decoule de l'equation de
+L'équation regissant les changements de coefficients decoule de l'equation de
 Bellman\cite{mengin}
 \[
   Q^*(s_t, a_t) = \argmax_{a_{t+1}}Q(s_{t+1}, a_{t+1}) + r(s_t)
@@ -379,6 +379,16 @@ actuelles de l'agent. Une fois le coup joue, l'agent reçoit une récompense
 évaluant évaluant l'impact du coup choisi sur l'environnement. L'agent utilise
 cette récompense et sa connaissance des états résultants pour affiner
 l'espérance de récompense associée au coup qu'il vient de réaliser.
+
+\subsection{Récompense}
+Une fonction de récompense doit être définie afin d'indiquer a l'agent la
+pertinence du coup joué. L'objectif étant d'avoir une hauteur finale minimale,
+il est souhaitable que le coup joue augmente le moins possible voire diminue la
+hauteur actuelle. Elle sera donc définie en fonction de la différence \(\delta
+h\) de hauteur induite par le coup,
+\[
+  r(\delta h) = 100\delta h.
+\]
 
 \subsection{Paramètres}
 L'apprentissage est paramétré par les trois variables,
