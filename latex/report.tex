@@ -61,10 +61,30 @@
 \maketitle
 \tableofcontents
 
-\chapter*{Introduction}
+\section*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
+\paragraph{Intelligence artificielle}
+Nous utiliserons la définition de l'ia de~\cite{schiex_alliot92} soit
+``faire exécuter par l'ordinateur des taches pour lesquelles l'homme, dans un
+contexte donné, est aujourd'hui meilleur que la machine''. Cela justifie
+l'application de l'ia aux jeux, ceux ci étant une activité quasi propre a
+l'homme.
 
-\chapter*{Notations}
+Dans le cadre du projet, nous implémentons un algorithme d'apprentissage
+artificiel pour le jeu Tetris. Plus précisément, l'apprentissage se fera par
+renforcement via l'algorithme de Q learning.
+
+\paragraph{Répartition des taches}
+Le programme nécessitant l'implémentation du jeu et de l'algorithme
+d'apprentissage, le travail a donc été divisé en deux parties. L'une realisee
+par Claire et L\'ea, l'autre par Gabriel et Beno\^it.
+
+\paragraph{Code source}
+Le code source est disponible sur
+\href{https://github.com/ViryBe/qai_tetris}{github}.
+
+
+\section*{Notations}
 \addcontentsline{toc}{chapter}{Notations}
 Seront notées dans la suite du rapport:
 \begin{itemize}
@@ -264,8 +284,24 @@ La récompense à long terme pour un ensemble
 
 
 \subsection{Le Q-learning}
+La particularité du Q learning vient de la définition du modèle \(R\). Dans ce
+cas, elle est calculée grâce a une matrice Q (pour qualité) de la façon
+suivante,
+\[
+  R(s) = \argmax_{a} Q(s,a).
+\]
+L'objectif est d'obtenir la fonction \(R\) optimale, usuellement notée
+\(R^*\), cela revient de manière équivalente a ajuster les coefficients afin de
+trouver une matrice optimale \(Q^*\).
 
+L'algorithme fonctionne selon un processus itératif qui fera converger sous
+certaines conditions, la matrice vers son homologue optimal.
 
+L'equation regissant les changements de coefficients decoule de l'equation de
+Bellman\cite{mengin}
+\[
+  Q^*(s_t, a_t) = \argmax_{a_{t+1}}Q(s_{t+1}, a_{t+1}) + r(s_t)
+\]
 
 \section{Représentation des états}
 
@@ -746,6 +782,7 @@ incarnée par le problème de mutabilité des données.
     Amine Boumaza,
     \textit{How to design good Tetris players}
     2013.
+    \bibitem{mengin}
 \end{thebibliography}
 
 \end{document}
