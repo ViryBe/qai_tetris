@@ -16,11 +16,11 @@
 
 ## Entrainement Agent
 ```bash
-$ ./main.byte -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+$ ./main.byte -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave save.qmat
 ```
 ou
 ```bash
-$ ./main.native -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave qmat.save
+$ ./main.native -ngames 500 -ntetr 10000 -gamma 0.8 -epsilon 0.05 -alphap 0.005 -qsave save.qmat
 ```
 
 #### Performances
@@ -33,7 +33,7 @@ Pour un entrainement de 500 parties de 10k tetrominos:
 
 A partir d'une matrice 'qmat.save':
 
-```$ ./main.native -demo -qload qmat.save```
+```$ ./main.native -demo -qload save.qmat```
 
 ## Script ```tetris_parameval.bash```
 
@@ -55,7 +55,7 @@ Calcule également les parametres optimaux avec l'option ```--panacea```:
 
 ```$ ./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
 
-Ce script entraîne un agent pour ~80 triplets de paramètres différents.
+Ce script entraîne un agent pour ~800 triplets de paramètres différents.
 Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
 
 ## Dépendances

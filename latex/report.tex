@@ -61,10 +61,30 @@
 \maketitle
 \tableofcontents
 
-\chapter*{Introduction}
+\section*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
+\paragraph{Intelligence artificielle}
+Nous utiliserons la définition de l'ia de~\cite{schiex_alliot92} soit
+``faire exécuter par l'ordinateur des taches pour lesquelles l'homme, dans un
+contexte donné, est aujourd'hui meilleur que la machine''. Cela justifie
+l'application de l'ia aux jeux, ceux ci étant une activité quasi propre a
+l'homme.
 
-\chapter*{Notations}
+Dans le cadre du projet, nous implémentons un algorithme d'apprentissage
+artificiel pour le jeu Tetris. Plus précisément, l'apprentissage se fera par
+renforcement via l'algorithme de Q learning.
+
+\paragraph{Répartition des taches}
+Le programme nécessitant l'implémentation du jeu et de l'algorithme
+d'apprentissage, le travail a donc été divisé en deux parties. L'une realisee
+par Claire et L\'ea, l'autre par Gabriel et Beno\^it.
+
+\paragraph{Code source}
+Le code source est disponible sur
+\href{https://github.com/ViryBe/qai_tetris}{github}.
+
+
+\section*{Notations}
 \addcontentsline{toc}{chapter}{Notations}
 Seront notées dans la suite du rapport:
 \begin{itemize}
@@ -264,8 +284,24 @@ La récompense à long terme pour un ensemble
 
 
 \subsection{Le Q-learning}
+La particularité du Q learning vient de la définition du modèle \(R\). Dans ce
+cas, elle est calculée grâce a une matrice Q (pour qualité) de la façon
+suivante,
+\[
+  R(s) = \argmax_{a} Q(s,a).
+\]
+L'objectif est d'obtenir la fonction \(R\) optimale, usuellement notée
+\(R^*\), cela revient de manière équivalente a ajuster les coefficients afin de
+trouver une matrice optimale \(Q^*\).
 
+L'algorithme fonctionne selon un processus itératif qui fera converger sous
+certaines conditions, la matrice vers son homologue optimal.
 
+L'équation regissant les changements de coefficients decoule de l'equation de
+Bellman\cite{mengin}
+\[
+  Q^*(s_t, a_t) = \argmax_{a_{t+1}}Q(s_{t+1}, a_{t+1}) + r(s_t)
+\]
 
 \section{Représentation des états}
 
@@ -343,6 +379,16 @@ actuelles de l'agent. Une fois le coup joué, l'agent reçoit une récompense
 évaluant l'impact du coup choisi sur l'environnement. L'agent utilise
 cette récompense et sa connaissance des états résultants pour affiner
 l'espérance de récompense associée au coup qu'il vient de réaliser.
+
+\subsection{Récompense}
+Une fonction de récompense doit être définie afin d'indiquer a l'agent la
+pertinence du coup joué. L'objectif étant d'avoir une hauteur finale minimale,
+il est souhaitable que le coup joue augmente le moins possible voire diminue la
+hauteur actuelle. Elle sera donc définie en fonction de la différence \(\delta
+h\) de hauteur induite par le coup,
+\[
+  r(\delta h) = 100\delta h.
+\]
 
 \subsection{Paramètres}
 L'apprentissage est paramétré par les trois variables,
@@ -620,19 +666,34 @@ les données sont enregistrées dans un fichier.
 
 
 \section{Compilation}
+<<<<<<< HEAD
 La compilation du code source se fait via un \textit{makefile} qui appelle
 \texttt{ocamlbuild} par les commandes usuelles de \texttt{make}. Il permet de
 créer deux exécutables,
+=======
+Le code source est compilable via un usuel \texttt{\$make}. Le
+\textit{makefile} utilise le programme \texttt{ocamlbuild}. L'utilisation
+d'\texttt{ocamlbuild} permet de séparer plus facilement les sources dans un
+dossier dédié (ici \texttt{src/}). Les dépendances entre programmes sont
+également automatiquement gérées. Deux cibles sont générées,
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 \begin{itemize}
-  \item le bytecode avec les options de débogage (\texttt{-g}),\texttt{main.byte};
+  \item le bytecode avec les options de débogage (\texttt{-g})
+    \texttt{main.byte};
   \item le binaire optimisé pour bénéficier d'un temps d'exécution réduit,
-  \texttt{main.native};
+    \texttt{main.native}.
 \end{itemize}
 
-Les dépendances entre les modules sont gérées par \texttt{ocamldep}. La cible
+La cible
 \texttt{tags} permet de créer le fichier de tags utilisable par divers éditeurs.
+<<<<<<< HEAD
 La cible \texttt{doc} génère la documentation à l'aide de l'outil
 \texttt{ocamldoc} et d'un code source documenté.
+=======
+La cible \texttt{doc} génère la documentation aux formats html, tex, texinfo,
+manpage et dot graph via \texttt{ocamldoc} et un code source adéquatement
+commenté.
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 
 
 
@@ -713,8 +774,13 @@ une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
+<<<<<<< HEAD
 Ce projet a permis d'aboutir à une implémentation viable de l'algorithme de Q
 learning applique au jeu de Tetris. L'algorithme développé obtient des résultats
+=======
+Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
+learning appliquée au jeu de Tetris. L'algorithme développé obtient des résultats
+>>>>>>> f817fa05689dc7ac3b6d64c08011e6bef2babf2e
 du même ordre que ce que l'on trouve dans la littérature, avec des évolutions
 visibles. Le paramétrage permet de modifier les caractéristiques du programme,
 le permettant de répondre à plusieurs contraintes, rappelons principalement la
@@ -737,6 +803,7 @@ incarnée par le problème de mutabilité des données.
     Amine Boumaza,
     \textit{How to design good Tetris players}
     2013.
+    \bibitem{mengin}
 \end{thebibliography}
 
 \end{document}

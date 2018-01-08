@@ -1,14 +1,17 @@
-TARGET = report
 PARAMEVAL = ../tetris_parameval.bash
-CC = latexmk
-FLAGS = -lualatex -shell-escape -synctex=1
+LC = latexmk
+FLAGS = -lualatex -shell-escape -synctex=1 -silent
 GRAPHDIR = data
 GRAPHS = gamma alphap epsilon eps_high
 GRAPHFILES = $(addsuffix .dat, $(addprefix $(GRAPHDIR)/, $(GRAPHS)))
-SRC = report.tex
 
-$(TARGET): $(SRC) $(GRAPHFILES)
-	$(CC) $(FLAGS) $<
+all: report.pdf slideshow.pdf
+
+slideshow.pdf: slideshow.tex
+	$(LC) $(FLAGS) $<
+
+report.pdf: report.tex $(GRAPHFILES)
+	$(LC) $(FLAGS) $<
 
 $(GRAPHDIR)/gamma.dat:
 	$(PARAMEVAL) -p gamma -l 0.8 -u 1 -n 6 -q -o $@
@@ -32,4 +35,4 @@ tags:
 	ctags *.tex Makefile
 
 clean:
-	rm -rf *.log *.toc *.aux *.out *.fdb_latexmk *.fls
+	$(LC) -c
