@@ -16,6 +16,31 @@
 \author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
 \date{}
 
+\usetikzlibrary{patterns,arrows,positioning}
+\tikzset{
+    %Define standard arrow tip
+    >=stealth',
+    %Define style for boxes
+    punkt/.style={
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           text width=6.5em,
+           minimum height=2em,
+           text centered},
+    % Define arrow style
+    pildwn/.style={
+           <-,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    pilup/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,}
+}
+
 % ----------------------------------------------------------
 % nuremotation des pages -----------------------------------
 % ----------------------------------------------------------
@@ -60,13 +85,39 @@
 }
 
 \section{Methode d'apprentissage}
+\begin{frame}[t]{Apprentissage par renforcement}
+  \begin{block}{Principe}
+    Une entité évoluant dans son environnement se voit attribuées des
+    récompenses en fonction de la pertinence de ses actions.
+    \begin{figure}[h]
+      \begin{center}
+        \begin{tikzpicture}[node distance=1cm, auto,]
+         %nodes
+          \node[punkt] (env) {Environnement};
+          \node[punkt, inner sep=5pt,below=2cm of env]
+          (agent) {Agent}
+          edge[pilup,bend right=60] node[right] {Action} (env.east)
+          edge[pildwn,bend left=70] node[left] {Nouvel état} (env.west)
+          edge[pildwn,bend left=50] node[right] {Récompense} (env.west);
+        \end{tikzpicture}
+      \end{center}
+      \caption{Principe d'apprentissage par renforcement}
+      \label{fig:reinforcement_learning}
+    \end{figure}
+  \end{block}
+\end{frame}
 
 \section{Vie de l'agent, choix des actions et autres questions metaphysiques}
+\begin{frame}[t]{Agent}
+  \begin{block}{Definition}
+    L'agent évolue dans son environnement. Il effectue des actions dans le but
+    de maximiser l'espérance de récompense.
+  \end{block}
+\end{frame}
 \begin{frame}[t]{Representation}
-  \begin{block}
-    {Esperances de recompenses}
-    Stockees dans une matrice. Associe a un etat et une action une esperance de
-    recompense.
+  \begin{block}{Esperances de recompenses}
+    Stockées dans une matrice. Associe a un état et une action une espérance de
+    récompense.
   \end{block}
 \end{frame}
 
@@ -75,7 +126,7 @@
 \section{Évolution de l'agent, apprentissage}
 
 \section{Conception modulaire}
-\begin{frame}[t]{Separation du code}
+\begin{frame}[t]{Séparation du code}
   \begin{block}{Inspiration}
     Calquée sur le jeu de tetris, un joueur et le jeu \(\rightarrow\)
     \texttt{agent} et \texttt{game}.

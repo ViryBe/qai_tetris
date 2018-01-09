@@ -22,8 +22,6 @@ profile:
 debug:
 	$(OCB) -tag debug main.byte
 
-doc: doc_html doc_tex doc_texinfo doc_man
-
 doc_html:
 	$(OCB) $(DOCDIR)/index.html
 
