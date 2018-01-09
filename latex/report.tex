@@ -419,17 +419,22 @@ Le taux d'apprentissage reste manipulable via le paramètre \( C \).
 Le paramètre \(\epsilon\) répond au problème exploration contre exploitation. En
 effet, un \(\epsilon\) important permet une exploration rapide de l'ensemble
 des états possibles en jouant des actions aléatoires. À l'inverse un \(\epsilon\)
-petit correspond à l'exploitation de la politique apprise par l'agent. Ainsi,
-une diminution d'\(\epsilon\) au cours de la phase d'apprentissage permet de
+petit correspond à l'exploitation de la politique apprise par l'agent.
+
+Une diminution d'\(\epsilon\) au cours de la phase d'apprentissage permet de
 stabiliser les résultats obtenus tout en bénéficiant de la prospection initiale.
+Pour répondre a ce besoin, il est judicieux d'utiliser une fonction constante par
+morceaux en guise d'\(\epsilon\). Cette fonction sera décroissante, avec une
+valeur initiale de l'ordre de 0.1 et une valeur finale de l'ordre de
+0.0001\footnote{Ces valeurs sont données a titre indicatif et n'ont fait l'objet
+d'aucune étude.}
 
 \begin{figure}
   \centering
   \subfloat[
     Premiers jeux, un \(\epsilon\) non nul favorise la prise de
-    décisions pertinentes, visible sur les jeux 10 \`a 40 o\`u la courbe bleue
-    (\(\epsilon = 0\)) est plus haute que les autres. La courbe
-    ayant l'\(\epsilon\) le plus \'elev\'e est la plus basse.
+    décisions pertinentes, visible sur les jeux 10 à 40 où les courbes les plus
+    basses sont celles ayant l'\(\epsilon\) le plus élevé.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
@@ -476,7 +481,7 @@ Pour évaluer les paramètres, plusieurs critères sont utilisables,
 \end{itemize}
 
 \subparagraph{Faisceaux et études}
-Pour identifier les plages optimales des paramètres et leur influences, seront
+Pour identifier les plages optimales des paramètres et leur influence, seront
 tracés pour chacun d'eux deux faisceaux de courbes. L'un mettra en évidence
 l'évolution de l'apprentissage en fonction de variations fortes de ce paramètre
 et l'autre se focalisera sur la zone jugée optimale. Les principaux facteurs
