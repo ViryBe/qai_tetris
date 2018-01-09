@@ -3,7 +3,7 @@
 ## Building
 
 * build all : ```$ make```
-* build documentation (output HTML) : ```$ make doc```
+* build documentation (output HTML) : ```$ make doc_html```, ```$ make doc_tex```, ```$ make doc_man```, ```$ make doc_texinfo``` et ```$ make doc_dot```
 * build tags ([ctags](http://ctags.sourceforge.net/)) : ```$ make tags```
 * clean : ```$ make clean```
 
