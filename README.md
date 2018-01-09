@@ -36,7 +36,7 @@ Pour un entrainement de 500 parties de 10k tetrominos:
 
 ## Visualisation d'un jeu
 
-A partir d'une matrice 'qmat.save':
+A partir d'une matrice 'save.mat':
 
 ```$ ./main.native -demo -qload save.qmat```
 
