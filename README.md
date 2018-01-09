@@ -3,7 +3,12 @@
 ## Building
 
 * build all : ```$ make```
-* build documentation (output HTML) : ```$ make doc```
+* build documentation: 
+  * ```$ make doc_html```
+  * ```$ make doc_tex```
+  * ```$ make doc_man```
+  * ```$ make doc_texinfo```
+  * ```$ make doc_dot```
 * build tags ([ctags](http://ctags.sourceforge.net/)) : ```$ make tags```
 * clean : ```$ make clean```
 
@@ -31,7 +36,7 @@ Pour un entrainement de 500 parties de 10k tetrominos:
 
 ## Visualisation d'un jeu
 
-A partir d'une matrice 'qmat.save':
+A partir d'une matrice 'save.mat':
 
 ```$ ./main.native -demo -qload save.qmat```
 
@@ -53,7 +58,7 @@ Exemple pour une variation 10 valeurs de gamma dans 0, 1:
 
 Calcule également les parametres optimaux avec l'option ```--panacea```:
 
-```$ ./tetris_parameval.bash --panacea --ngames 512 --ntetr 10000```
+```$ ./tetris_parameval.bash --panacea --ngames 500 --ntetr 10000```
 
 Ce script entraîne un agent pour ~800 triplets de paramètres différents.
 Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
@@ -69,3 +74,8 @@ Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
 ```$ ./main.native --help```
 
 ```$ ./tetris_parameval.bash --help```
+
+## Latex
+
+Le rapport et la présentation peuvent être compilés par la commande ```$ make``` depuis le répertoire latex/.
+La compilation execute ~20 fois ```./main.native```, ce qui peut prendre un peu de temps.
