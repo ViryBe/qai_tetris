@@ -17,6 +17,7 @@
 \usepackage{algpseudocode}
 \usepackage{subfig}
 \usepackage{hyperref}
+\usepackage{tabulary}
 
 \usetikzlibrary{patterns,arrows,positioning}
 
@@ -64,19 +65,20 @@
 \section*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 \paragraph{Intelligence artificielle}
-Nous utiliserons la définition de l'ia de~\cite{schiex_alliot92} soit
-``faire exécuter par l'ordinateur des taches pour lesquelles l'homme, dans un
+Nous utiliserons la définition de l'intelligence artificielle
+de~\cite{schiex_alliot92} soit
+``faire exécuter par l'ordinateur des tâches pour lesquelles l'homme, dans un
 contexte donné, est aujourd'hui meilleur que la machine''. Cela justifie
-l'application de l'ia aux jeux, ceux ci étant une activité quasi propre a
-l'homme.
+l'application de l'intelligence artificielle aux jeux, ceux-ci étant une
+activité quasi propre à l'Homme.
 
 Dans le cadre du projet, nous implémentons un algorithme d'apprentissage
 artificiel pour le jeu Tetris. Plus précisément, l'apprentissage se fera par
 renforcement via l'algorithme de Q learning.
 
-\paragraph{Répartition des taches}
+\paragraph{Répartition des tâches}
 Le programme nécessitant l'implémentation du jeu et de l'algorithme
-d'apprentissage, le travail a donc été divisé en deux parties. L'une realisee
+d'apprentissage, le travail a donc été divisé en deux parties. L'une réalisée
 par Claire et L\'ea, l'autre par Gabriel et Beno\^it.
 
 \paragraph{Code source}
@@ -103,11 +105,10 @@ sur le plateau.
 
 \section{Le jeu et sa simplification}
 Tetris met le joueur au défi de réaliser des lignes complètes en déplaçant des
-pièces de formes différentes, les tétrominos, qui défilent depuis le haut
+pièces de formes différentes, les tetrominos, qui défilent depuis le haut
 jusqu'au bas de l'écran. Les lignes complétées disparaissent tout en rapportant
-des points et le joueur peut de nouveau remplir les cases libérées. Le jeu
-n'a pas de fin: le joueur perd la partie lorsqu'un tétromino reste bloqué en
-haut.
+des points et le joueur peut de nouveau remplir les cases libérées.
+Le joueur perd la partie lorsqu'un tetromino reste bloqué en haut.
 
 Dans notre version simplifiée, il n'y a pas de limite de hauteur, le jeu se
 termine après avoir fourni 10000 tetrominos à placer. De plus notre
@@ -217,7 +218,7 @@ Un tetromino choisi aléatoirement parmi les cinq disponibles est donné au
 joueur. Ce dernier doit alors choisir où et comment le placer. Une fois ce
 choix effectué, le tetromino est placé en respectant les contraintes du jeu. Le
 plateau est ensuite mis à jour: les lignes complètes sont supprimées et la
-hauteur est réévaluée. Un nouveau tetromino est donne et le jeu continue.
+hauteur est réévaluée. Un nouveau tetromino est donné et le jeu continue.
 
 
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
@@ -235,7 +236,7 @@ la taille totale du plateau reste la même.
 
 \chapter{Q learning}
 
-\section{Principe de l'apprentissage par renforcement et Q-learning}
+\section{Principe de l'apprentissage par renforcement et Q learning}
 \subsection{L'apprentissage par renforcement}
 
 L'apprentissage par renforcement est une méthode d'apprentissage automatique
@@ -283,21 +284,21 @@ La récompense à long terme pour un ensemble
 \]
 
 
-\subsection{Le Q-learning}
+\subsection{Le Q learning}
 La particularité du Q learning vient de la définition du modèle \(R\). Dans ce
-cas, elle est calculée grâce a une matrice Q (pour qualité) de la façon
+cas, elle est calculée grâce à une matrice Q (pour qualité) de la façon
 suivante,
 \[
   R(s) = \argmax_{a} Q(s,a).
 \]
 L'objectif est d'obtenir la fonction \(R\) optimale, usuellement notée
-\(R^*\), cela revient de manière équivalente a ajuster les coefficients afin de
+\(R^*\), cela revient de manière équivalente à ajuster les coefficients afin de
 trouver une matrice optimale \(Q^*\).
 
 L'algorithme fonctionne selon un processus itératif qui fera converger sous
 certaines conditions, la matrice vers son homologue optimal.
 
-L'équation regissant les changements de coefficients decoule de l'equation de
+L'équation régissant les changements de coefficients découle de l'équation de
 Bellman\cite{mengin}
 \[
   Q^*(s_t, a_t) = \argmax_{a_{t+1}}Q(s_{t+1}, a_{t+1}) + r(s_t)
@@ -329,7 +330,7 @@ l'état et l'autre pour la pièce, et les combine en un état entier final,
 \section{Algorithmes}\label{sec:algorithmes}
 
 L'algorithme~\ref{alg:action} concerne la manière dont l'agent choisit les
-actions parmi l'ensemble des actions possibles \(\mathcal{A}\), étant donne un
+actions parmi l'ensemble des actions possibles \(\mathcal{A}\), étant donné un
 état \(s\). Le paramètre \(\epsilon\) définit la fréquence de choix aléatoire.
 \begin{algorithm}
   \caption{Choix de l'action}\label{alg:action}
@@ -356,7 +357,7 @@ agent myope ne choisissant son action que par rapport a la récompense immédiat
 tandis qu'un \(\gamma\) tendant vers un associe autant d'importance aux
 récompenses des coups suivants qu'à la récompense immédiate.
 \begin{algorithm}
-  \caption{Algorithme de \textit{Q-learning}}\label{alg:qlearning}
+  \caption{Algorithme de \textit{Q learning}}\label{alg:qlearning}
   \begin{algorithmic}
     [1]
     \Procedure{Update}{$Q$, $\epsilon$, $\gamma$, $\alpha$}
@@ -381,7 +382,7 @@ cette récompense et sa connaissance des états résultants pour affiner
 l'espérance de récompense associée au coup qu'il vient de réaliser.
 
 \subsection{Récompense}
-Une fonction de récompense doit être définie afin d'indiquer a l'agent la
+Une fonction de récompense doit être définie afin d'indiquer à l'agent la
 pertinence du coup joué. L'objectif étant d'avoir une hauteur finale minimale,
 il est souhaitable que le coup joue augmente le moins possible voire diminue la
 hauteur actuelle. Elle sera donc définie en fonction de la différence \(\delta
@@ -420,7 +421,7 @@ effet, un \(\epsilon\) important permet une exploration rapide de l'ensemble
 des états possibles en jouant des actions aléatoires. À l'inverse un \(\epsilon\)
 petit correspond à l'exploitation de la politique apprise par l'agent. Ainsi,
 une diminution d'\(\epsilon\) au cours de la phase d'apprentissage permet de
-stabiliser les résultats obtenus.
+stabiliser les résultats obtenus tout en bénéficiant de la prospection initiale.
 
 \begin{figure}
   \centering
@@ -432,11 +433,11 @@ stabiliser les résultats obtenus.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
-          legend entries={0,.0003,.0006,.0009}
+          legend entries={0,.001,.002,.003}
         ]
         \foreach \i in {0,1,...,3}{%
           \addplot+ table [
-            skip coords between index={100}{512},
+            skip coords between index={100}{513},
             x expr = {\lineno}, y index = \i
           ] {data/epsilon.dat};
         }
@@ -451,7 +452,7 @@ stabiliser les résultats obtenus.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
-          legend entries={0,.0003,.0006,.0009}
+          legend entries={0,.001,.002,.003}
         ]
         \foreach \i in {0,1,...,3}{%
           \addplot+ table [
@@ -473,75 +474,157 @@ Pour évaluer les paramètres, plusieurs critères sont utilisables,
   \item la vitesse de convergence vers une hauteur stable,
   \item la valeur de la hauteur stabilisée.
 \end{itemize}
-Les hauteurs finales variant peu, seule la vitesse de convergence et la
-stabilité finale discrimineront la qualité des paramètres.
 
+\subparagraph{Faisceaux et études}
+Pour identifier les plages optimales des paramètres et leur influences, seront
+tracés pour chacun d'eux deux faisceaux de courbes. L'un mettra en évidence
+l'évolution de l'apprentissage en fonction de variations fortes de ce paramètre
+et l'autre se focalisera sur la zone jugée optimale. Les principaux facteurs
+discriminants recherchés seront la hauteur finale et la vitesse de convergence.
 
 \begin{figure}
   \centering
-  \begin{tikzpicture}
-    \begin{axis}[line width=0.05, mark size = 0.1,
-        legend entries={0.80,0.84,0.88,0.92,0.96,1.00}
-      ]
-      \foreach \i in {0,1,...,5}{%
-        \addplot+ table [x expr = {\lineno}, y index = \i] {data/gamma.dat};
-      }
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Influence du paramètre \(\gamma\)}
+  \subfloat[
+    La hauteur finale croît avec \(\epsilon\).
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={.002,.068,.134,.2}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [x expr = {\lineno}, y index = \i]
+          {data/epsilon_wide.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:wide_epsilon}
+  \;
+  \subfloat[
+    La vitesse de convergence decroit en fonction de \(\gamma\).
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={.6,.75,.9,}
+        ]
+        \foreach \i in {0,1,...,2}{%
+          \addplot+ table [x expr = {\lineno}, y index = \i]
+          {data/gamma_wide.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:wide_gamma}
+  \subfloat[
+    La vitesse de convergence décroît en fonction de \(C\), le paramètre du taux
+    d'apprentissage.
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={.001,.75,.3,}
+        ]
+        \foreach \i in {0,1,...,2}{%
+          \addplot+ table [x expr = {\lineno}, y index = \i]
+          {data/alphap_wide.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:wide_alphap}
+  \caption{Variations majeures des paramètres}\label{fig:wide_var}
 \end{figure}
-
-\subparagraph{Fréquence de coups aléatoires} Les
-courbes~\ref{sfig:exex_first_steps} montrent qu'un \(\epsilon\) nul n'est pas
-optimal. Le graphe~\ref{fig:eps_high} montre qu'un \(\epsilon\) plus grand
-que 0.02 tend à ralentir la convergence du système.
 \begin{figure}
   \centering
-  \begin{tikzpicture}
-    \begin{axis}[line width=0.05, mark size = 0.1,
-        legend entries={.002,.068,.134,.2}
-      ]
-      \foreach \i in {0,1,...,3}{%
-        \addplot+ table [x expr = {\lineno}, y index = \i] {data/eps_high.dat};
-      }
-    \end{axis}
-  \end{tikzpicture}
-  \caption{L'élévation de la fréquence de coups aléatoires réduit fortement la
-  vitesse de convergence.}\label{fig:eps_high}
+  \subfloat[
+    La courbe \(\epsilon = 0.002\) tend à rester sous les autres et a donc la
+    vitesse de convergence la plus élevée.
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={0,.001,.002,.003}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [
+            x expr = {\lineno}, y index = \i,
+            skip coords between index = {0}{50},
+            skip coords between index = {220}{513},
+          ]
+          {data/epsilon.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:epsilon}
+  \;
+  \subfloat[
+    \(\gamma\)
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={.8,.87,.93,1}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [
+            x expr = {\lineno}, y index = \i,
+            skip coords between index = {0}{20},
+            skip coords between index = {350}{513},
+          ]
+          {data/gamma.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:gamma}
+  \subfloat[
+    \(C\), toutes les courbes sont équivalentes au bout du 80e jeu.
+  ] {%
+    \begin{tikzpicture}
+      \begin{axis}[line width=0.05, mark size = 0.1,
+          legend entries={.001,.0016,.0022,0028}
+        ]
+        \foreach \i in {0,1,...,3}{%
+          \addplot+ table [
+            x expr = {\lineno}, y index = \i,
+            skip coords between index = {0}{10},
+            skip coords between index = {140}{513},
+          ]
+          {data/alphap.dat};
+        }
+      \end{axis}
+    \end{tikzpicture}
+  }\label{sfig:alphap}
+  \caption{Détails d'évolution de l'apprentissage au voisinage des valeurs
+  optimales}\label{fig:wide_var}
 \end{figure}
-
-
-\subparagraph{Taux d'apprentissage}
-\begin{figure}
+Les données sont résumées dans la table~\ref{tab:param}.
+\begin{table}
   \centering
-  \begin{tikzpicture}
-    \begin{axis}[line width=0.05, mark size = 0.1,
-        legend entries={.001,.0028,.0046,.0064,.0082,.01}
-      ]
-      \foreach \i in {0,1,...,5}{%
-        \addplot+ table [
-          x expr = {\lineno},
-          y index = \i,
-          skip coords between index={300}{513},
-        ] {data/alphap.dat};
-      }
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Le taux d'apprentissage influence principalement la vitesse de
-  convergence.}\label{fig:alphap}
-\end{figure}
+  \begin{tabulary}{\linewidth}{|C|C|r|}
+    \hline
+    Param. & Influence & Val.\ opt.\\
+    \hline
+    \(C\) & cs & 0.001\\
+    \hline
+    \(\epsilon\) & fh & 0.001\\
+    \hline
+    \(\gamma\) & cs & 0.9\\
+    \hline
+  \end{tabulary}
+  \caption{Influences et valeurs des paramètres, cs pour la vitesse de
+  convergence et fh pour la hauteur finale.}\label{tab:param}
+\end{table}
+
 
 \paragraph{Limite de la méthode}
-Pour augmenter les performances de l'agent, le modèle peut être affine, par
+Pour augmenter les performances de l'agent, le modèle peut être affiné, par
 exemple en considérant plus de cases.
 
 Le nombre d'états étant le nombre de lignes de la Q matrice, son ordre de
-grandeur doit rester limite (dans notre cas, environ 20000) pour des
+grandeur doit rester limité (dans notre cas, environ 20000) pour des
 considérations de mémoire. En effet, le nombre d'état augmente de manière
 exponentielle en fonction du nombre de cases considérées.
 
+On pourra notamment exploiter certaines propriétés du jeu de Tetris pour
+diminuer le nombre d'états comme par exemple la symétrie du plateau, permettant
+de réduire le nombre d'états.
 
-\chapter{Minimisation d'une fonction objectif \( V \)}
+
+\chapter{Minimisation d'une fonction objectif \(V\)}
 
 \section{Représentation des états et transitions}
 
@@ -585,8 +668,9 @@ On appelle transition un 4-uplet \( (s_t, a_t, r_t, s_{t+1}) \), Avec:
 L'algorithme d'apprentissage utilisé dans cette partie repose sur une variante
 stochastique de l'algorithme par descente de gradient.
 
-L'idée est de jouer \( B \) coups et enregistrer dans une mémoire les différentes
-transitions. Les coups sont choisis selon l'algorithme~\ref{alg:choseactionv2}.
+L'idée est de jouer \( B \) coups et d'enregistrer dans une mémoire les
+différentes transitions. Les coups sont choisis selon
+l'algorithme~\ref{alg:choseactionv2}.
 
 \begin{algorithm}[h]
   \caption{Choix de l'action}\label{alg:choseactionv2}
@@ -641,7 +725,7 @@ La procédure est synthétisée dans l'algorithme suivant:
     \Repeat{}
     \For{1 to $B$}
     \State{} \(a \gets \mathup{ChooseAction2}(V, s, \mathcal{A}, \epsilon)\)
-    \State{} joue \(a\), observer \(r\) et le nouvel \'etat \(s'\)
+    \State{} jouer \(a\), observer \(r\) et le nouvel \'etat \(s'\)
     \State{} ajouter à la mémoire \( \left(\phi(s), a, r, \phi(s')\right) \)
     \EndFor{}
     \State{} Choisir aléatoirement \(B\) quadruplets depuis la mémoire
@@ -658,7 +742,7 @@ La procédure est synthétisée dans l'algorithme suivant:
 
 \paragraph{}
 Si cette méthode permet de s'affranchir des contraintes de mémoire liées au
-nombre d'états, il n'est pas sur qu'elle soit plus performante (apprentissage
+nombre d'états, il n'est pas sûr qu'elle soit plus performante (apprentissage
 plus rapide, convergence plus rapide, hauteur finale plus faible, \dots).
 L'implémentation n'étant pas achevée, nous ne pouvons conclure sur ce point. Le
 code reste néanmoins accessible sur la branche \texttt{valuation} du dépôt
@@ -671,7 +755,7 @@ github.
 
 \chapter{Programmes auxiliaires}
 \section{Scripts}\label{sec:faisceaux}
-\paragraph{Creation de faisceaux}
+\paragraph{Création de faisceaux}
 La création de faisceaux de courbes est automatisée via le script bash
 \texttt{tetris\_parameval.bash}. Tout le paramétrage se fait en ligne de commande
 par les arguments passés au script. Le langage bash a été choisi car il semble
@@ -681,10 +765,10 @@ Le parsing se fait avec le GNU \texttt{getopt}, les calculs en virgule flottante
 avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
 les données sont enregistrées dans un fichier.
 
-\paragraph{Parametres optimaux}
-Les parametres \(\alpha, \gamma, \epsilon\) optimisant au choix la hauteur
-finale, l'ecart type ou la vitesse de convergence sont determines par un script
-bash donnant des donnees a traiter a un script python.
+\paragraph{Paramètres optimaux}
+Les paramètres \(\alpha, \gamma, \epsilon\) optimisant au choix la hauteur
+finale, l'écart type ou la vitesse de convergence, sont déterminés par un script
+bash donnant des données à traiter a un script python.
 
 
 
@@ -769,8 +853,8 @@ type d\'esignant la donnée avec laquelle travaille l'agent (e.g.\ matrice de
 flottants pour le Q learning et tableau de poids flottants pour la fonction de
 valuation). Le r\'esultat de l'application de ce foncteur est un module ayant
 une fonction \texttt{train} entra\^inant en place l'agent, une fonction
-\texttt{play} pour jouer un jeu de tetris et une fonction make pour cr\'eer un
-agent initial.
+\texttt{play} pour jouer un jeu de tetris et une fonction \texttt{make} pour
+cr\'eer un agent initial.
 
 La généralisation du code s'est malheureusement révélée plus
 délicate que prévu. D'une part les deux méthodes implémentées
@@ -786,26 +870,20 @@ une branche dédiée du git, la branche \texttt{valuation}. Le code du
 foncteur est disponible sur la branche \texttt{functorise}.
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
-Ce projet a permis d'aboutir a une implémentation viable de l'algorithme de Q
+Ce projet a permis d'aboutir à une implémentation viable de l'algorithme de Q
 learning appliquée au jeu de Tetris. L'algorithme développé obtient des
 résultats du même ordre que ce que l'on trouve dans la littérature, avec une
-évolutions des performances de jeu visible.
+évolution des performances de jeu visible.
 
 Le paramétrage permet d'adapter le comportement de l'agent en fonction des
-performances souhaitées.
+performances souhaitées, à savoir la vitesse de convergence et la hauteur
+finale.
 
 L'utilisation d'OCaml a permis d'aborder les différences entre la programmation
 fonctionnelle et impérative, notamment l'opposition sécurité contre performance.
 
-L'implémentation actuelle peut voir sa représentation des états allégée en
-tirant profit de la symétrie du plateau, chaque état dispose d'un état
-symétrique par rapport a un axe au milieu du plateau. On divise ainsi le nombre
-d'états par deux. On peut ainsi espérer une convergence plus rapide de la
-matrice Q vers la matrice optimale.
-
-D'autres méthodes d'apprentissages pourraient également être explorées. On peut
+D'autres méthodes d'apprentissage pourraient également être explorées. On peut
 par exemple citer le deep Q learning\cite{deepmind}.
-
 
 \begin{thebibliography}{9}
     \bibitem{watkins92}
