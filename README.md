@@ -74,3 +74,8 @@ Il est donc (très) long à exectuer (+3h30 sur Intel Core i7...).
 ```$ ./main.native --help```
 
 ```$ ./tetris_parameval.bash --help```
+
+## Latex
+
+Le rapport et la présentation peuvent être compilés par la commande ```$ make``` depuis le répertoire latex/.
+La compilation execute ~20 fois ```./main.native```, ce qui peut prendre un peu de temps.
