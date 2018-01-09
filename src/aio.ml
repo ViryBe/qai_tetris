@@ -42,7 +42,7 @@ module Clargs = struct
   let epsilon = ref 0.05
   let gamma = ref 0.8
   let alphap = ref 0.02
-  let ngames = ref 1000
+  let ngames = ref 500
   let ntetr = ref 10000
   let demo = ref false
   let qload = ref None
@@ -74,13 +74,15 @@ module Clargs = struct
   (** Speclist for argument parsing, mind the order *)
   let speclist = [
     ("-demo", Arg.Set demo, "demo mode, requires qload");
-    ("-ngames", Arg.Set_int ngames, "number of games played");
-    ("-ntetr", Arg.Set_int ntetr, "number of tetrominos played in a game");
+    ("-ngames", Arg.Set_int ngames, "number of games played (default 500)");
+    ("-ntetr", Arg.Set_int ntetr,
+     "number of tetrominos played in a game (default 10000)");
     ("-epsilon", Arg.Float (float_check epsilon),
-     "frequency of random action, in [0, 1]");
+     "frequency of random action, in [0, 1] (default 0.05)");
     ("-gamma", Arg.Float (float_check gamma),
-     "sight length of the policy, in [0, 1]");
-    ("-alphap", Arg.Set_float alphap, "parameter of the learning rate");
+     "sight length of the policy, in [0, 1] (default 0.8)");
+    ("-alphap", Arg.Set_float alphap,
+     "parameter of the learning rate (default 0.02)");
     ("-qload", Arg.String check_qload, "path of Q matrix to load");
     ("-qsave", Arg.String (set_option qsave),
      "output file for generated Q matrix");
