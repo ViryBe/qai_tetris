@@ -203,7 +203,7 @@ tetrominos. Les rotations sont représentées par les points cardinaux
       \draw (0,0) rectangle (1,-1);
     \end{tikzpicture}
   }
-  \caption{Point de référence de tetromino, ici hachure}\label{fig:tetref}
+  \caption{Point de référence de tetromino, ici hachuré}\label{fig:tetref}
 \end{figure}
 
 La géométrie de certains tetrominos rend certaines orientations redondantes. Par
@@ -223,15 +223,17 @@ hauteur est réévaluée. Un nouveau tetromino est donné et le jeu continue.
 
 Lors d'une partie le joueur doit poser les pièces qui lui sont proposées sur
 le plateau de jeu. Il est donc nécessaire d'utiliser une fonction \texttt{play}
-qui permet de placer une pièce sur le plateau. La pièce ``tombe'' donc dans la
+qui permet de placer une pièce sur le plateau. La pièce ``tombe'' dans la
 colonne sélectionnée tant qu'elle ne rencontre pas d'obstacle (fond du plateau
 ou un autre tétromino). Pour cela, il y a besoin d'une fonction de test de
 collision, qui renvoie si l'emplacement testé peut accueillir le tetromino.
-S'il y a collision, on sélectionne le dernier emplacement libre et on place la
+S'il y a collision, on sélectionne le dernier emplacement libre et on y place la
 pièce.
 
-Lorsqu'une ligne est entièrement remplie, elle est supprimée du tableau, mais
-la taille totale du plateau reste la même.
+Si une des deux lignes contenant une partie du nouveau tetromino est complète,
+elle est supprimée du plateau et toute la partie supérieure est
+descendue d'une ligne. La hauteur actuelle \(h\) est mise \`a jour (décrémentée)
+mais la hauteur totale \(b_h\) reste inchangée.
 
 
 \chapter{Q learning}
@@ -292,7 +294,7 @@ suivante,
   R(s) = \argmax_{a} Q(s,a).
 \]
 L'objectif est d'obtenir la fonction \(R\) optimale, usuellement notée
-\(R^*\), cela revient de manière équivalente à ajuster les coefficients afin de
+\(R^*\). Cela revient de manière équivalente à ajuster les coefficients afin de
 trouver une matrice optimale \(Q^*\).
 
 L'algorithme fonctionne selon un processus itératif qui fera converger sous
@@ -301,8 +303,12 @@ certaines conditions, la matrice vers son homologue optimal.
 L'équation régissant les changements de coefficients découle de l'équation de
 Bellman\cite{mengin}
 \[
-  Q^*(s_t, a_t) = \argmax_{a_{t+1}}Q(s_{t+1}, a_{t+1}) + r(s_t)
+  Q^*(s_t, a_t) = \max_{a_{t+1}}Q^*(s_{t+1}, a_{t+1}) + r(s_t)
 \]
+L'équation ci-dessus impose à la matrice optimale \(Q^*\) d'avoir, pour un état
+et une action a un instant \(t\), la meilleure espérance de récompense.
+Celle-ci provient de la meilleure espérance récompense de l'état suivant à
+laquelle on ajoute la récompense associée à l'action immédiate.
 
 \section{Représentation des états}
 
@@ -382,13 +388,14 @@ cette récompense et sa connaissance des états résultants pour affiner
 l'espérance de récompense associée au coup qu'il vient de réaliser.
 
 \subsection{Récompense}
-Une fonction de récompense doit être définie afin d'indiquer à l'agent la
+Une fonction de récompense (\texttt{reward}) doit être définie afin d'indiquer
+à l'agent la
 pertinence du coup joué. L'objectif étant d'avoir une hauteur finale minimale,
 il est souhaitable que le coup joue augmente le moins possible voire diminue la
 hauteur actuelle. Elle sera donc définie en fonction de la différence \(\delta
 h\) de hauteur induite par le coup,
 \[
-  r(\delta h) = 100\delta h.
+  r(\delta h) = 100\cdot \delta h.
 \]
 
 \subsection{Paramètres}
@@ -423,10 +430,10 @@ petit correspond à l'exploitation de la politique apprise par l'agent.
 
 Une diminution d'\(\epsilon\) au cours de la phase d'apprentissage permet de
 stabiliser les résultats obtenus tout en bénéficiant de la prospection initiale.
-Pour répondre a ce besoin, il est judicieux d'utiliser une fonction constante par
+Il est judicieux d'utiliser une fonction constante par
 morceaux en guise d'\(\epsilon\). Cette fonction sera décroissante, avec une
 valeur initiale de l'ordre de 0.1 et une valeur finale de l'ordre de
-0.0001\footnote{Ces valeurs sont données a titre indicatif et n'ont fait l'objet
+0.0001\footnote{Ces valeurs sont données à titre indicatif et n'ont fait l'objet
 d'aucune étude.}
 
 \begin{figure}
@@ -483,9 +490,20 @@ Pour évaluer les paramètres, plusieurs critères sont utilisables,
 \subparagraph{Faisceaux et études}
 Pour identifier les plages optimales des paramètres et leur influence, seront
 tracés pour chacun d'eux deux faisceaux de courbes. L'un mettra en évidence
-l'évolution de l'apprentissage en fonction de variations fortes de ce paramètre
-et l'autre se focalisera sur la zone jugée optimale. Les principaux facteurs
-discriminants recherchés seront la hauteur finale et la vitesse de convergence.
+l'évolution de l'apprentissage en fonction de variations fortes
+(courbes~\ref{fig:wide_var}) de ce paramètre
+et l'autre se focalisera sur la zone jugée optimale
+(courbes~\ref{fig:tight_var}).
+Les principaux facteurs discriminants recherchés seront la hauteur finale et
+la vitesse de convergence.
+
+Les courbes sont tracées sur 512 jeux, indiqués en abscisse. La hauteur finale
+de chaque jeu est indiquée en ordonnée. Les paramètres seront toujours pris de
+manière à ce que la matrice converge vers la matrice optimale
+(voir~\cite{watkins92}). Par conséquent, la hauteur finale, à l'infini, est
+toujours la même, celle de la matrice optimale. Par conséquent ce que nous
+appellerons hauteur finale ici sera une hauteur variant peu au bout des 512
+jeux.
 
 \begin{figure}
   \centering
@@ -558,7 +576,7 @@ discriminants recherchés seront la hauteur finale et la vitesse de convergence.
   }\label{sfig:epsilon}
   \;
   \subfloat[
-    \(\gamma\)
+    \(\gamma\) est optimal quand proche de 1.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
@@ -580,7 +598,7 @@ discriminants recherchés seront la hauteur finale et la vitesse de convergence.
   ] {%
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
-          legend entries={.001,.0016,.0022,0028}
+          legend entries={.001,.0016,.0022,.0028}
         ]
         \foreach \i in {0,1,...,3}{%
           \addplot+ table [
@@ -594,14 +612,14 @@ discriminants recherchés seront la hauteur finale et la vitesse de convergence.
     \end{tikzpicture}
   }\label{sfig:alphap}
   \caption{Détails d'évolution de l'apprentissage au voisinage des valeurs
-  optimales}\label{fig:wide_var}
+  optimales}\label{fig:tight_var}
 \end{figure}
 Les données sont résumées dans la table~\ref{tab:param}.
 \begin{table}
   \centering
   \begin{tabulary}{\linewidth}{|C|C|r|}
     \hline
-    Param. & Influence & Val.\ opt.\\
+    Param. & Influence & Val.\ raisonnables\\
     \hline
     \(C\) & cs & 0.001\\
     \hline
@@ -615,7 +633,7 @@ Les données sont résumées dans la table~\ref{tab:param}.
 \end{table}
 
 
-\paragraph{Limite de la méthode}
+\section*{Limite de la méthode}
 Pour augmenter les performances de l'agent, le modèle peut être affiné, par
 exemple en considérant plus de cases.
 
@@ -626,7 +644,7 @@ exponentielle en fonction du nombre de cases considérées.
 
 On pourra notamment exploiter certaines propriétés du jeu de Tetris pour
 diminuer le nombre d'états comme par exemple la symétrie du plateau, permettant
-de réduire le nombre d'états.
+de réduire le nombre d'états, voir~\ref{bdolah_livnat99}.
 
 
 \chapter{Minimisation d'une fonction objectif \(V\)}
@@ -771,9 +789,10 @@ avec \texttt{bc}. Les courbes sont ensuite produites via \texttt{gnuplot} et
 les données sont enregistrées dans un fichier.
 
 \paragraph{Paramètres optimaux}
-Les paramètres \(\alpha, \gamma, \epsilon\) optimisant au choix la hauteur
+Les paramètres \(C, \gamma, \epsilon\) optimisant au choix la hauteur
 finale, l'écart type ou la vitesse de convergence, sont déterminés par un script
-bash donnant des données à traiter a un script python.
+python. Un script bash sert d'intermédiaire entre le programme ocaml et le
+script python.
 
 
 
@@ -877,8 +896,8 @@ foncteur est disponible sur la branche \texttt{functorise}.
 \addcontentsline{toc}{chapter}{Conclusion}
 Ce projet a permis d'aboutir à une implémentation viable de l'algorithme de Q
 learning appliquée au jeu de Tetris. L'algorithme développé obtient des
-résultats du même ordre que ce que l'on trouve dans la littérature, avec une
-évolution des performances de jeu visible.
+résultats du même ordre que ce que l'on trouve dans la littérature\cite{melax},
+avec une évolution des performances de jeu visible.
 
 Le paramétrage permet d'adapter le comportement de l'agent en fonction des
 performances souhaitées, à savoir la vitesse de convergence et la hauteur
@@ -910,7 +929,17 @@ par exemple citer le deep Q learning\cite{deepmind}.
     \bibitem{mengin}
     J\'er\^ome Mengin,
     \textit{Apprentissage par renforcement},
+    \url{https://www.irit.fr/~Jerome.Mengin/teaching/mach-learn/ap-renforc_diapos.pdf},
     Université Paul Sabatier, 2016
+    \bibitem{bdolah_livnat99}
+    Yael Bdolah \& Dror Livnat,
+    \textit{Reinforcement Learning Playing Tetris}
+    \url{http://www.math.tau.ac.il/~mansour/rl-course/student_proj/livnat/tetris.html},
+    1999
+    \bibitem{melax}
+    \textit{Reinforcement Learning Tetris Example}
+    S.~Melax,
+    \url{https://melax.github.io/tetris/tetris.html}
 \end{thebibliography}
 
 \end{document}
