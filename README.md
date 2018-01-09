@@ -3,7 +3,7 @@
 ## Building
 
 * build all : ```$ make```
-* build documentation (output HTML) : 
+* build documentation: 
   * ```$ make doc_html```
   * ```$ make doc_tex```
   * ```$ make doc_man```
