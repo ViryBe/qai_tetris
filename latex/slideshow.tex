@@ -124,7 +124,7 @@
     Utilise une matrice Q pour stocker les espérances de récompense.
   \end{block}
   \begin{itemize}
-    \item Les colonnes de la matrice correspondent à une action.
+    \item Les colonnes de la matrice correspondent aux actions.
     \item Les lignes de la matrice correspondent aux états.
   \end{itemize}
 \end{frame}
@@ -219,7 +219,7 @@
     \[ \text{action} = \text{orientation} + \text{translation} \]
   \end{block}
 
-  \begin{block}{Subdef}
+  \begin{block}{Types}
     \begin{itemize}
       \item translation \(\in [0, 5]\)
       \item orientation \(\in \{\)North, South, East, West\(\}\)
@@ -229,10 +229,19 @@
     schema here. Un ensemble d'orientations par tetromino.
   \end{alertblock}
 \end{frame}
+
 \subsection{Gestion du plateau}
+\begin{frame}[c]{Réalisation de l'action et conséquences}
+  \begin{block}{Placement vertical}
+    Évaluation des collisions: collision \(\rightarrow\) placé en amont
+  \end{block}
+  \begin{block}{Lignes pleines}
+    Ligne remplie enlevée du jeu
+  \end{block}
+\end{frame}
 
-
-\section{Evolution de l'agent}
+\section{Évolution de l'agent}
+\subsection{Récompense}
 \subsection{Mise a jour}
 \subsection{Resultats}
 \subsection{Paametrage}
