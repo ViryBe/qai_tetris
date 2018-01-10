@@ -14,6 +14,7 @@
 \usepackage{float}
 \usepackage{subfig}
 \usepackage{tabulary}
+\usepackage{graphicx}
 
 \DeclareMathOperator{\card}{card}
 \DeclareMathOperator{\argmax}{argmax}
@@ -21,7 +22,7 @@
 
 \usecolortheme{dolphin}
 
-\title{QAI Tetris}
+\title{Tetris par Q learning}
 \author{C.~Cousin, G.~Hondet, L.~Pineau, B.~Viry}
 \date{}
 
@@ -95,6 +96,14 @@
 
 \section*{Introduction}
 \begin{frame}[c]{Introduction}
+  \begin{center}
+    \begin{minipage}[c]{0.4\linewidth}
+      \includegraphics[height=6cm]{tetris.png}
+    \end{minipage}
+    \begin{minipage}[c]{0.4\linewidth}
+      \includegraphics[height=3cm]{alphago.jpg}
+    \end{minipage}
+  \end{center}
 \end{frame}
 
 \section{Apprentissage}
@@ -110,23 +119,25 @@
           \node[punkt] (env) {Environnement};
           \node[punkt, inner sep=5pt,below=2cm of env]
           (agent) {Agent}
-          edge[pilup,bend right=60] node[right] {Action} (env.east)
-          edge[pildwn,bend left=70] node[left] {Nouvel état} (env.west)
-          edge[pildwn,bend left=50] node[right] {Récompense} (env.west);
+          edge[pilup,bend right=60] node[right] {Action \(a_t\)} (env.east)
+          edge[pildwn,bend left=70] node[left] {Nouvel état \(s_{t+1}\)}
+          (env.west)
+          edge[pildwn,bend left=50] node[right] {Récompense \(r_t\)} (env.west);
         \end{tikzpicture}
       \end{center}
-      \caption{Principe d'apprentissage par renforcement}
+      \caption{Principe d'apprentissage par renforcement, à l'instant \(t\)}
       \label{fig:reinforcement_learning}
     \end{figure}
   \end{block}
 \end{frame}
 
 
-\subsection{Méthode employée}
+\subsection{Q learning}
 
 \begin{frame}{Q learning}
   \begin{block}{Agent}
-    Utilise une matrice Q pour stocker les espérances de récompense.
+    Utilise une matrice Q pour stocker les espérances de récompense à long
+    terme (somme des récompenses d'une partie).
   \end{block}
   \begin{itemize}
     \item Les colonnes de la matrice correspondent aux actions.
@@ -136,7 +147,7 @@
 
 \subsection{Choix de l'action}
 
-\begin{frame}{État (\(s\))}
+\begin{frame}{État}
   Données utiles de l'environnement pour jouer une action.
 
   \begin{exampleblock}{Dans notre cas}
@@ -144,14 +155,14 @@
   \end{exampleblock}
   \begin{block}{Obtention}
     \[
-      \text{plateau} \pause{} + \text{pièce} \pause{} = \text{état}
-      \pause{} \in \mathbf{N}
+      \text{état} = \text{plateau} + \text{pièce} =
+      \pause{} \in \mathbb{N}
     \]
   \end{block}
 \end{frame}
 
 \begin{frame}{Choix de l'action}
-    \(Q(s, a)\) approxime la récompense a long terme,
+    \(Q(s, a)\) approxime la récompense à long terme,
     \pause{}
     \[ \text{action choisie} = \underset{a}{\argmax} Q(s, a) \]
     \pause{}
@@ -169,6 +180,20 @@
         \EndProcedure{}
       \end{algorithmic}
   \end{algorithm}
+\end{frame}
+
+\begin{frame}[c]{Exploitation v exploration}
+  \begin{description}[Exploitation]
+    \item[Exploration] balayer toutes les actions possibles
+    \item[Exploitation] tirer profit de l'apprentissage
+  \end{description}
+  \pause{}
+  \[ \Downarrow \]
+  \[ \text{Choix de } \epsilon \]
+  \pause{}
+  \begin{block}{Compromis}
+    Peut-être assuré par une variation d'\(\epsilon\) au cours des parties.
+  \end{block}
 \end{frame}
 
 \section{Environnement Tetris}
@@ -238,14 +263,19 @@
 
 \subsection{Gestion du plateau}
 \begin{frame}[c]{Réalisation du mouvement et conséquences}
-  \begin{block}{Placement vertical}
-    Évaluation des collisions: collision \(\rightarrow\) placé en amont
+  \begin{block}{Plateau}
+    Matrice d'entiers de largeur 6.
   \end{block}
+  \begin{block}{Placement vertical}
+    Évaluation des collisions : collision \(\rightarrow\) placé en amont
+  \end{block}
+\end{frame}
+\begin{frame}[c]{Ligne pleine}
   \begin{block}{Lignes pleines}
     Ligne remplie enlevée du jeu
   \end{block}
   \begin{alertblock}{Tetromino flottant}
-    schema here. Un ensemble d'orientations par tetromino.
+    schema here. Pour résoudre : un ensemble d'orientations par tetromino.
   \end{alertblock}
 \end{frame}
 
@@ -261,6 +291,7 @@
   \end{block}
   \pause{}
   \[ R(\delta h) = k \cdot \delta h, k < 0 \]
+  avec \(\delta h =\) hauteur après coup \(-\) hauteur avant coup.
 \end{frame}
 \subsection{Mise à jour}
 \begin{frame}[c]{Mise à jour}
@@ -269,15 +300,16 @@
   \end{block}
   \pause{}
   \[
-    Q(s, a) \leftarrow Q(s,a) + \alpha
-    [r + \gamma \max_{a'} Q(s',a') - Q(s,a)]
+    Q(s_t, a_t) \leftarrow Q(s_t,a_t) + \alpha
+    [r_t + \gamma \max_{a_{t+1}} Q(s_{t+1},a_{t+1}) - Q(s_t,a_t)]
   \]
 \end{frame}
 
 \subsection{Paramétrage}
 \begin{frame}[c]{Paramètres}
   \begin{block}{Taux d'apprentissage \(\alpha\)}
-    Doit vérifier \(\sum_{k} a_k = \infty, \quad \sum_k a_k < \infty \).
+    Doit vérifier \(\sum_{k} \alpha_k = \infty, \quad
+    \sum_k \alpha_k^2 < \infty \).
     \pause{}
     Ici, \[ \alpha_k = \frac{1}{1 + Ck} \]
     Nous agirons sur \(C\).
@@ -285,29 +317,61 @@
   \pause{}
   \begin{block}{Vision de l'agent \(\gamma\)}
     Prise en compte des récompenses futures, \(\in [0,1]\).
-  \end{block}
-\end{frame}
-
-\begin{frame}[c]{Exploitation v exploration}
-  \begin{description}
-    \item[Exploration] balayer toutes les actions possibles
-    \item[Exploitation] tirer profit de l'apprentissage
-  \end{description}
-  \pause{}
-  \[ \Downarrow \]
-  \[ \text{Choix de } \epsilon \]
-  \begin{block}{Valeurs}
+    \pause{}
+    \begin{itemize}
+      \item \(\gamma \to 0 \implies\) Agent myope, pas de considération des
+        récompenses futures.
+      \item \(\gamma \to 1 \implies\) Valorise autant les récompenses futures
+        que la récompense immédiate.
+    \end{itemize}
   \end{block}
 \end{frame}
 
 \begin{frame}[c]{Qualification de l'agent}
-  \begin{description}
-    \item[Vitsse de décroissance] temps de passage au-dessous d'un seuil
-    \item[Hauteur finale] hauteur une fois celle ci stabilisée
+  \begin{description}[Hauteur finale]
+    \item[Décroissance] temps de passage au-dessous d'un seuil
+    \item[Hauteur finale] hauteur une fois celle-ci stabilisée
     \item[Stabilité] variation des hauteurs finales autour de la moyenne 
   \end{description}
-  \pause{}
-  + graph
+  \begin{figure}[H]
+    \begin{tikzpicture}
+      \begin{axis}[
+          line width=0.05, mark size = 0.1,
+          height = 0.5\linewidth,
+          width = \linewidth,
+          xlabel = jeux, ylabel = hauteur fin de jeu
+        ]
+        \addplot+ table [
+          x expr = {\lineno}, y index = 0,
+        ]
+        {data/gamma.dat};
+      \end{axis}
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[c]{Qualification de l'agent}
+  \begin{description}[Hauteur finale]
+    \item[Décroissance] temps de passage au-dessous d'un seuil
+    \item[Hauteur finale] hauteur une fois celle-ci stabilisée
+    \item[Stabilité] variation des hauteurs finales autour de la moyenne 
+  \end{description}
+  \begin{figure}[H]
+    \begin{tikzpicture}
+      \begin{axis}[
+          line width=0.05, mark size = 0.1,
+          height = 0.5\linewidth,
+          width = \linewidth,
+          xlabel = jeux, ylabel = hauteur fin de jeu
+        ]
+        \addplot+ table [
+          x expr = {\lineno}, y index = 0,
+        ]
+        {data/gamma.dat};
+        \addplot[domain=0:512]{100};
+      \end{axis}
+    \end{tikzpicture}
+  \end{figure}
 \end{frame}
 
 \begin{frame}[c]{Résultats}
@@ -315,8 +379,8 @@
     \begin{tikzpicture}
       \begin{axis}[line width=0.05, mark size = 0.1,
           legend entries={.002,.068,.134,.2},
-          xlabel = {Jeu},
-          ylabel = {Hauteur fin de jeu},
+          xlabel = {jeux},
+          ylabel = {hauteur fin de jeu},
           title = Apprentissages avec différents \(\epsilon\),
         ]
         \foreach \i in {0,1,...,3}{%
@@ -328,11 +392,11 @@
   \end{figure}
 \end{frame}
 
-\begin{frame}[c]{In fine}
+\begin{frame}[c]{Tests paramètres}
   \begin{block}{Protocole}
     \begin{itemize}
-      \item Seuil: nombre de jeux pour passer en dessous d'une hauteur finale
-        fixée.
+      \item Seuil défini par nombre de jeux pour passer en dessous d'une
+        hauteur finale fixée.
       \item Moyenne (moy.) et écarts types (e.t.) calculés sur les dernières
         parties.
     \end{itemize}
@@ -342,7 +406,7 @@
     \centering
     \begin{tabulary}{\linewidth}{|C|r|r|r||r|r|r|}
       \hline
-      & \(\alpha\) & \(\epsilon\) & \(\gamma\) & Moy. & E.t.\ & Seuil\\
+      & \(C\) & \(\epsilon\) & \(\gamma\) & Moy. & E.t.\ & Seuil\\
       \hline
       Moy. & 0.001 & 0.0025 & 0.65 & 1.14 & 1.08 & 68\\
       \hline
@@ -359,7 +423,8 @@
 \section{Valuation}
 \begin{frame}[c]{Fonction de valuation}
   \begin{block}{Motivation}
-    S'affranchir des contraintes mémoires liées à la Q matrice.
+    S'affranchir des contraintes mémoires liées à la Q matrice. Le nouvel état
+    contient le plateau entier.
   \end{block}
   \pause{}
   \begin{block}{Agent}
@@ -368,11 +433,11 @@
   \pause{}
   \begin{exampleblock}{Features}
     Caractéristiques utiles du plateau pour estimer l'espérance de récompense.
-    E.g.\ Nombre de trous, hauteur de la dernière pièce tombée\dots
+    E.g.\ Nombre de trous, hauteur de la dernière pièce tombée.
   \end{exampleblock}
   \pause{}
   \begin{block}{Apprentissage}
-    Modification des poids \(w\) composant \(V\) par descente de gradient.
+    Modification des poids composant \(V\) par descente de gradient.
   \end{block}
 \end{frame}
 
