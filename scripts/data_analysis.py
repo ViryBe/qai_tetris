@@ -17,9 +17,11 @@ def standard_deviation(l):
     return sqrt(sum / (len(l) -1))
 
 
-def compute_stats(dic_rslt, ntetro, ngames):
+def compute_stats(dic_rslt, ntetro, ngames, th):
     rslt = {}
-    threshold_height = ntetro / 100  # 1% of the nb of tetro
+    # threshold_height = ntetro / 100  # 1% of the nb of tetro
+    threshold_height = th
+
     threshold_means = int(ngames / 10)
 
     for key in dic_rslt:
@@ -43,6 +45,17 @@ def compute_stats(dic_rslt, ntetro, ngames):
             rslt[key] = [average(thresholds), average(means), average(standard_deviations)]
 
     return rslt
+
+
+def m(d):
+    s = 0
+    lenght = 0
+    for key in d:
+        for l in d[key]:
+            for h in l:
+                s += h
+                lenght += 1
+    return s/lenght
 
 
 def best_params(dict_stat, feature="th"):
@@ -109,16 +122,28 @@ def content_parser(filename):
     return rslt
 
 
+def affichage_rslts(r1, r2, r3):
+
+    print("                    |   {:<40} {:<10} {:<10} {:<10}".format("params", "mean", "s.d.", "th"))
+    print("best mean           |   {:<40} {:.2f}   |   {:.2f}   |   {:.2f}".format(r1[0], r1[1], r1[3], r1[2]))
+    print("best std deviation  |   {:<40} {:.2f}   |   {:.2f}   |   {:.2f}".format(r3[0], r3[1], r3[3], r3[2]))
+    print("best threashold     |   {:<40} {:.2f}   |   {:.2f}   |   {:.2f}".format(r2[0], r2[1], r2[3], r2[2]))
+
+
 if __name__ == '__main__':
     filename = argv[1]
     # ntetro = com_parser(filename)
     ngames, ntetro = com_parser(filename)
     dic_parsed = content_parser(filename)
-    dict_stat = compute_stats(dic_parsed, ntetro, ngames)
-    print("mean\tthreshold\tstandard deviation")
-    print("best mean")
-    print(best_params(dict_stat, 'mean'))
-    print("best threashold")
-    print(best_params(dict_stat, 'th'))
-    print("best standard_deviation")
-    print(best_params(dict_stat, 'var'))
+
+    # th = m(dic_parsed)
+    print("alpha   = [0.0001 0.0005 0.0007 0.0010 0.0012 0.0015 0.0020 0.0050 0.0100]")
+    print("epsilon = [0.0005 0.0010 0.0015 0.0020 0.0025 0.0100 0.0200 0.1000 0.1500]")
+    print("gamma   = [0.5500 0.6000 0.6500 0.7000 0.7500 0.8000 0.8500 0.9000 0.9500 1.0000]")
+    th = 100
+    print("threashold = {}".format(th))
+    dict_stat = compute_stats(dic_parsed, ntetro, ngames, th)
+    r1 = best_params(dict_stat, 'mean')
+    r2 = best_params(dict_stat, 'th')
+    r3 = best_params(dict_stat, 'var')
+    affichage_rslts(r1, r2, r3)
