@@ -9,6 +9,14 @@
 \usepackage{ulem}
 \usepackage{gensymb}
 \usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{float}
+\usepackage{subfig}
+
+\DeclareMathOperator{\card}{card}
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\uniform}{Uniform}
 
 \usecolortheme{dolphin}
 
@@ -84,10 +92,11 @@
   \end{frame}
 }
 
-\section{Methode d'apprentissage}
-\begin{frame}[t]{Apprentissage par renforcement}
+\section{Apprentissage}
+\subsection{Version}
+\begin{frame}{Apprentissage par renforcement}
   \begin{block}{Principe}
-    Une entité évoluant dans son environnement se voit attribuées des
+    Un agent évoluant dans son environnement se voit attribuer des
     récompenses en fonction de la pertinence de ses actions.
     \begin{figure}[h]
       \begin{center}
@@ -107,31 +116,128 @@
   \end{block}
 \end{frame}
 
-\section{Vie de l'agent, choix des actions et autres questions metaphysiques}
-\begin{frame}[t]{Agent}
-  \begin{block}{Definition}
-    L'agent évolue dans son environnement. Il effectue des actions dans le but
-    de maximiser l'espérance de récompense.
-  \end{block}
-\end{frame}
-\begin{frame}[t]{Representation}
-  \begin{block}{Esperances de recompenses}
-    Stockées dans une matrice. Associe a un état et une action une espérance de
-    récompense.
-  \end{block}
-\end{frame}
 
-\section{Effectuer une action, conséquences}
+\subsection{Méthode employée}
 
-\section{Évolution de l'agent, apprentissage}
-
-\section{Conception modulaire}
-\begin{frame}[t]{Séparation du code}
-  \begin{block}{Inspiration}
-    Calquée sur le jeu de tetris, un joueur et le jeu \(\rightarrow\)
-    \texttt{agent} et \texttt{game}.
+\begin{frame}{Q learning}
+  \begin{block}{Agent}
+    Utilise une matrice Q pour stocker les espérances de récompense.
   \end{block}
+  \begin{itemize}
+    \item Les colonnes de la matrice correspondent à une action.
+    \item Les lignes de la matrice correspondent aux états.
+  \end{itemize}
 \end{frame}
 
-\section{Un agent, des agents?}
+\subsection{Choix de l'action}
+
+\begin{frame}{État}
+  Données utiles de l'environnement pour jouer une action.
+
+  \begin{block}{Obtention}
+    \[
+      \text{plateau} \pause{} + \text{pièce} \pause{} = \text{état}
+      \pause{} \in \mathbf{N}
+    \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{Choix de l'action}
+    \(Q(s, a)\) approxime la récompense a long terme,
+    \pause{}
+    \[ \text{action choisie} = \argmax_a Q(s, a) \]
+    \pause{}
+  \begin{algorithm}[H]
+      \caption{Choix de l'action}\label{alg:action}
+      \begin{algorithmic}
+        [1]
+        \Procedure{ChooseAction}{$Q$, $s$, $\mathcal{A}$}
+        \State{} tirage \(\gets \uniform([0, 1])\)
+        \If{tirage \(> \epsilon\)}
+        \Return{\(\argmax_{a\in\mathcal{A}} Q(s, a)\)}
+        \Else{}
+        \Return{\(\uniform(\mathcal{A})\)}
+        \EndIf{}
+        \EndProcedure{}
+      \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+\section{Environnement Tetris}
+\subsection{Tetromino}
+\begin{frame}[c]{Tetromino}
+  \begin{block}{Représentation}
+    Matrice \(2 \times 2\) d'entiers
+  \end{block}
+  \begin{figure}[h]
+    \centering
+    \subfloat[Diagonale] {%
+      \begin{tikzpicture}
+        \fill[color=magenta] (0,0) rectangle (1,1);
+        \fill[color=magenta] (0,0) rectangle (-1,-1);
+        \draw (-1,1) rectangle (1,-1);
+      \end{tikzpicture}
+    }\qquad
+    \subfloat[L] {%
+      \begin{tikzpicture}
+        \fill[color=cyan] (0,0) rectangle (1,1);
+        \fill[color=cyan] (0,0) rectangle (-1,-1);
+        \fill[color=cyan] (0,0) rectangle (-1,1);
+        \draw (-1,1) rectangle (1,-1);
+      \end{tikzpicture}
+    }\qquad
+    \subfloat[Carré] {%
+      \begin{tikzpicture}
+        \fill[color=yellow] (0,0) rectangle (1,1);
+        \fill[color=yellow] (0,0) rectangle (-1,-1);
+        \fill[color=yellow] (0,0) rectangle (-1,1);
+        \fill[color=yellow] (0,0) rectangle (1,-1);
+        \draw (-1,1) rectangle (1,-1);
+      \end{tikzpicture}
+    }\\
+    \subfloat[Barre] {%
+      \begin{tikzpicture}
+        \fill[color=green] (0,0) rectangle (-1,-1);
+        \fill[color=green] (0,0) rectangle (-1,1);
+        \draw (-1,1) rectangle (1,-1);
+      \end{tikzpicture}
+    }\qquad
+    \subfloat[Point] {%
+      \begin{tikzpicture}
+        \fill[color=red] (0,0) rectangle (-1,1);
+        \draw (-1,1) rectangle (1,-1);
+      \end{tikzpicture}
+    }
+    \caption{Liste des tetrominos}\label{fig:tetrolist}
+  \end{figure}
+\end{frame}
+
+\subsection{Action}
+\begin{frame}[c]{Action}
+  \begin{block}{Définition}
+    Données utiles au placement d'un tetromino sur le plateau.
+    \[ \text{action} = \text{orientation} + \text{translation} \]
+  \end{block}
+
+  \begin{block}{Subdef}
+    \begin{itemize}
+      \item translation \(\in [0, 5]\)
+      \item orientation \(\in \{\)North, South, East, West\(\}\)
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Tetromino flottant}
+    schema here. Un ensemble d'orientations par tetromino.
+  \end{alertblock}
+\end{frame}
+\subsection{Gestion du plateau}
+
+
+\section{Evolution de l'agent}
+\subsection{Mise a jour}
+\subsection{Resultats}
+\subsection{Paametrage}
+
+
+\section{Valuation}
+
 \end{document}
