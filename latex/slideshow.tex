@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{amsmath}
+\usepackage{stmaryrd}
 \usepackage{color,graphicx}
 \usepackage{gensymb}
 \usepackage{tikz,pgfplots}
@@ -97,7 +98,7 @@
 \end{frame}
 
 \section{Apprentissage}
-\subsection{Version}
+\subsection{Apprentissage par renforcement}
 \begin{frame}{Apprentissage par renforcement}
   \begin{block}{Principe}
     Un agent évoluant dans son environnement se voit attribuer des
@@ -135,9 +136,12 @@
 
 \subsection{Choix de l'action}
 
-\begin{frame}{État}
+\begin{frame}{État (\(s\))}
   Données utiles de l'environnement pour jouer une action.
 
+  \begin{exampleblock}{Dans notre cas}
+    Les deux plus hautes lignes non vides du plateau.
+  \end{exampleblock}
   \begin{block}{Obtention}
     \[
       \text{plateau} \pause{} + \text{pièce} \pause{} = \text{état}
@@ -149,7 +153,7 @@
 \begin{frame}{Choix de l'action}
     \(Q(s, a)\) approxime la récompense a long terme,
     \pause{}
-    \[ \text{action choisie} = \argmax_a Q(s, a) \]
+    \[ \text{action choisie} = \underset{a}{\argmax} Q(s, a) \]
     \pause{}
   \begin{algorithm}[H]
       \caption{Choix de l'action}\label{alg:action}
@@ -220,12 +224,13 @@
 \begin{frame}[c]{Mouvement}
   \begin{block}{Définition}
     Données utiles au placement d'un tetromino sur le plateau.
-    \[ \text{action} = \text{orientation} + \text{translation} \]
+    \pause{}
+    \[ \text{mouvement} = \text{orientation} + \text{translation} \]
   \end{block}
-
+  \pause{}
   \begin{block}{Types}
     \begin{itemize}
-      \item translation \(\in [0, 4]\)
+      \item translation \(\in \llbracket 0, 4 \rrbracket\)
       \item orientation \(\in \{\)North, South, East, West\(\}\)
     \end{itemize}
   \end{block}
@@ -248,19 +253,21 @@
 \subsection{Récompense}
 \begin{frame}[c]{Récompense ou pénalité}
   \begin{block}{Motivation}
-    Quantifie la pertinence du mouvement effectué
+    Quantifie la pertinence du mouvement effectué.
   \end{block}
   \pause{}
   \begin{block}{Objectif de l'agent}
-    Minimiser la hauteur finale
+    Minimiser la hauteur finale.
   \end{block}
-  \[ R(\delta h) = -100 \cdot \delta h \]
+  \pause{}
+  \[ R(\delta h) = k \cdot \delta h, k < 0 \]
 \end{frame}
 \subsection{Mise à jour}
 \begin{frame}[c]{Mise à jour}
   \begin{block}{Besoin}
     Prendre en compte les récompenses pour modifier le comportement de l'agent.
   \end{block}
+  \pause{}
   \[
     Q(s, a) \leftarrow Q(s,a) + \alpha
     [r + \gamma \max_{a'} Q(s',a') - Q(s,a)]
@@ -270,11 +277,12 @@
 \subsection{Paramétrage}
 \begin{frame}[c]{Paramètres}
   \begin{block}{Taux d'apprentissage \(\alpha\)}
-    Doit vérifier \(\sum_{k} a_k = \infty, \quad \sum_k a_k < \infty \). Ici,
-    \[ \alpha_k = \frac{1}{1 + Ck} \]
+    Doit vérifier \(\sum_{k} a_k = \infty, \quad \sum_k a_k < \infty \).
+    \pause{}
+    Ici, \[ \alpha_k = \frac{1}{1 + Ck} \]
     Nous agirons sur \(C\).
   \end{block}
-
+  \pause{}
   \begin{block}{Vision de l'agent \(\gamma\)}
     Prise en compte des récompenses futures, \(\in [0,1]\).
   \end{block}
@@ -285,6 +293,7 @@
     \item[Exploration] balayer toutes les actions possibles
     \item[Exploitation] tirer profit de l'apprentissage
   \end{description}
+  \pause{}
   \[ \Downarrow \]
   \[ \text{Choix de } \epsilon \]
   \begin{block}{Valeurs}
@@ -297,6 +306,7 @@
     \item[Hauteur finale] hauteur une fois celle ci stabilisée
     \item[Stabilité] variation des hauteurs finales autour de la moyenne 
   \end{description}
+  \pause{}
   + graph
 \end{frame}
 
@@ -327,6 +337,7 @@
         parties.
     \end{itemize}
   \end{block}
+  \pause{}
   \begin{table}
     \centering
     \begin{tabulary}{\linewidth}{|C|r|r|r||r|r|r|}
