@@ -87,7 +87,7 @@ let init_qmat qmat =
   List.iter init_qmat_aux Game.Tetromino.set
 
 (** Function updating Q matrix, plays one game *)
-let update_qmat bheight qmat eps gam alpha ntetr =
+let update_qmat bheight qmat eps gam alpha ntetr ngame =
   (* Initialise state *)
   let board = Game.Board.make bheight
   and tetromino = ref (Game.Tetromino.make_rand ()) in
@@ -106,7 +106,7 @@ let update_qmat bheight qmat eps gam alpha ntetr =
     and nstate = get_state board !tetromino in
     (* Update Q matrix *)
     qmat.(!state).(act_ind) <- qmat.(!state).(act_ind) +.
-                               (alpha i) *.  (reward +.
+                               (alpha (i + ngame)) *.  (reward +.
                                 gam *. (Auxfct.flarray_max qmat.(nstate)) -.
                                 qmat.(!state).(act_ind));
     state := nstate ;
@@ -118,8 +118,8 @@ let update_qmat bheight qmat eps gam alpha ntetr =
 let train qmat eps gam alpha ngames ntetr =
   (* Should ideally be updated during process, limiting height *)
   let bh = 2 * ntetr + 1 in
-  for i = 0 to ngames do
-    let fboard = (update_qmat bh qmat eps gam alpha ntetr) in
+  for i = 0 to ngames - 1 do
+    let fboard = (update_qmat bh qmat eps gam alpha ntetr i) in
     let fheight = Game.Board.height fboard in
     Printf.printf "%d\n" fheight
   done
