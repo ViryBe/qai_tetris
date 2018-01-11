@@ -28,6 +28,8 @@ latex/*.toc
 latex/*.log
 latex/*.nav
 latex/*.snm
+latex/*.vrb
+latex/pics/
 latex/data
 
 # vim specific files
