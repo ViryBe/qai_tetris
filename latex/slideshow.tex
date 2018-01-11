@@ -99,10 +99,10 @@
 \begin{frame}[c]{Introduction}
   \begin{center}
     \begin{minipage}[c]{0.4\linewidth}
-      \includegraphics[height=6cm]{tetris.png}
+      \includegraphics[height=6cm]{pics/tetris.png}
     \end{minipage}
     \begin{minipage}[c]{0.4\linewidth}
-      \includegraphics[height=3cm]{alphago.jpg}
+      \includegraphics[height=3cm]{pics/alphago.jpg}
     \end{minipage}
   \end{center}
 \end{frame}
@@ -156,7 +156,7 @@
   \end{exampleblock}
   \begin{block}{Obtention}
     \[
-      \text{état} = \text{plateau} + \text{pièce} =
+      \text{état} = \text{plateau} + \text{pièce}
       \pause{} \in \mathbb{N}
     \]
   \end{block}
@@ -262,13 +262,25 @@
   \end{block}
 \end{frame}
 
-\subsection{Gestion du plateau}
+\subsection{Réalisation du mouvement}
 \begin{frame}[c]{Réalisation du mouvement et conséquences}
   \begin{block}{Plateau}
     Matrice d'entiers de largeur 6.
   \end{block}
   \begin{block}{Placement vertical}
-    Évaluation des collisions : collision \(\rightarrow\) placé en amont
+    Évaluation successive des collisions, placement en amont de la première
+    collision.
+    \begin{columns}[t]
+      \begin{column}{0.33\linewidth}
+        \includegraphics[height=4cm]{pics/mvt_1.png}
+      \end{column}
+      \begin{column}{0.34\linewidth}
+        \includegraphics[height=4cm]{pics/mvt_2.png}
+      \end{column}
+      \begin{column}{0.33\linewidth}
+        \includegraphics[height=4cm]{pics/mvt_3.png}
+      \end{column}
+    \end{columns}
   \end{block}
 \end{frame}
 \begin{frame}[c]{Ligne pleine}
@@ -276,7 +288,18 @@
     Ligne remplie enlevée du jeu
   \end{block}
   \begin{alertblock}{Tetromino flottant}
-    schema here. Pour résoudre : un ensemble d'orientations par tetromino.
+    \begin{columns}[t]
+      \begin{column}{0.5\linewidth}
+        Résolu par un ensemble d'actions propre à chaque tetromino.
+      \end{column}
+      \begin{column}{0.5\linewidth}
+          \begin{figure}[H]
+            \centering
+            \includegraphics[height=3cm]{pics/floating_tetr.png}
+            \caption{Tetromino flottant}
+          \end{figure}
+      \end{column}
+    \end{columns}
   \end{alertblock}
 \end{frame}
 
