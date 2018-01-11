@@ -29,8 +29,7 @@ latex/*.log
 latex/*.nav
 latex/*.snm
 latex/*.vrb
-latex/*.png
-latex/*.jpg
+latex/pics/
 latex/data
 
 # vim specific files
