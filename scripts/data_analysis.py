@@ -47,17 +47,6 @@ def compute_stats(dic_rslt, ntetro, ngames, th):
     return rslt
 
 
-def m(d):
-    s = 0
-    lenght = 0
-    for key in d:
-        for l in d[key]:
-            for h in l:
-                s += h
-                lenght += 1
-    return s/lenght
-
-
 def best_params(dict_stat, feature="th"):
     """
     feature : 'mean' | 'var' | 'th'
@@ -77,6 +66,9 @@ def best_params(dict_stat, feature="th"):
 
 
 def com_parser(filename):
+    """
+    renvoie le nombre de tetrominos et de parties à partir du fichier filename
+    """
     with open(filename, "r") as f:
         ngames = 0
         ntetro = 0
@@ -131,17 +123,20 @@ def affichage_rslts(r1, r2, r3):
 
 
 if __name__ == '__main__':
+    """
+    il faut un param -> le nom du fichier a analyser
+    """
     filename = argv[1]
-    # ntetro = com_parser(filename)
     ngames, ntetro = com_parser(filename)
     dic_parsed = content_parser(filename)
 
-    # th = m(dic_parsed)
     print("alpha   = [0.0001 0.0005 0.0007 0.0010 0.0012 0.0015 0.0020 0.0050 0.0100]")
     print("epsilon = [0.0005 0.0010 0.0015 0.0020 0.0025 0.0100 0.0200 0.1000 0.1500]")
     print("gamma   = [0.5500 0.6000 0.6500 0.7000 0.7500 0.8000 0.8500 0.9000 0.9500 1.0000]")
+
     th = 100
     print("threashold = {}".format(th))
+
     dict_stat = compute_stats(dic_parsed, ntetro, ngames, th)
     r1 = best_params(dict_stat, 'mean')
     r2 = best_params(dict_stat, 'th')
